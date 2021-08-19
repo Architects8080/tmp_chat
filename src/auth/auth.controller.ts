@@ -34,11 +34,11 @@ export class AuthController {
     if (token) {
       res.cookie('access_token', token);
       return res.redirect(
-        `${this.configService.get<string>('CLIENT_ADDRESS')}/main`,
+        `${this.configService.get<string>('client_address')}/main`,
       );
     }
     return res.redirect(
-      `${this.configService.get<string>('CLIENT_ADDRESS')}/register`,
+      `${this.configService.get<string>('client_address')}/register`,
     );
   }
 

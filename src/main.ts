@@ -10,7 +10,7 @@ async function bootstrap() {
   app.use(
     cookieParser(),
     session({
-      secret: 'this is secret',
+      secret: configService.get<string>('session.secret'),
       resave: false,
       saveUninitialized: true,
     }),
