@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Query, Req, UseFilters } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 
 @Controller('user')
@@ -11,9 +19,9 @@ export class UserController {
   }
 
   @Post()
-  async creatUser(@Body() req, @Body('nickname')  nickname: string) {
+  async creatUser(@Body() req) {
     // req -> req.user로 변경이 필요
-    return this.userService.createUser(req, nickname);
+    return this.userService.createUser(req);
   }
 
   @Get(':id')
