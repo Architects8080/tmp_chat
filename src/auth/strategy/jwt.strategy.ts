@@ -1,6 +1,7 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
+import * as cookie from 'cookie';
 import { Strategy } from 'passport-jwt';
 import { AuthService } from '../auth.service';
 import { JwtDto } from '../dto/jwt.dto';
@@ -9,6 +10,8 @@ var cookieExtractor = function (req) {
   var token = null;
   if (req && req.cookies) {
     token = req.cookies['access_token'];
+  } else if (req && req.request) {
+    token = cookie.parse(req.request.headers.cookie)['access_token'];
   }
   return token;
 };

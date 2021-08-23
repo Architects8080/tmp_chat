@@ -13,9 +13,7 @@ export class AuthService {
 
   async sign({ id }) {
     const payload = { id: id };
-    return {
-      access_token: this.jwtService.sign(payload),
-    };
+    return this.jwtService.sign(payload);
   }
 
   async login(user: any, session: Record<string, User>) {
@@ -44,7 +42,7 @@ export class AuthService {
     session.newUser.nickname = nickname;
     await this.userService.createUser(session.newUser);
 
-    return this.login(session.newUser, session); //will return jwt
+    return this.login(session.newUser, session); // will return jwt
   }
 
   //jwt validate
