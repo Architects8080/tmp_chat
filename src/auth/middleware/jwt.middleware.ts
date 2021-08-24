@@ -20,7 +20,7 @@ export class JwtMiddleware implements NestMiddleware {
       const leftExpiredTime = decoded.exp - Date.now() / 1000;
       if (leftExpiredTime < 3600) {
         const newToken = await this.authService.sign({ id: decoded.id });
-        res.cookie('access_token', newToken.access_token);
+        res.cookie('access_token', newToken);
       }
     } catch (error) {}
     next();
