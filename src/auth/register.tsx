@@ -36,7 +36,7 @@ function Register() {
 				setRegisted(true);
 			})
 		}catch (error) { //forbidden (already existed user)
-			console.log("error! redirect to main.")
+			console.log("error! redirect to main.");
 			setForbiddenError(true);
 		}
 		setForm({

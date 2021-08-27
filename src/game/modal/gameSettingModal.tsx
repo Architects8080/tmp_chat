@@ -24,14 +24,14 @@ function GameSettingModal({open, close, header, children}: ModalProps) {
 		"https://rembound.com/files/pong-flash-demo.png",
 		"https://www.imaginarycloud.com/blog/content/images/2019/02/Pong.jpg",
 		"https://raw.githubusercontent.com/godotengine/godot-demo-projects/3.2-57baf0a/2d/pong/screenshots/pong.png"
-	]
+	];
 
 	const dropdownRef = useRef(null);
 	const [isActive, setIsActive] = useDetectOutsideClick(dropdownRef, false);
 	const [currentImageIdx, setcurrentImageIdx] = useState(0);
 
 	const [isSelect, setIsSelect] = useState(false);
-	const [buttonText, setButtonText] = useState("맵 선택")
+	const [buttonText, setButtonText] = useState("맵 선택");
 
 	var isChecked = false;
 
@@ -39,13 +39,13 @@ function GameSettingModal({open, close, header, children}: ModalProps) {
 		setButtonText("맵 선택");
 		setIsSelect(false);
 		setcurrentImageIdx(0);
-	}, [])
+	}, []);
 
 	const onClick = (label: string) => {
 		return (event: React.MouseEvent) => {
 			setButtonText(label);
 			if (label != "맵 선택")
-				setIsSelect(true)
+				setIsSelect(true);
 			setIsActive(!isActive);
 			event.preventDefault();
 		}
@@ -65,15 +65,15 @@ function GameSettingModal({open, close, header, children}: ModalProps) {
 
 	const handleChangeEvent = (e: React.ChangeEvent<HTMLInputElement>) => {
 		isChecked = e.target.checked;
-		console.log(`isChecked`, isChecked)
+		console.log(`isChecked`, isChecked);
 	}
 
 	const handleSubmit = (event: React.MouseEvent) => {
-		console.log(`user submit!`)
-		console.log(`1. map idx ? : `, currentImageIdx)
+		console.log(`user submit!`);
+		console.log(`1. map idx ? : `, currentImageIdx);
 		console.log(`2. is Obstacle? : `, isChecked);
 		// server send
-		close()
+		close();
 	}
 
 	return (

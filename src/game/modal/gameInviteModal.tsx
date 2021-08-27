@@ -3,7 +3,7 @@ import "./modal.css";
 
 type User = {
 	nickname: string,
-	avater: string
+	avater: string,
 }
 
 type ModalProps = {
@@ -17,15 +17,15 @@ type ModalProps = {
 
 function GameInviteModal({open, close, header, user, isCustom}: ModalProps) {
 	const handleAccept = () => {
-		console.log(`${user.nickname}님이 accept 버튼을 눌렀습니다.`)
+		console.log(`${user.nickname}님이 accept 버튼을 눌렀습니다.`);
 		//server send
-		close()
+		close();
 	}
 
 	const handleReject = (event: React.MouseEvent) => {
-		console.log(`${user.nickname}님이 reject 버튼을 눌렀습니다.`)
+		console.log(`${user.nickname}님이 reject 버튼을 눌렀습니다.`);
 		// server send
-		close()
+		close();
 	}
 
 	return (
