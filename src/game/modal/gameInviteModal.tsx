@@ -11,20 +11,27 @@ type ModalProps = {
 	close: any;
 	header: any;
 	user: User;
-	isCustom: number;
+	accept: any,
+	reject: any,
 	children: React.ReactNode;
 }
 
-function GameInviteModal({open, close, header, user, isCustom}: ModalProps) {
+function GameInviteModal({open, close, header, user, accept, reject}: ModalProps) {
 	const handleAccept = () => {
-		console.log(`${user.nickname}님이 accept 버튼을 눌렀습니다.`);
 		//server send
+		console.log(`${user.nickname}님이 accept 버튼을 눌렀습니다.`);
+
+		//server response
+		accept();
 		close();
 	}
 
 	const handleReject = (event: React.MouseEvent) => {
-		console.log(`${user.nickname}님이 reject 버튼을 눌렀습니다.`);
 		// server send
+		console.log(`${user.nickname}님이 reject 버튼을 눌렀습니다.`);
+
+		// server response
+		reject();
 		close();
 	}
 

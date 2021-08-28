@@ -4,6 +4,7 @@ import { Route } from 'react-router-dom';
 import Login from './auth/login';
 import Main from './auth/main';
 import Register from './auth/register';
+import Game from './game/modal/game';
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
 		<Route exact path="/" component={Login}/>
 		<Route path="/main" component={Main}/>
 		<Route path="/register" component={Register}/>
+		<Route path="/game" component={Game}/>
 	</div>
   );
 }
