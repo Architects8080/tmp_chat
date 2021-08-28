@@ -17,7 +17,7 @@ type ModalProps = {
 // 	isObstacle: boolean;
 // }
 
-function GameSettingModal({open, close, header, children}: ModalProps) {
+function GameSettingModal(prop: ModalProps) {
 
 	const imgURL: string[] = [
 		"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfA4HU79bnFZF2GXuPt-G-8aW-lA7HtIvWKlrbPdvRqZUsoQSzn_K9II6tX1Xff_5A_Bo&usqp=CAU",
@@ -77,11 +77,11 @@ function GameSettingModal({open, close, header, children}: ModalProps) {
 	}
 
 	return (
-		<div className={ open ? 'openModal modal' : 'modal'}>
-			{ open ? (
+		<div className={ prop.open ? 'openModal modal' : 'modal'}>
+			{ prop.open ? (
 				<section>
 					<div className="modal-title">
-						{header}
+						{prop.header}
 						<button className="modal-close" onClick={close}> X </button>
 					</div>
 					<div className="explain">

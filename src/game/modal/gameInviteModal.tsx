@@ -16,31 +16,31 @@ type ModalProps = {
 	children: React.ReactNode;
 }
 
-function GameInviteModal({open, close, header, user, accept, reject}: ModalProps) {
+function GameInviteModal(prop: ModalProps) {
 	const handleAccept = () => {
 		//server send
-		console.log(`${user.nickname}님이 accept 버튼을 눌렀습니다.`);
+		console.log(`${prop.user.nickname}님이 accept 버튼을 눌렀습니다.`);
 
 		//server response
-		accept();
+		prop.accept();
 		close();
 	}
 
 	const handleReject = (event: React.MouseEvent) => {
 		// server send
-		console.log(`${user.nickname}님이 reject 버튼을 눌렀습니다.`);
+		console.log(`${prop.user.nickname}님이 reject 버튼을 눌렀습니다.`);
 
 		// server response
-		reject();
+		prop.reject();
 		close();
 	}
 
 	return (
-		<div className={ open ? 'openModal modal' : 'modal'}>
-			{ open ? (
+		<div className={ prop.open ? 'openModal modal' : 'modal'}>
+			{ prop.open ? (
 				<section>
 					<div className="modal-title">
-						{header}
+						{prop.header}
 						<button className="modal-close" onClick={close}> X </button>
 					</div>
 
@@ -48,19 +48,19 @@ function GameInviteModal({open, close, header, user, accept, reject}: ModalProps
 					{/* from Server get ImageURL*/}
 					<div className="modal-content center">
 						<div className="image-cropper">
-							<img src={user.avater} className="rounded"/> 
+							<img src={prop.user.avater} className="rounded"/> 
 						</div>
 					</div>
 
 					{/* 2번째 subtitle */}
 					{/* from Server get nick */}
 					<div className="modal-content center">
-						{user.nickname}
+						{prop.user.nickname}
 					</div>
 
 					{/* 3번째 subtitle */}
 					<div className="game-invite">
-						{user.nickname}님의 게임 신청이 도착했습니다.<br/><br/>
+						{prop.user.nickname}님의 게임 신청이 도착했습니다.<br/><br/>
 							게임 신청을 수락하시겠습니까?
 					</div>
 					<div className="gameInvite-submit">

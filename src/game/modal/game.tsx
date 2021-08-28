@@ -18,6 +18,7 @@ type snackbarProp = {
 
 function Game() {
 
+	// snackbar part
 	const { enqueueSnackbar } = useSnackbar();
 	const acceptMessage = `곧 게임이 시작되니 준비하십시오.`;
 	const rejectMessage = `상대방이 게임을 거절했습니다.`;
@@ -32,6 +33,15 @@ function Game() {
 		})
 	}
 
+	const acceptGameInvite = () => {
+		showSnackbar({message: acceptMessage, variant: "success"});
+	}
+
+	const rejectGameInvite = () => {
+		showSnackbar({message: rejectMessage, variant: "error"});
+	}
+
+	// modal part
 	const [isGameSettingModalOpen, setGameSettingModalOpen] = useState(false);
 	const [isGameInviteModalOpen, setGameInviteModalOpen] = useState(false);
 
@@ -49,14 +59,6 @@ function Game() {
 
 	const closeGameInviteModal = () => {
 		setGameInviteModalOpen(false);
-	}
-
-	const acceptGameInvite = () => {
-		showSnackbar({message: acceptMessage, variant: "success"});
-	}
-
-	const rejectGameInvite = () => {
-		showSnackbar({message: rejectMessage, variant: "error"});
 	}
 
 	return (
