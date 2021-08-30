@@ -1,0 +1,85 @@
+import { UseGuards } from '@nestjs/common';
+import {
+  WebSocketGateway,
+  WebSocketServer,
+  SubscribeMessage,
+  MessageBody,
+  ConnectedSocket,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+} from '@nestjs/websockets';
+import { Server } from 'socket.io';
+import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
+import { SocketUser } from 'src/socket/socket-user';
+import { GameService } from './game.service';
+import { SocketUserService } from './socket-user.service';
+
+@UseGuards(JwtAuthGuard)
+@WebSocketGateway(4000, { namespace: 'game' })
+export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
+  constructor(
+    private gameService: GameService,
+    private socketUserService: SocketUserService,
+  ) {}
+
+  @WebSocketServer()
+  server: Server;
+
+  handleConnection(client: SocketUser, ...args: any[]) {
+    this.socketUserService.addSocket(client);
+  }
+
+  handleDisconnect(client: SocketUser) {
+    this.socketUserService.removeSocket(client);
+  }
+
+  @SubscribeMessage('invite')
+  inviteGame(
+    @MessageBody() data: any[],
+    @ConnectedSocket() client: SocketUser,
+  ) {
+    const targetUserId = data[0];
+    const targetUser = this.socketUserService.getSocketById(targetUserId);
+
+    if (targetUser) {
+      const roomId: number = this.gameService.invite(
+        client.user.id,
+        targetUser.user.id,
+      );
+
+      targetUser.emit('invite', client.user.id, roomId);
+    }
+  }
+
+  @SubscribeMessage('accept')
+  acceptGame(
+    @MessageBody() data: any[],
+    @ConnectedSocket() client: SocketUser,
+  ) {
+    const roomId = data[0];
+    const acceptedRoom = this.gameService.accept(client.user.id, roomId);
+
+    if (acceptedRoom) {
+      const player1 = this.socketUserService.getSocketById(acceptedRoom.player1.id);
+      const player2 = this.socketUserService.getSocketById(acceptedRoom.player2.id);
+
+      if (!player1 || !player2) {
+        // exception
+      }
+      player1.emit('ready', roomId);
+      player2.emit('ready', roomId);
+    }
+  }
+
+  @SubscribeMessage('cancel')
+  cancelGame(
+    @MessageBody() data: any[],
+    @ConnectedSocket() client: SocketUser,
+  ) {
+    const roomId = data[0];
+    const canceledPlayer = this.gameService.cancel(client.user.id, roomId);
+
+    if (canceledPlayer)
+      canceledPlayer.emit('cancel', roomId);
+  }
+}
