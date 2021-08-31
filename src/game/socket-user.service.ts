@@ -3,7 +3,7 @@ import { SocketUser } from 'src/socket/socket-user';
 
 @Injectable()
 export class SocketUserService {
-  private socketUser: Map<number, SocketUser>;
+  private socketUser: Map<number, SocketUser> = new Map();
 
   // mutable object;
   getAllSocket() {

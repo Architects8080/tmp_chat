@@ -1,4 +1,5 @@
 import { UseGuards } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import {
   WebSocketGateway,
   WebSocketServer,
@@ -10,6 +11,7 @@ import {
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
+import { cookieExtractor, JwtStrategy } from 'src/auth/strategy/jwt.strategy';
 import { SocketUser } from 'src/socket/socket-user';
 import { GameService } from './game.service';
 import { SocketUserService } from './socket-user.service';
@@ -18,6 +20,8 @@ import { SocketUserService } from './socket-user.service';
 @WebSocketGateway(4000, { namespace: 'game' })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
+    private jwtService: JwtService,
+    private jwtStrategy: JwtStrategy,
     private gameService: GameService,
     private socketUserService: SocketUserService,
   ) {}
@@ -25,12 +29,26 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
-  handleConnection(client: SocketUser, ...args: any[]) {
-    this.socketUserService.addSocket(client);
+  async handleConnection(client: SocketUser, ...args: any[]) {
+    try {
+      const token = cookieExtractor(client);
+      const userPayload = this.jwtService.verify(token);
+      const user = await this.jwtStrategy.validate(userPayload);
+      client.user = user;
+      this.socketUserService.addSocket(client);
+    } catch (error) {
+      client.disconnect(true);
+    }
   }
 
-  handleDisconnect(client: SocketUser) {
-    this.socketUserService.removeSocket(client);
+  async handleDisconnect(client: SocketUser) {
+    try {
+      const token = cookieExtractor(client);
+      const userPayload = this.jwtService.verify(token);
+      const user = await this.jwtStrategy.validate(userPayload);
+      client.user = user;
+      this.socketUserService.removeSocket(client);
+    } catch (error) {}
   }
 
   @SubscribeMessage('invite')
@@ -60,8 +78,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const acceptedRoom = this.gameService.accept(client.user.id, roomId);
 
     if (acceptedRoom) {
-      const player1 = this.socketUserService.getSocketById(acceptedRoom.player1.id);
-      const player2 = this.socketUserService.getSocketById(acceptedRoom.player2.id);
+      const player1 = this.socketUserService.getSocketById(
+        acceptedRoom.player1.id,
+      );
+      const player2 = this.socketUserService.getSocketById(
+        acceptedRoom.player2.id,
+      );
 
       if (!player1 || !player2) {
         // exception
@@ -79,7 +101,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const roomId = data[0];
     const canceledPlayer = this.gameService.cancel(client.user.id, roomId);
 
-    if (canceledPlayer)
-      canceledPlayer.emit('cancel', roomId);
+    if (canceledPlayer) canceledPlayer.emit('cancel', roomId);
   }
 }

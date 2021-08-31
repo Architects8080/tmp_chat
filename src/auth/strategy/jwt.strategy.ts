@@ -6,8 +6,8 @@ import { Strategy } from 'passport-jwt';
 import { AuthService } from '../auth.service';
 import { JwtDto } from '../dto/jwt.dto';
 
-var cookieExtractor = function (req) {
-  var token = null;
+export const cookieExtractor = function (req) {
+  let token = null;
   if (req && req.cookies) {
     token = req.cookies['access_token'];
   } else if (req && req.request) {
