@@ -3,7 +3,10 @@ import { ConfigService } from '@nestjs/config';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 
 export class SocketCorsAdapter extends IoAdapter {
-  constructor(app: INestApplicationContext, private configService: ConfigService) {
+  constructor(
+    app: INestApplicationContext,
+    private configService: ConfigService,
+  ) {
     super(app);
   }
 
@@ -11,7 +14,7 @@ export class SocketCorsAdapter extends IoAdapter {
     options.cors = {
       origin: this.configService.get<string>('client_address'),
       credentials: true,
-    } 
+    };
     return super.create(port, options);
   }
 }
