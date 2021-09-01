@@ -15,6 +15,7 @@ import { Request, Response } from 'express';
 import { User } from 'src/user/entity/user.entity';
 import { AuthService } from './auth.service';
 import { FTAuthGuard } from './guard/ft-auth.guard';
+import { JwtAuthGuard } from './guard/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -22,6 +23,18 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly configService: ConfigService,
   ) {}
+
+  @UseGuards(JwtAuthGuard)
+  @Get('test')
+  async test(@Req() req, @Res({ passthrough: true }) res: Response) {
+    const token = await this.authService.sign(req.user);
+    if (token) {
+      res.cookie('access_token', token);
+      return res.redirect(
+        `${this.configService.get<string>('client_address')}/main`,
+      );
+    }
+  }
 
   @UseGuards(FTAuthGuard)
   @Get('login')
