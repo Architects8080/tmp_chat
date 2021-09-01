@@ -20,7 +20,6 @@ export class UserService {
     try {
       return await this.userRepository.insert(newUser);
     } catch (error) {
-      console.log(error);
       throw new BadRequestException();
     }
   }
@@ -30,7 +29,7 @@ export class UserService {
   }
 
   async getUserById(id: number) {
-    const user: User = await this.userRepository.findOne({where : {id : id}});
+    const user: User = await this.userRepository.findOne({ where: { id: id } });
     if (!user) throw new NotFoundException();
     return user;
   }
