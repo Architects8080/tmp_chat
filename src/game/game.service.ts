@@ -11,6 +11,7 @@ export class GameService {
 
     gameRoom.player1.id = userId;
     gameRoom.player2.id = targetUserId;
+    gameRoom.player1.isAccept = true;
     return gameRoom.socketRoomId;
   }
 
