@@ -30,8 +30,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   server: Server;
 
   async handleConnection(client: SocketUser, ...args: any[]) {
+    console.log('Client Connected');
     try {
-      const token = cookieExtractor(client);
+      const token = cookieExtractor(client); //error
       const userPayload = this.jwtService.verify(token);
       const user = await this.jwtStrategy.validate(userPayload);
       client.user = user;
@@ -42,6 +43,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   async handleDisconnect(client: SocketUser) {
+    console.log('Client Disconnected');
     try {
       const token = cookieExtractor(client);
       const userPayload = this.jwtService.verify(token);
@@ -65,7 +67,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         targetUser.user.id,
       );
 
-      targetUser.emit('invite', client.user.id, roomId);
+      targetUser.emit(
+        'invite',
+        client.user.nickname,
+        client.user.avatar,
+        roomId,
+      );
     }
   }
 
@@ -99,7 +106,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: SocketUser,
   ) {
     const roomId = data[0];
-    const canceledPlayer = this.gameService.cancel(client.user.id, roomId);
+    const canceledPlayerId = this.gameService.cancel(client.user.id, roomId);
+    const canceledPlayer =
+      this.socketUserService.getSocketById(canceledPlayerId);
 
     if (canceledPlayer) canceledPlayer.emit('cancel', roomId);
   }
