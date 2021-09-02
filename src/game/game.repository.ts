@@ -10,7 +10,7 @@ export class GameRepository {
 
   private generateRoomId(): number {
     let id = 0;
-    while (id != 0 && !this.gameRoomMap.has(id)) {
+    while (id == 0 || this.gameRoomMap.has(id)) {
       const max = 1000;
       const min = 100;
       id = Math.floor(Math.random() * (max - min)) + min;
