@@ -1,22 +1,22 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import {BrowserRouter} from 'react-router-dom';
-import reportWebVitals from './reportWebVitals';
-import { SnackbarProvider } from 'notistack';
-import { SnackbarUtilsConfigurator } from './game/snackbar/snackbar';
+import React from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
+import App from "./App";
+import { BrowserRouter } from "react-router-dom";
+import reportWebVitals from "./reportWebVitals";
+import { SnackbarProvider } from "notistack";
+import { SnackbarUtilsConfigurator } from "./game/snackbar/snackbar";
 
 ReactDOM.render(
   <React.StrictMode>
-	<SnackbarProvider>
-		<SnackbarUtilsConfigurator />
-		<BrowserRouter>
-			<App />
-		</BrowserRouter>
-	</SnackbarProvider>
+    <SnackbarProvider>
+      <SnackbarUtilsConfigurator />
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </SnackbarProvider>
   </React.StrictMode>,
-  document.getElementById('root')
+  document.getElementById("root")
 );
 
 // If you want to start measuring performance in your app, pass a function
