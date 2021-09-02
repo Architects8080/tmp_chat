@@ -12,11 +12,6 @@ type ModalProps = {
 	children: React.ReactNode;
 }
 
-// type Submit = {
-// 	mapIdx: number;
-// 	isObstacle: boolean;
-// }
-
 function GameSettingModal(prop: ModalProps) {
 
 	const imgURL: string[] = [
@@ -73,7 +68,7 @@ function GameSettingModal(prop: ModalProps) {
 		console.log(`1. map idx ? : `, currentImageIdx);
 		console.log(`2. is Obstacle? : `, isChecked);
 		// server send
-		close();
+		prop.close();
 	}
 
 	return (
@@ -82,7 +77,7 @@ function GameSettingModal(prop: ModalProps) {
 				<section>
 					<div className="modal-title">
 						{prop.header}
-						<button className="modal-close" onClick={close}> X </button>
+						<button className="modal-close" onClick={prop.close}> X </button>
 					</div>
 					<div className="explain">
 						커스텀 게임을 진행하기 전에 맵, 장애물 여부를 선택해주세요.

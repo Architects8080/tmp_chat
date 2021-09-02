@@ -5,10 +5,12 @@ import App from './App';
 import {BrowserRouter} from 'react-router-dom';
 import reportWebVitals from './reportWebVitals';
 import { SnackbarProvider } from 'notistack';
+import { SnackbarUtilsConfigurator } from './game/snackbar/snackbar';
 
 ReactDOM.render(
   <React.StrictMode>
 	<SnackbarProvider>
+		<SnackbarUtilsConfigurator />
 		<BrowserRouter>
 			<App />
 		</BrowserRouter>

@@ -1,38 +1,45 @@
 import React from 'react';
 import "./modal.css";
+import { io } from '../../socket/socket';
+import { useState } from 'react';
+import { useEffect } from 'react';
 
-type User = {
+type inviteInfo = {
 	nickname: string,
 	avater: string,
+	roomID: number,
 }
 
 type ModalProps = {
 	open: any;
 	close: any;
 	header: any;
-	user: User;
-	accept: any,
-	reject: any,
 	children: React.ReactNode;
+	inviteInfo: inviteInfo;
 }
 
 function GameInviteModal(prop: ModalProps) {
+
+	useEffect(() => {
+		console.log(prop);
+	}, [])
+
 	const handleAccept = () => {
 		//server send
-		console.log(`${prop.user.nickname}님이 accept 버튼을 눌렀습니다.`);
+		console.log("accept roomID", prop.inviteInfo.roomID);
+		io.emit('accept', [prop.inviteInfo.roomID]);
+		console.log(`accept 버튼을 눌렀습니다.`);
 
-		//server response
-		prop.accept();
-		close();
+		prop.close();
 	}
 
 	const handleReject = (event: React.MouseEvent) => {
 		// server send
-		console.log(`${prop.user.nickname}님이 reject 버튼을 눌렀습니다.`);
+		console.log("reject roomID", prop.inviteInfo.roomID);
+		io.emit('cancel', [prop.inviteInfo.roomID]);
+		console.log(`reject 버튼을 눌렀습니다.`);
 
-		// server response
-		prop.reject();
-		close();
+		prop.close();
 	}
 
 	return (
@@ -41,26 +48,26 @@ function GameInviteModal(prop: ModalProps) {
 				<section>
 					<div className="modal-title">
 						{prop.header}
-						<button className="modal-close" onClick={close}> X </button>
+						<button className="modal-close" onClick={handleReject}> X </button>
 					</div>
 
 					{/* 1번째 subtitle */}
 					{/* from Server get ImageURL*/}
 					<div className="modal-content center">
 						<div className="image-cropper">
-							<img src={prop.user.avater} className="rounded"/> 
+							<img src={prop.inviteInfo.avater} className="rounded"/> 
 						</div>
 					</div>
 
 					{/* 2번째 subtitle */}
 					{/* from Server get nick */}
 					<div className="modal-content center">
-						{prop.user.nickname}
+						{prop.inviteInfo.nickname}
 					</div>
 
 					{/* 3번째 subtitle */}
 					<div className="game-invite">
-						{prop.user.nickname}님의 게임 신청이 도착했습니다.<br/><br/>
+						{prop.inviteInfo.nickname}님의 게임 신청이 도착했습니다.<br/><br/>
 							게임 신청을 수락하시겠습니까?
 					</div>
 					<div className="gameInvite-submit">

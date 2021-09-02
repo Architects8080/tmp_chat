@@ -2,10 +2,10 @@ import React from 'react';
 import './App.css';
 import { Route } from 'react-router-dom';
 import Login from './auth/login';
-import Main from './auth/main';
+import Main from './main';
 import Register from './auth/register';
 import TestLogin from './auth/test';
-import Game from './game/modal/game';
+import Game from './game/game';
 
 function App() {
   return (
