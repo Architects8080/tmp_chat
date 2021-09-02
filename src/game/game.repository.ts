@@ -6,7 +6,7 @@ export class GameRepository {
   // need typeorm
   constructor() {}
 
-  gameRoomMap: Map<number, GameRoom>;
+  gameRoomMap: Map<number, GameRoom> = new Map();
 
   private generateRoomId(): number {
     let id = 0;
