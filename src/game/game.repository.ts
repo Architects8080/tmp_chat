@@ -25,8 +25,9 @@ export class GameRepository {
   createGameRoom(): GameRoom {
     const instance = new GameRoom();
     const socketRoomId = this.generateRoomId();
-
+    
     instance.socketRoomId = socketRoomId;
+    instance.gameStatus = GameStatus.READY;
     this.gameRoomMap.set(socketRoomId, instance);
     return instance;
   }

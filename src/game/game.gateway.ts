@@ -13,6 +13,7 @@ import { Server } from 'socket.io';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 import { cookieExtractor, JwtStrategy } from 'src/auth/strategy/jwt.strategy';
 import { SocketUser } from 'src/socket/socket-user';
+import { GameInfo } from './data/gameinfo.data';
 import { GameService } from './game.service';
 import { SocketUserService } from './socket-user.service';
 
@@ -97,6 +98,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
       player1.emit('ready', roomId);
       player2.emit('ready', roomId);
+      this.gameService.start(roomId, (gameInfo: GameInfo) => {
+        this.server.in('gameroom:' + roomId.toString()).emit('update', roomId, gameInfo)
+      });
     }
   }
 
@@ -111,5 +115,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.socketUserService.getSocketById(canceledPlayerId);
 
     if (canceledPlayer) canceledPlayer.emit('cancel', roomId);
+  }
+
+  @SubscribeMessage('move')
+  movePlayer( 
+    @MessageBody() data: any[],
+    @ConnectedSocket() client: SocketUser,
+  ) {
+    const roomId = data[0];
+    const moveInfo = data[1];
+    this.gameService.move(roomId, client.user.id, moveInfo);
   }
 }

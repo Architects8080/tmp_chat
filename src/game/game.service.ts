@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { SocketUser } from 'src/socket/socket-user';
-import { RoomPlayer } from './data/room-player.data';
+import { GamePlayer } from './data/game-player.data';
+import { GameInfo } from './data/gameinfo.data';
+import { GameRoom } from './data/gameroom.data';
 import { GameRepository } from './game.repository';
 
 @Injectable()
@@ -34,5 +35,43 @@ export class GameService {
     else return;
     this.gameRepository.deleteGameRoom(roomId);
     return canceledPlayerId;
+  }
+
+  private gameLoop(room: GameRoom, onUpdate: (gameInfo: GameInfo)=>any, onFinish?) {
+    return () => {
+      onUpdate(room.gameInfo);
+      if (room.gameStatus = GameStatus.FINISHED) { 
+        clearInterval(room.interval);
+        onFinish();
+        this.gameRepository.saveGameToDB(room.socketRoomId);
+        this.gameRepository.deleteGameRoom(room.socketRoomId);
+      }
+    }
+  }
+
+  start(roomId: number, onUpdate: (gameInfo: GameInfo)=>any) {
+    const gameRoom = this.gameRepository.getGameRoom(roomId);
+    const gameInfo = new GameInfo();
+
+    gameInfo.ball = {x: 5, y: 2};
+    gameInfo.player1 = {id: gameRoom.player1.id, position: {x: 0, y: 2}, score: 0};
+    gameInfo.player2 = {id: gameRoom.player2.id, position: {x: 9, y: 2}, score: 0};
+    gameRoom.gameInfo = gameInfo;
+    gameRoom.gameStatus = GameStatus.STARTED;
+    gameRoom.interval = setInterval(this.gameLoop(gameRoom, onUpdate), 10);
+  }
+
+  private movePlayer (gamePlayer: GamePlayer, moveInfo: any) {
+    gamePlayer.position.y += moveInfo;
+  }
+
+  move(roomId: number, playerId: number, moveInfo: any) {
+    const gameRoom = this.gameRepository.getGameRoom(roomId);
+    if (!gameRoom || gameRoom.gameStatus != GameStatus.STARTED)
+      return;
+    if (gameRoom.player1.id == playerId) 
+      this.movePlayer(gameRoom.gameInfo.player1, moveInfo);
+    if (gameRoom.player2.id == playerId)
+      this.movePlayer(gameRoom.gameInfo.player2, moveInfo);
   }
 }
