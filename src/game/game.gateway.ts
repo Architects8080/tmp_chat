@@ -99,7 +99,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       player1.emit('ready', roomId);
       player2.emit('ready', roomId);
       this.gameService.start(roomId, (gameInfo: GameInfo) => {
-        this.server.in('gameroom:' + roomId.toString()).emit('update', roomId, gameInfo)
+        this.server
+          .in('gameroom:' + roomId.toString())
+          .emit('update', roomId, gameInfo);
       });
     }
   }
@@ -118,7 +120,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('move')
-  movePlayer( 
+  movePlayer(
     @MessageBody() data: any[],
     @ConnectedSocket() client: SocketUser,
   ) {

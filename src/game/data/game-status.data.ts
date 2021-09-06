@@ -1,3 +1,5 @@
 enum GameStatus {
-  READY, STARTED, FINISHED
+  READY,
+  STARTED,
+  FINISHED,
 }
