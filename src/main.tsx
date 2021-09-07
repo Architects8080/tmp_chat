@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Redirect } from "react-router";
 import GameInviteModal from "./game/modal/gameInviteModal";
 import ShowSnackbar from "./game/snackbar/snackbar";
 import { io } from "./socket/socket";
@@ -13,6 +14,7 @@ function Main() {
     avater: "",
     roomID: 0,
   });
+  const [roomID, setRoomID] = useState(0);
 
   const openGameInviteModal = () => {
     setGameInviteModalOpen(true);
@@ -34,8 +36,7 @@ function Main() {
 
     io.on("ready", (roomID) => {
       ShowSnackbar.success(acceptMessage);
-
-      //redirect
+      setRoomID(roomID);
     });
 
     io.on("cancel", (roomID) => {
@@ -47,6 +48,8 @@ function Main() {
   const handleCustomMatch = () => {
     io.emit("invite", [targetUserID]);
   };
+
+  if (roomID != 0) return <Redirect to={{ pathname: "/game/" + roomID }} />;
 
   return (
     <div>

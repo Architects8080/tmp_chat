@@ -18,7 +18,6 @@ type ModalProps = {
 };
 
 function GameInviteModal(prop: ModalProps) {
-
   const handleAccept = () => {
     io.emit("accept", [prop.inviteInfo.roomID]);
 

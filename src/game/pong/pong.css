@@ -1,0 +1,8 @@
+.pong {
+	text-align: center;
+}
+
+.canvas {
+	border-radius: 10px;
+	background: lightgray;
+}
