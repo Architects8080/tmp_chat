@@ -1,4 +1,4 @@
-import { UseGuards } from '@nestjs/common';
+import { Inject, UseGuards } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import {
   WebSocketGateway,
@@ -15,7 +15,7 @@ import { cookieExtractor, JwtStrategy } from 'src/auth/strategy/jwt.strategy';
 import { SocketUser } from 'src/socket/socket-user';
 import { GameInfo } from './data/gameinfo.data';
 import { GameService } from './game.service';
-import { SocketUserService } from './socket-user.service';
+import { SocketUserService } from '../socket/socket-user.service';
 
 @UseGuards(JwtAuthGuard)
 @WebSocketGateway(4000, { namespace: 'game' })
@@ -24,6 +24,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private jwtService: JwtService,
     private jwtStrategy: JwtStrategy,
     private gameService: GameService,
+    @Inject("GAME_SOCKET_USER_SERVICE")
     private socketUserService: SocketUserService,
   ) {}
 
