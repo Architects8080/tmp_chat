@@ -1,9 +1,9 @@
 import { GamePlayer } from './game-player.data';
-import { Position } from './position.data';
+import { GameObject } from './object.data';
 
 export class GameInfo {
-  player1: GamePlayer;
-  player2: GamePlayer;
-  ball: Position;
-  obstacles: Position[];
+  player1: GamePlayer = new GamePlayer();
+  player2: GamePlayer = new GamePlayer();
+  ball: GameObject = new GameObject();
+  obstacles: GameObject[] = [];
 }

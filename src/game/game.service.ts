@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { GamePlayer } from './data/game-player.data';
+import { GameStatus } from './data/game-status.data';
 import { GameInfo } from './data/gameinfo.data';
 import { GameRoom } from './data/gameroom.data';
 import { GameRepository } from './game.repository';
 
 @Injectable()
 export class GameService {
-  constructor(private readonly gameRepository: GameRepository) {}
+  constructor(private gameRepository: GameRepository) {}
 
   invite(userId: number, targetUserId: number): number {
     const gameRoom = this.gameRepository.createGameRoom();
@@ -44,7 +45,7 @@ export class GameService {
   ) {
     return () => {
       onUpdate(room.gameInfo);
-      if ((room.gameStatus = GameStatus.FINISHED)) {
+      if (room.gameStatus == GameStatus.FINISHED) {
         clearInterval(room.interval);
         onFinish();
         this.gameRepository.saveGameToDB(room.socketRoomId);
@@ -57,15 +58,17 @@ export class GameService {
     const gameRoom = this.gameRepository.getGameRoom(roomId);
     const gameInfo = new GameInfo();
 
-    gameInfo.ball = { x: 5, y: 2 };
+    gameInfo.ball = { position: { x: 5, y: 2 }, vector: { dx: 0, dy: 0 } };
     gameInfo.player1 = {
       id: gameRoom.player1.id,
       position: { x: 0, y: 2 },
+      vector: { dx: 0, dy: 0 },
       score: 0,
     };
     gameInfo.player2 = {
       id: gameRoom.player2.id,
       position: { x: 9, y: 2 },
+      vector: { dx: 0, dy: 0 },
       score: 0,
     };
     gameRoom.gameInfo = gameInfo;
