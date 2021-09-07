@@ -99,6 +99,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
       player1.emit('ready', roomId);
       player2.emit('ready', roomId);
+      player1.join('gameroom:' + roomId.toString());
+      player2.join('gameroom:' + roomId.toString());
       this.gameService.start(roomId, (gameInfo: GameInfo) => {
         this.server
           .in('gameroom:' + roomId.toString())

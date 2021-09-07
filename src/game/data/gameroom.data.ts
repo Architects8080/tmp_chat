@@ -1,3 +1,4 @@
+import { GameStatus } from './game-status.data';
 import { GameInfo } from './gameinfo.data';
 import { RoomPlayer } from './room-player.data';
 

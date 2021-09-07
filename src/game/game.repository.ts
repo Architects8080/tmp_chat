@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { GameStatus } from './data/game-status.data';
 import { GameRoom } from './data/gameroom.data';
 
 @Injectable()
