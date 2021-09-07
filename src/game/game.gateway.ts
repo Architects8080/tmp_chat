@@ -99,8 +99,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
       player1.emit('ready', roomId);
       player2.emit('ready', roomId);
+
       player1.join('gameroom:' + roomId.toString());
       player2.join('gameroom:' + roomId.toString());
+
       this.gameService.start(roomId, (gameInfo: GameInfo) => {
         this.server
           .in('gameroom:' + roomId.toString())
@@ -127,8 +129,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: any[],
     @ConnectedSocket() client: SocketUser,
   ) {
-    const roomId = data[0];
+    const roomId = +data[0];
     const moveInfo = data[1];
+
+    console.log(`roomId : `, roomId, `client.user.id : `, client.user.id, `moveInfo : `, moveInfo);
     this.gameService.move(roomId, client.user.id, moveInfo);
   }
 }

@@ -44,6 +44,7 @@ export class GameService {
     onFinish?,
   ) {
     return () => {
+      //some calc
       onUpdate(room.gameInfo);
       if (room.gameStatus == GameStatus.FINISHED) {
         clearInterval(room.interval);
@@ -58,16 +59,23 @@ export class GameService {
     const gameRoom = this.gameRepository.getGameRoom(roomId);
     const gameInfo = new GameInfo();
 
-    gameInfo.ball = { position: { x: 5, y: 2 }, vector: { dx: 0, dy: 0 } };
+    const canvasWidth = 800;
+    const canvasHeight = 600;
+
+    const paddleWidth = 10;
+    const paddleHeight = 75;
+    const paddleY = (canvasHeight - paddleHeight) / 2;
+
+    gameInfo.ball = { position: { x: canvasWidth / 2, y: canvasHeight / 2 }, vector: { dx: 0, dy: 0 } };
     gameInfo.player1 = {
       id: gameRoom.player1.id,
-      position: { x: 0, y: 2 },
+      position: { x: 0 + paddleWidth, y: paddleY },
       vector: { dx: 0, dy: 0 },
       score: 0,
     };
     gameInfo.player2 = {
       id: gameRoom.player2.id,
-      position: { x: 9, y: 2 },
+      position: { x: canvasWidth - paddleWidth * 2, y: paddleY },
       vector: { dx: 0, dy: 0 },
       score: 0,
     };
@@ -77,11 +85,14 @@ export class GameService {
   }
 
   private movePlayer(gamePlayer: GamePlayer, moveInfo: any) {
+    console.log(gamePlayer.id, "move!!");
     gamePlayer.position.y += moveInfo;
   }
 
   move(roomId: number, playerId: number, moveInfo: any) {
+
     const gameRoom = this.gameRepository.getGameRoom(roomId);
+
     if (!gameRoom || gameRoom.gameStatus != GameStatus.STARTED) return;
     if (gameRoom.player1.id == playerId)
       this.movePlayer(gameRoom.gameInfo.player1, moveInfo);
