@@ -14,6 +14,9 @@ export class GameService {
   canvasHeight = 600;
   ballRadius = 10;
 
+  paddleWidth = 10;
+  paddleHeight = 75;
+
   invite(userId: number, targetUserId: number): number {
     const gameRoom = this.gameRepository.createGameRoom();
 
@@ -70,6 +73,24 @@ export class GameService {
         y: ballPosition.y + ballVector.dy,
       };
 
+      //paddle collision check
+      if (
+        ballPosition.x + ballVector.dx <
+          room.gameInfo.player1.position.x + this.paddleWidth + 5 &&
+        ballPosition.y + ballVector.dy > room.gameInfo.player1.position.y &&
+        ballPosition.y + ballVector.dy <
+          room.gameInfo.player1.position.y + this.paddleHeight
+      )
+        ballVector.dx = -ballVector.dx;
+
+      if (
+        ballPosition.x + ballVector.dx > room.gameInfo.player2.position.x - 5 &&
+        ballPosition.y + ballVector.dy > room.gameInfo.player2.position.y &&
+        ballPosition.y + ballVector.dy <
+          room.gameInfo.player2.position.y + this.paddleHeight
+      )
+        ballVector.dx = -ballVector.dx;
+
       //score check & ball position reset
       if (ballPosition.x <= this.ballRadius + 5) {
         room.gameInfo.player2.score++;
@@ -100,9 +121,7 @@ export class GameService {
     const gameRoom = this.gameRepository.getGameRoom(roomId);
     const gameInfo = new GameInfo();
 
-    const paddleWidth = 10;
-    const paddleHeight = 75;
-    const paddleY = (this.canvasHeight - paddleHeight) / 2;
+    const paddleY = (this.canvasHeight - this.paddleHeight) / 2;
 
     gameInfo.ball = {
       position: { x: this.canvasWidth / 2, y: this.canvasHeight / 2 },
@@ -110,13 +129,13 @@ export class GameService {
     };
     gameInfo.player1 = {
       id: gameRoom.player1.id,
-      position: { x: 0 + paddleWidth, y: paddleY },
+      position: { x: 0 + this.paddleWidth, y: paddleY },
       vector: { dx: 0, dy: 0 },
       score: 0,
     };
     gameInfo.player2 = {
       id: gameRoom.player2.id,
-      position: { x: this.canvasWidth - paddleWidth * 2, y: paddleY },
+      position: { x: this.canvasWidth - this.paddleWidth * 2, y: paddleY },
       vector: { dx: 0, dy: 0 },
       score: 0,
     };
