@@ -119,7 +119,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: SocketUser,
   ) {
     const roomId = data[0];
-    const canceledPlayerId = this.gameRoomService.cancel(client.user.id, roomId);
+    const canceledPlayerId = this.gameRoomService.cancel(
+      client.user.id,
+      roomId,
+    );
     const canceledPlayer =
       this.socketUserService.getSocketById(canceledPlayerId);
 

@@ -1,11 +1,17 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { GameStatus } from './data/game-status.data';
 import { GameRoom } from './data/gameroom.data';
+import { Match } from './entity/match.entity';
 
 @Injectable()
 export class GameRepository {
   // need typeorm
-  constructor() {}
+  constructor(
+    @InjectRepository(Match)
+    private readonly matchRepository: Repository<Match>,
+  ) {}
 
   gameRoomMap: Map<number, GameRoom> = new Map();
 
@@ -42,6 +48,22 @@ export class GameRepository {
   }
 
   saveGameToDB(roomId: number) {
-    // save to db
+    const room = this.getGameRoom(roomId);
+    if (!room) return false;
+    const gameInfo = room.gameInfo;
+    const match: Match = this.matchRepository.create();
+    if (gameInfo.player1.score >= gameInfo.player2.score) {
+      match.winner = gameInfo.player1.id;
+      match.loser = gameInfo.player2.id;
+      match.winnerScore = gameInfo.player1.score;
+      match.loserScore = gameInfo.player2.score;
+    } else {
+      match.winner = gameInfo.player2.id;
+      match.loser = gameInfo.player1.id;
+      match.winnerScore = gameInfo.player2.score;
+      match.loserScore = gameInfo.player1.score;
+    }
+    match.gameType = room.gameType;
+    this.matchRepository.insert(match);
   }
 }
