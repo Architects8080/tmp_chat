@@ -40,6 +40,8 @@ export class AuthService {
   //register 이후에 jwt 리턴
   async register(nickname: string, session: any) {
     session.newUser.nickname = nickname;
+    if (!session.newUser.nickname)
+      session.newUser.nickname = session.newUser.intraLogin;
     await this.userService.createUser(session.newUser);
 
     return this.login(session.newUser, session); // will return jwt
