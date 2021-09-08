@@ -24,7 +24,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private jwtService: JwtService,
     private jwtStrategy: JwtStrategy,
     private gameService: GameService,
-    @Inject("GAME_SOCKET_USER_SERVICE")
+    @Inject('GAME_SOCKET_USER_SERVICE')
     private socketUserService: SocketUserService,
   ) {}
 
@@ -132,7 +132,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const roomId = +data[0];
     const moveInfo = data[1];
 
-    console.log(`roomId : `, roomId, `client.user.id : `, client.user.id, `moveInfo : `, moveInfo);
+    console.log(
+      `roomId : `,
+      roomId,
+      `client.user.id : `,
+      client.user.id,
+      `moveInfo : `,
+      moveInfo,
+    );
     this.gameService.move(roomId, client.user.id, moveInfo);
   }
 }
