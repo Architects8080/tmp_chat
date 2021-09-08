@@ -7,7 +7,7 @@ import { GameSocketUserService } from './game.socket-user.service';
 
 @Module({
   imports: [AuthModule],
-  providers: [GameGateway, GameService, GameRepository, GameSocketUserService],
+  providers: [GameGateway, GameService, GameRoomService, GameRepository, GameSocketUserService],
   exports: [GameService, GameSocketUserService, GameRepository],
 })
 export class GameModule {}

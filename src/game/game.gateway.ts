@@ -16,6 +16,7 @@ import { SocketUser } from 'src/socket/socket-user';
 import { GameInfo } from './data/gameinfo.data';
 import { GameService } from './game.service';
 import { SocketUserService } from '../socket/socket-user.service';
+import { GameRoomService } from './game-room.service';
 
 @UseGuards(JwtAuthGuard)
 @WebSocketGateway(4000, { namespace: 'game' })
@@ -24,6 +25,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private jwtService: JwtService,
     private jwtStrategy: JwtStrategy,
     private gameService: GameService,
+    private gameRoomService: GameRoomService,
     @Inject('GAME_SOCKET_USER_SERVICE')
     private socketUserService: SocketUserService,
   ) {}
@@ -64,7 +66,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const targetUser = this.socketUserService.getSocketById(targetUserId);
 
     if (targetUser) {
-      const roomId: number = this.gameService.invite(
+      const roomId: number = this.gameRoomService.invite(
         client.user.id,
         targetUser.user.id,
       );
@@ -84,7 +86,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: SocketUser,
   ) {
     const roomId = data[0];
-    const acceptedRoom = this.gameService.accept(client.user.id, roomId);
+    const acceptedRoom = this.gameRoomService.accept(client.user.id, roomId);
 
     if (acceptedRoom) {
       const player1 = this.socketUserService.getSocketById(
@@ -117,7 +119,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: SocketUser,
   ) {
     const roomId = data[0];
-    const canceledPlayerId = this.gameService.cancel(client.user.id, roomId);
+    const canceledPlayerId = this.gameRoomService.cancel(client.user.id, roomId);
     const canceledPlayer =
       this.socketUserService.getSocketById(canceledPlayerId);
 
