@@ -3,15 +3,24 @@ export type Position = {
   y: number;
 };
 
-export type GamePlayer = {
+export type Vector = {
+  dx: number;
+  dy: number;
+};
+
+export type GameObject = {
+  position: Position;
+  vector: Vector;
+};
+
+export type GamePlayer = GameObject & {
   id: number;
   score: number;
-  position: Position;
 };
 
 export type GameInfo = {
   player1: GamePlayer;
   player2: GamePlayer;
-  ball: Position;
-  obstacles: Position[];
+  ball: GameObject;
+  obstacles: GameObject[];
 };

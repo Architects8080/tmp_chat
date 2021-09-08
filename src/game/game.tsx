@@ -20,12 +20,11 @@ function Game() {
   return (
     <React.Fragment>
       {/* its game room! game room id : {id} */}
-      { gameInfo ? 
-        <Pong
-          roomID={id}
-          gameInfo={gameInfo}
-        ></Pong> : ""
-      }
+      <div>
+        player 1 score : {gameInfo?.player1.score}; player 2 score :{" "}
+        {gameInfo?.player2.score};
+      </div>
+      {gameInfo ? <Pong roomID={id} gameInfo={gameInfo}></Pong> : ""}
     </React.Fragment>
   );
 }
