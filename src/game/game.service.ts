@@ -9,6 +9,7 @@ import { GameRepository } from './game.repository';
 export class GameService {
   constructor(private gameRepository: GameRepository) {}
 
+  //default value
   canvasWidth = 800;
   canvasHeight = 600;
   ballRadius = 10;
@@ -51,6 +52,7 @@ export class GameService {
       const ballPosition = room.gameInfo.ball.position;
       const ballVector = room.gameInfo.ball.vector;
 
+      //ball move
       // console.log(room.gameInfo.ball.position);
       if (
         ballPosition.x + ballVector.dx > this.canvasWidth - this.ballRadius ||
@@ -62,10 +64,27 @@ export class GameService {
         ballPosition.y + ballVector.dy < this.ballRadius
       )
         ballVector.dy = -ballVector.dy;
+
       room.gameInfo.ball.position = {
         x: ballPosition.x + ballVector.dx,
         y: ballPosition.y + ballVector.dy,
       };
+
+      //score check & ball position reset
+      if (ballPosition.x <= this.ballRadius + 5) {
+        room.gameInfo.player2.score++;
+        room.gameInfo.ball.position = {
+          x: this.canvasWidth / 2,
+          y: this.canvasHeight / 2,
+        };
+      }
+      if (ballPosition.x >= this.canvasWidth - (this.ballRadius + 5)) {
+        room.gameInfo.player1.score++;
+        room.gameInfo.ball.position = {
+          x: this.canvasWidth / 2,
+          y: this.canvasHeight / 2,
+        };
+      }
 
       onUpdate(room.gameInfo);
       if (room.gameStatus == GameStatus.FINISHED) {
