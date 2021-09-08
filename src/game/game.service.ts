@@ -9,6 +9,10 @@ import { GameRepository } from './game.repository';
 export class GameService {
   constructor(private gameRepository: GameRepository) {}
 
+  canvasWidth = 800;
+  canvasHeight = 600;
+  ballRadius = 10;
+
   invite(userId: number, targetUserId: number): number {
     const gameRoom = this.gameRepository.createGameRoom();
 
@@ -44,7 +48,25 @@ export class GameService {
     onFinish?,
   ) {
     return () => {
-      //some calc
+      const ballPosition = room.gameInfo.ball.position;
+      const ballVector = room.gameInfo.ball.vector;
+
+      // console.log(room.gameInfo.ball.position);
+      if (
+        ballPosition.x + ballVector.dx > this.canvasWidth - this.ballRadius ||
+        ballPosition.x + ballVector.dx < this.ballRadius
+      )
+        ballVector.dx = -ballVector.dx;
+      if (
+        ballPosition.y + ballVector.dy > this.canvasHeight - this.ballRadius ||
+        ballPosition.y + ballVector.dy < this.ballRadius
+      )
+        ballVector.dy = -ballVector.dy;
+      room.gameInfo.ball.position = {
+        x: ballPosition.x + ballVector.dx,
+        y: ballPosition.y + ballVector.dy,
+      };
+
       onUpdate(room.gameInfo);
       if (room.gameStatus == GameStatus.FINISHED) {
         clearInterval(room.interval);
@@ -59,14 +81,14 @@ export class GameService {
     const gameRoom = this.gameRepository.getGameRoom(roomId);
     const gameInfo = new GameInfo();
 
-    const canvasWidth = 800;
-    const canvasHeight = 600;
-
     const paddleWidth = 10;
     const paddleHeight = 75;
-    const paddleY = (canvasHeight - paddleHeight) / 2;
+    const paddleY = (this.canvasHeight - paddleHeight) / 2;
 
-    gameInfo.ball = { position: { x: canvasWidth / 2, y: canvasHeight / 2 }, vector: { dx: 0, dy: 0 } };
+    gameInfo.ball = {
+      position: { x: this.canvasWidth / 2, y: this.canvasHeight / 2 },
+      vector: { dx: 4, dy: 2 },
+    };
     gameInfo.player1 = {
       id: gameRoom.player1.id,
       position: { x: 0 + paddleWidth, y: paddleY },
@@ -75,7 +97,7 @@ export class GameService {
     };
     gameInfo.player2 = {
       id: gameRoom.player2.id,
-      position: { x: canvasWidth - paddleWidth * 2, y: paddleY },
+      position: { x: this.canvasWidth - paddleWidth * 2, y: paddleY },
       vector: { dx: 0, dy: 0 },
       score: 0,
     };
@@ -85,12 +107,11 @@ export class GameService {
   }
 
   private movePlayer(gamePlayer: GamePlayer, moveInfo: any) {
-    console.log(gamePlayer.id, "move!!");
+    console.log(gamePlayer.id, 'move!!');
     gamePlayer.position.y += moveInfo;
   }
 
   move(roomId: number, playerId: number, moveInfo: any) {
-
     const gameRoom = this.gameRepository.getGameRoom(roomId);
 
     if (!gameRoom || gameRoom.gameStatus != GameStatus.STARTED) return;
