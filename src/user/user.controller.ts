@@ -6,9 +6,13 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 import { UserService } from './user.service';
 
+@UseGuards(JwtAuthGuard)
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -16,6 +20,11 @@ export class UserController {
   @Get()
   async getUsers() {
     return this.userService.getUsers();
+  }
+
+  @Get('me')
+  async getMe(@Req() req) {
+    return req.user;
   }
 
   @Post()
