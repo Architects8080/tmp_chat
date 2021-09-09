@@ -3,6 +3,7 @@ import { GamePlayer } from './data/game-player.data';
 import { GameStatus } from './data/game-status.data';
 import { GameInfo } from './data/gameinfo.data';
 import { GameRoom } from './data/gameroom.data';
+import { GameObject } from './data/object.data';
 import { GameRepository } from './game.repository';
 
 @Injectable()
@@ -17,66 +18,108 @@ export class GameService {
   paddleWidth = 10;
   paddleHeight = 75;
 
+  maxPaddleSpeed = 30;
+  
+  private resetPosCenter(obj: GameObject) {
+    obj.position.x = this.canvasWidth / 2;
+    obj.position.y = this.canvasHeight / 2;
+  }
+
+  private moveBall(gameInfo: GameInfo) {
+    const ballPosition = gameInfo.ball.position;
+    const ballVector = gameInfo.ball.vector;
+
+    if (
+      ballPosition.x + ballVector.dx > this.canvasWidth - this.ballRadius ||
+      ballPosition.x + ballVector.dx < this.ballRadius
+    )
+      ballVector.dx = -ballVector.dx;
+    if (
+        ballPosition.y + ballVector.dy > this.canvasHeight - this.ballRadius ||
+        ballPosition.y + ballVector.dy < this.ballRadius
+      )
+        ballVector.dy = -ballVector.dy;
+
+      gameInfo.ball.position = {
+        x: ballPosition.x + ballVector.dx,
+        y: ballPosition.y + ballVector.dy,
+      };
+    return gameInfo;
+  }
+
+  private movePlayer(gameInfo: GameInfo) {
+    const move = (player: GamePlayer) => {
+      const pos = player.position;
+      const vec = player.vector;
+      const sign = vec.dy < 0 ? -0.1 : 0.1;
+
+      pos.y += vec.dy;
+      if (pos.y + vec.dy < 0) {
+        pos.y = 0;
+        vec.dy = 0;
+      }
+      if (pos.y + vec.dy + this.paddleHeight > this.canvasHeight) {
+        pos.y = this.canvasHeight - this.paddleHeight;
+        vec.dy = 0;
+      }
+      if (vec.dy != 0)  
+        vec.dy -= sign; 
+    };
+    move(gameInfo.player1);
+    move(gameInfo.player2);
+  }
+
+  private checkCollision(gameInfo: GameInfo) {
+    const ballPosition = gameInfo.ball.position;
+    const ballVector = gameInfo.ball.vector;
+    const player1 = gameInfo.player1;
+    const player2 = gameInfo.player2;
+    if (
+      ballPosition.x + ballVector.dx <
+        player1.position.x + this.paddleWidth + 5 &&
+      ballPosition.y + ballVector.dy > gameInfo.player1.position.y &&
+      ballPosition.y + ballVector.dy <
+        player1.position.y + this.paddleHeight
+    )
+      ballVector.dx = -ballVector.dx;
+
+    if (
+      ballPosition.x + ballVector.dx > player2.position.x - 5 &&
+      ballPosition.y + ballVector.dy > player2.position.y &&
+      ballPosition.y + ballVector.dy <
+        player2.position.y + this.paddleHeight
+    )
+      ballVector.dx = -ballVector.dx;
+
+  }
+  
+  private checkGoal(gameInfo: GameInfo) {
+    const ballPosition = gameInfo.ball.position;
+    const player1 = gameInfo.player1;
+    const player2 = gameInfo.player2;
+
+    if (ballPosition.x <= this.ballRadius + 5) {
+      player2.score++;
+      this.resetPosCenter(gameInfo.ball);
+    }
+    if (ballPosition.x >= this.canvasWidth - (this.ballRadius + 5)) {
+      player1.score++;
+      this.resetPosCenter(gameInfo.ball);
+    }
+  }
+
   private gameLoop(
     room: GameRoom,
     onUpdate: (gameInfo: GameInfo) => any,
     onFinish?,
   ) {
     return () => {
-      const ballPosition = room.gameInfo.ball.position;
-      const ballVector = room.gameInfo.ball.vector;
-
-      //ball move
-      // console.log(room.gameInfo.ball.position);
-      if (
-        ballPosition.x + ballVector.dx > this.canvasWidth - this.ballRadius ||
-        ballPosition.x + ballVector.dx < this.ballRadius
-      )
-        ballVector.dx = -ballVector.dx;
-      if (
-        ballPosition.y + ballVector.dy > this.canvasHeight - this.ballRadius ||
-        ballPosition.y + ballVector.dy < this.ballRadius
-      )
-        ballVector.dy = -ballVector.dy;
-
-      room.gameInfo.ball.position = {
-        x: ballPosition.x + ballVector.dx,
-        y: ballPosition.y + ballVector.dy,
-      };
-
-      //paddle collision check
-      if (
-        ballPosition.x + ballVector.dx <
-          room.gameInfo.player1.position.x + this.paddleWidth + 5 &&
-        ballPosition.y + ballVector.dy > room.gameInfo.player1.position.y &&
-        ballPosition.y + ballVector.dy <
-          room.gameInfo.player1.position.y + this.paddleHeight
-      )
-        ballVector.dx = -ballVector.dx;
-
-      if (
-        ballPosition.x + ballVector.dx > room.gameInfo.player2.position.x - 5 &&
-        ballPosition.y + ballVector.dy > room.gameInfo.player2.position.y &&
-        ballPosition.y + ballVector.dy <
-          room.gameInfo.player2.position.y + this.paddleHeight
-      )
-        ballVector.dx = -ballVector.dx;
-
-      //score check & ball position reset
-      if (ballPosition.x <= this.ballRadius + 5) {
-        room.gameInfo.player2.score++;
-        room.gameInfo.ball.position = {
-          x: this.canvasWidth / 2,
-          y: this.canvasHeight / 2,
-        };
-      }
-      if (ballPosition.x >= this.canvasWidth - (this.ballRadius + 5)) {
-        room.gameInfo.player1.score++;
-        room.gameInfo.ball.position = {
-          x: this.canvasWidth / 2,
-          y: this.canvasHeight / 2,
-        };
-      }
+      const gameInfo = room.gameInfo;
+      
+      this.movePlayer(gameInfo);
+      this.moveBall(gameInfo);
+      this.checkCollision(gameInfo);
+      this.checkGoal(gameInfo);
 
       onUpdate(room.gameInfo);
       if (room.gameStatus == GameStatus.FINISHED) {
@@ -115,9 +158,12 @@ export class GameService {
     gameRoom.interval = setInterval(this.gameLoop(gameRoom, onUpdate), 10);
   }
 
-  private movePlayer(gamePlayer: GamePlayer, moveInfo: any) {
-    console.log(gamePlayer.id, 'move!!');
-    gamePlayer.position.y += moveInfo;
+  private forcePlayer(gamePlayer: GamePlayer, moveInfo: any) {
+    gamePlayer.vector.dy += moveInfo;
+    if (gamePlayer.vector.dy > this.maxPaddleSpeed)
+      gamePlayer.vector.dy = this.maxPaddleSpeed;
+    if (-gamePlayer.vector.dy > this.maxPaddleSpeed) 
+      gamePlayer.vector.dy = -this.maxPaddleSpeed; 
   }
 
   move(roomId: number, playerId: number, moveInfo: any) {
@@ -125,8 +171,8 @@ export class GameService {
 
     if (!gameRoom || gameRoom.gameStatus != GameStatus.STARTED) return;
     if (gameRoom.player1.id == playerId)
-      this.movePlayer(gameRoom.gameInfo.player1, moveInfo);
+      this.forcePlayer(gameRoom.gameInfo.player1, moveInfo);
     if (gameRoom.player2.id == playerId)
-      this.movePlayer(gameRoom.gameInfo.player2, moveInfo);
+      this.forcePlayer(gameRoom.gameInfo.player2, moveInfo);
   }
 }
