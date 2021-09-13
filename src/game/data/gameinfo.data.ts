@@ -6,4 +6,6 @@ export class GameInfo {
   player2: GamePlayer = new GamePlayer();
   ball: GameObject = new GameObject();
   obstacles: GameObject[] = [];
+  startAt: Date = new Date();
+  endAt: Date;
 }

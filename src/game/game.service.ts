@@ -4,6 +4,7 @@ import { GameStatus } from './data/game-status.data';
 import { GameInfo } from './data/gameinfo.data';
 import { GameRoom } from './data/gameroom.data';
 import { GameObject } from './data/object.data';
+import { Match } from './entity/match.entity';
 import { GameRepository } from './game.repository';
 
 @Injectable()
@@ -19,7 +20,7 @@ export class GameService {
   paddleHeight = 75;
 
   maxPaddleSpeed = 30;
-  
+
   private resetPosCenter(obj: GameObject) {
     obj.position.x = this.canvasWidth / 2;
     obj.position.y = this.canvasHeight / 2;
@@ -35,15 +36,15 @@ export class GameService {
     )
       ballVector.dx = -ballVector.dx;
     if (
-        ballPosition.y + ballVector.dy > this.canvasHeight - this.ballRadius ||
-        ballPosition.y + ballVector.dy < this.ballRadius
-      )
-        ballVector.dy = -ballVector.dy;
+      ballPosition.y + ballVector.dy > this.canvasHeight - this.ballRadius ||
+      ballPosition.y + ballVector.dy < this.ballRadius
+    )
+      ballVector.dy = -ballVector.dy;
 
-      gameInfo.ball.position = {
-        x: ballPosition.x + ballVector.dx,
-        y: ballPosition.y + ballVector.dy,
-      };
+    gameInfo.ball.position = {
+      x: ballPosition.x + ballVector.dx,
+      y: ballPosition.y + ballVector.dy,
+    };
     return gameInfo;
   }
 
@@ -62,8 +63,7 @@ export class GameService {
         pos.y = this.canvasHeight - this.paddleHeight;
         vec.dy = 0;
       }
-      if (vec.dy != 0)  
-        vec.dy -= sign; 
+      if (vec.dy != 0) vec.dy -= sign;
     };
     move(gameInfo.player1);
     move(gameInfo.player2);
@@ -74,25 +74,23 @@ export class GameService {
     const ballVector = gameInfo.ball.vector;
     const player1 = gameInfo.player1;
     const player2 = gameInfo.player2;
+
     if (
       ballPosition.x + ballVector.dx <
         player1.position.x + this.paddleWidth + 5 &&
       ballPosition.y + ballVector.dy > gameInfo.player1.position.y &&
-      ballPosition.y + ballVector.dy <
-        player1.position.y + this.paddleHeight
+      ballPosition.y + ballVector.dy < player1.position.y + this.paddleHeight
     )
       ballVector.dx = -ballVector.dx;
 
     if (
       ballPosition.x + ballVector.dx > player2.position.x - 5 &&
       ballPosition.y + ballVector.dy > player2.position.y &&
-      ballPosition.y + ballVector.dy <
-        player2.position.y + this.paddleHeight
+      ballPosition.y + ballVector.dy < player2.position.y + this.paddleHeight
     )
       ballVector.dx = -ballVector.dx;
-
   }
-  
+
   private checkGoal(gameInfo: GameInfo) {
     const ballPosition = gameInfo.ball.position;
     const player1 = gameInfo.player1;
@@ -108,33 +106,44 @@ export class GameService {
     }
   }
 
+  isGameFinished(gameInfo: GameInfo) {
+    return gameInfo.player1.score > 3 || gameInfo.player2.score > 3;
+  }
+
   private gameLoop(
     room: GameRoom,
     onUpdate: (gameInfo: GameInfo) => any,
-    onFinish?,
+    onFinish: (match: Match) => any,
   ) {
     return () => {
       const gameInfo = room.gameInfo;
-      
+
       this.movePlayer(gameInfo);
       this.moveBall(gameInfo);
       this.checkCollision(gameInfo);
       this.checkGoal(gameInfo);
 
-      onUpdate(room.gameInfo);
-      if (room.gameStatus == GameStatus.FINISHED) {
+      if (
+        this.isGameFinished(gameInfo) ||
+        room.gameStatus == GameStatus.FINISHED
+      ) {
+        room.gameStatus = GameStatus.FINISHED;
+        room.gameInfo.endAt = new Date();
         clearInterval(room.interval);
-        onFinish();
-        this.gameRepository.saveGameToDB(room.socketRoomId);
+        const match = this.gameRepository.saveGameToDB(room.socketRoomId);
+        if (match) onFinish(match);
         this.gameRepository.deleteGameRoom(room.socketRoomId);
-      }
+      } else onUpdate(room.gameInfo);
     };
   }
 
-  start(roomId: number, onUpdate: (gameInfo: GameInfo) => any) {
+  start(
+    roomId: number,
+    onUpdate: (gameInfo: GameInfo) => any,
+    onFinish: (match: Match) => any,
+  ) {
     const gameRoom = this.gameRepository.getGameRoom(roomId);
     const gameInfo = new GameInfo();
-
     const paddleY = (this.canvasHeight - this.paddleHeight) / 2;
 
     gameInfo.ball = {
@@ -154,16 +163,20 @@ export class GameService {
       score: 0,
     };
     gameRoom.gameInfo = gameInfo;
+    gameRoom.gameType = 0;
     gameRoom.gameStatus = GameStatus.STARTED;
-    gameRoom.interval = setInterval(this.gameLoop(gameRoom, onUpdate), 10);
+    gameRoom.interval = setInterval(
+      this.gameLoop(gameRoom, onUpdate, onFinish),
+      10,
+    );
   }
 
   private forcePlayer(gamePlayer: GamePlayer, moveInfo: any) {
     gamePlayer.vector.dy += moveInfo;
     if (gamePlayer.vector.dy > this.maxPaddleSpeed)
       gamePlayer.vector.dy = this.maxPaddleSpeed;
-    if (-gamePlayer.vector.dy > this.maxPaddleSpeed) 
-      gamePlayer.vector.dy = -this.maxPaddleSpeed; 
+    if (-gamePlayer.vector.dy > this.maxPaddleSpeed)
+      gamePlayer.vector.dy = -this.maxPaddleSpeed;
   }
 
   move(roomId: number, playerId: number, moveInfo: any) {

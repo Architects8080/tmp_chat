@@ -47,11 +47,12 @@ export class GameRepository {
     return this.gameRoomMap.set(roomId, gameRoom);
   }
 
-  saveGameToDB(roomId: number) {
+  saveGameToDB(roomId: number): Match {
     const room = this.getGameRoom(roomId);
-    if (!room) return false;
+    if (!room) return null;
     const gameInfo = room.gameInfo;
     const match: Match = this.matchRepository.create();
+
     if (gameInfo.player1.score >= gameInfo.player2.score) {
       match.winner = gameInfo.player1.id;
       match.loser = gameInfo.player2.id;
@@ -63,7 +64,11 @@ export class GameRepository {
       match.winnerScore = gameInfo.player2.score;
       match.loserScore = gameInfo.player1.score;
     }
+    const gameTime =
+      (gameInfo.endAt.getTime() - gameInfo.startAt.getTime()) / 1000;
+    match.gameTime = Math.round(gameTime); // second
     match.gameType = room.gameType;
     this.matchRepository.insert(match);
+    return match;
   }
 }

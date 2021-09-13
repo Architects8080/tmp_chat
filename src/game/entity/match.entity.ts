@@ -9,9 +9,6 @@ export class Match {
   @Column()
   gameType: number; // enum
 
-  @Column()
-  mapType: number; // enum or string
-
   @ManyToOne((type) => User)
   winner: number;
   @ManyToOne((type) => User)
@@ -21,4 +18,7 @@ export class Match {
   winnerScore: number;
   @Column()
   loserScore: number;
+
+  @Column()
+  gameTime: number; // second
 }

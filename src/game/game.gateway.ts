@@ -17,6 +17,8 @@ import { GameInfo } from './data/gameinfo.data';
 import { GameService } from './game.service';
 import { SocketUserService } from '../socket/socket-user.service';
 import { GameRoomService } from './game-room.service';
+import { GameRoom } from './data/gameroom.data';
+import { Match } from './entity/match.entity';
 
 @UseGuards(JwtAuthGuard)
 @WebSocketGateway(4000, { namespace: 'game' })
@@ -105,11 +107,29 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       player1.join('gameroom:' + roomId.toString());
       player2.join('gameroom:' + roomId.toString());
 
-      this.gameService.start(roomId, (gameInfo: GameInfo) => {
-        this.server
-          .in('gameroom:' + roomId.toString())
-          .emit('update', roomId, gameInfo);
-      });
+      this.gameService.start(
+        roomId,
+        (gameInfo: GameInfo) => {
+          this.server
+            .in('gameroom:' + roomId.toString())
+            .emit('update', roomId, gameInfo);
+        },
+        (match: Match) => {
+          const winner = this.socketUserService.getSocketById(match.winner);
+          this.server
+            .in('gameroom:' + roomId.toString())
+            .emit('gameover', roomId, {
+              winnerProfile: {
+                nickname: winner.user.nickname,
+                avatar: winner.user.avatar,
+              },
+              score: {
+                winnerScore: match.winnerScore,
+                loserScore: match.loserScore,
+              },
+            });
+        },
+      );
     }
   }
 
