@@ -2,6 +2,7 @@ import React from "react";
 import { useEffect } from "react";
 import { useRef } from "react";
 import { useState } from "react";
+import { io } from "../../socket/socket";
 import "./modal.css";
 import useDetectOutsideClick from "./useDetectOutsideClick";
 
@@ -9,6 +10,7 @@ type ModalProps = {
   open: any;
   close: any;
   header: any;
+  targetUserId: number;
   children: React.ReactNode;
 };
 
@@ -64,7 +66,9 @@ function GameSettingModal(prop: ModalProps) {
     console.log(`user submit!`);
     console.log(`1. map idx ? : `, currentImageIdx);
     console.log(`2. is Obstacle? : `, isChecked);
+
     // server send
+    io.emit('invite', prop.targetUserId, {currentImageIdx, isChecked})
     prop.close();
   };
 
