@@ -1,5 +1,11 @@
-import { User } from 'src/user/entity/user.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { MatchPlayer } from './match-player.entity';
 
 @Entity('match')
 export class Match {
@@ -8,17 +14,14 @@ export class Match {
 
   @Column()
   gameType: number; // enum
-
-  @ManyToOne((type) => User)
-  winner: number;
-  @ManyToOne((type) => User)
-  loser: number;
-
   @Column()
-  winnerScore: number;
+  startAt: Date;
   @Column()
-  loserScore: number;
-
+  endAt: Date;
   @Column()
   gameTime: number; // second
+
+  @OneToMany(() => MatchPlayer, (matchPlayer) => matchPlayer.match)
+  @JoinColumn()
+  players: MatchPlayer[];
 }
