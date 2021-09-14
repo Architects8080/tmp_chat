@@ -5,6 +5,8 @@ import { useEffect } from "react";
 import { useRef } from "react";
 import { io } from "../../socket/socket";
 import { GameInfo } from "../gameType";
+import GameResultModal from "../modal/gameResultModal";
+import { score, winnerProfile } from "../modal/gameResultModalType";
 import "./pong.css";
 
 type PongProps = {
@@ -12,16 +14,23 @@ type PongProps = {
   gameInfo: GameInfo;
 };
 
+type gameoverInfo = {
+  winnerProfile: winnerProfile;
+  score: score;
+};
+
 function Pong({ roomID, gameInfo }: PongProps) {
-  console.log(`RoomID, `, roomID, `Pong GameInfo : `, gameInfo);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const moveUpSpeed = 7;
-  const moveDownSpeed = -7;
+  const moveUpSpeed = -7;
+  const moveDownSpeed = 7;
+
+  const [gameoverInfo, setGameoverInfo] = useState({} as gameoverInfo);
 
   const [test, setTest] = useState(0);
   const time = useRef(0);
 
   const keyDownEvent = useCallback((e) => {
+    //usememo 그대로 써서 cost
     if (e.key === "ArrowUp" || e.key === "w") {
       io.emit("move", [roomID, moveUpSpeed]);
     }
@@ -33,6 +42,12 @@ function Pong({ roomID, gameInfo }: PongProps) {
   const ballRadius = 10;
   const paddleHeight = 75;
   const paddleWidth = 10;
+
+  const [isGameOver, setIsGameOver] = useState(false);
+  const closeGameInviteModal = () => {
+    window.location.href = "http://localhost:3000/main";
+    setIsGameOver(false);
+  };
 
   useEffect(() => {
     const canvas: HTMLCanvasElement | null = canvasRef.current;
@@ -48,8 +63,8 @@ function Pong({ roomID, gameInfo }: PongProps) {
 
     const draw = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      console.log(gameInfo.ball.position);
       drawball();
+      drawpaddle();
     };
 
     const drawball = () => {
@@ -85,14 +100,46 @@ function Pong({ roomID, gameInfo }: PongProps) {
       ctx.closePath();
     };
 
-    drawpaddle();
-
     window.addEventListener("keydown", keyDownEvent);
-    return () => clearInterval(timer);
+
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener("keydown", keyDownEvent);
+    };
   }, [test]);
+
+  useEffect(() => {
+    io.on("gameover", (roomId: number, gameoverInfo: gameoverInfo) => {
+      console.log("gameoverInfo: ", gameoverInfo);
+      setGameoverInfo(gameoverInfo);
+      setIsGameOver(true);
+    });
+  }, []);
+
+  // if (isGameOver)
+  //   return (
+  //     <GameResultModal
+  //       open={isGameOver}
+  //       close={closeGameInviteModal}
+  //       header="게임 결과"
+  //       score={gameoverInfo.score}
+  //       winnerProfile={gameoverInfo.winnerProfile}
+  //     ></GameResultModal>
+  //   );
 
   return (
     <>
+      {isGameOver ? (
+        <GameResultModal
+          open={isGameOver}
+          close={closeGameInviteModal}
+          header="게임 결과"
+          score={gameoverInfo.score}
+          winnerProfile={gameoverInfo.winnerProfile}
+        ></GameResultModal>
+      ) : (
+        ""
+      )}
       <canvas ref={canvasRef} height={600} width={800} className="canvas" />
     </>
   );

@@ -92,8 +92,9 @@ div.modal-content {
 
 div.modal-content.center {
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  text-align: center;
   margin-top: 28px;
 
   font-family: Spoqa Han Sans Neo;
@@ -254,6 +255,21 @@ div.modal-content > div.image-cropper {
 
   color: #ff5c5c;
   border-radius: 8px;
+}
+
+.modal > section > div.gameResult-submit > button.accept {
+  width: 528px;
+  margin-top: 30px;
+  padding: 16px 0;
+  background: rgba(53, 97, 255, 0.1);
+  border-radius: 8px;
+
+  font-family: Spoqa Han Sans Neo;
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 20px;
+
+  color: #3562ff;
 }
 
 .modal.openModal {
