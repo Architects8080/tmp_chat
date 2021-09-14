@@ -65,12 +65,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: SocketUser,
   ) {
     const targetUserId = data[0];
+    const mapSetting = data[1];
     const targetUser = this.socketUserService.getSocketById(targetUserId);
 
     if (targetUser) {
       const roomId: number = this.gameRoomService.invite(
         client.user.id,
         targetUser.user.id,
+        mapSetting,
       );
 
       targetUser.emit(
@@ -147,7 +149,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.socketUserService.getSocketById(canceledPlayerId);
 
     if (canceledPlayer) canceledPlayer.emit('cancel', roomId);
-  }
+  } 
 
   @SubscribeMessage('move')
   movePlayer(

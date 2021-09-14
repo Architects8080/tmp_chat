@@ -14,6 +14,8 @@ export class GameRoom {
   player2: RoomPlayer;
 
   gameType: number; // need change to enum
+  mapType: number; // map index(id)
 
+  isObstacle: boolean;
   interval: NodeJS.Timer;
 }

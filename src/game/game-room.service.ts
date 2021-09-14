@@ -5,11 +5,15 @@ import { GameRepository } from './game.repository';
 export class GameRoomService {
   constructor(private gameRepository: GameRepository) {}
 
-  invite(userId: number, targetUserId: number): number {
+  invite(userId: number, targetUserId: number, mapSetting: any): number { //, mapSetting: object
     const gameRoom = this.gameRepository.createGameRoom();
 
     gameRoom.player1 = { id: userId, isAccept: true };
     gameRoom.player2 = { id: targetUserId, isAccept: false };
+    gameRoom.isObstacle = mapSetting.isObstacle;
+    gameRoom.mapType = mapSetting.mapId;
+    if (gameRoom.mapType == 0)
+      gameRoom.mapType = 1;
     return gameRoom.socketRoomId;
   }
 
