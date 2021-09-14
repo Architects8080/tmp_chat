@@ -17,8 +17,7 @@ import { GameInfo } from './data/gameinfo.data';
 import { GameService } from './game.service';
 import { SocketUserService } from '../socket/socket-user.service';
 import { GameRoomService } from './game-room.service';
-import { GameRoom } from './data/gameroom.data';
-import { Match } from './entity/match.entity';
+import { GamePlayer } from './data/game-player.data';
 
 @UseGuards(JwtAuthGuard)
 @WebSocketGateway(4000, { namespace: 'game' })
@@ -114,18 +113,27 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             .in('gameroom:' + roomId.toString())
             .emit('update', roomId, gameInfo);
         },
-        (match: Match) => {
-          const winner = this.socketUserService.getSocketById(match.winner);
+        (gameInfo: GameInfo) => {
+          let winner: GamePlayer;
+          let loser: GamePlayer;
+          if (gameInfo.player1.score >= gameInfo.player2.score) {
+            winner = gameInfo.player1;
+            loser = gameInfo.player2;
+          } else {
+            winner = gameInfo.player2;
+            loser = gameInfo.player1;
+          }
+          const winnerUser = this.socketUserService.getSocketById(winner.id);
           this.server
             .in('gameroom:' + roomId.toString())
             .emit('gameover', roomId, {
               winnerProfile: {
-                nickname: winner.user.nickname,
-                avatar: winner.user.avatar,
+                nickname: winnerUser.user.nickname,
+                avatar: winnerUser.user.avatar,
               },
               score: {
-                winnerScore: match.winnerScore,
-                loserScore: match.loserScore,
+                winnerScore: winner.score,
+                loserScore: loser.score,
               },
             });
         },

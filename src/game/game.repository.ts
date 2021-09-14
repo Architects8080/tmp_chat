@@ -1,8 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
+import { GamePlayer } from './data/game-player.data';
 import { GameStatus } from './data/game-status.data';
 import { GameRoom } from './data/gameroom.data';
+import { MatchPlayer } from './entity/match-player.entity';
 import { Match } from './entity/match.entity';
 
 @Injectable()
@@ -10,7 +13,10 @@ export class GameRepository {
   // need typeorm
   constructor(
     @InjectRepository(Match)
-    private readonly matchRepository: Repository<Match>,
+    private matchRepository: Repository<Match>,
+    @InjectRepository(MatchPlayer)
+    private matchPlayerRepository: Repository<MatchPlayer>,
+    private userService: UserService,
   ) {}
 
   gameRoomMap: Map<number, GameRoom> = new Map();
@@ -47,28 +53,32 @@ export class GameRepository {
     return this.gameRoomMap.set(roomId, gameRoom);
   }
 
-  saveGameToDB(roomId: number): Match {
+  async saveMatchPlayer(matchId: number, player: GamePlayer, isLeft: boolean) {
+    const matchPlayer = this.matchPlayerRepository.create();
+    const user = await this.userService.getUserById(player.id);
+    matchPlayer.matchId = matchId;
+    matchPlayer.userId = player.id;
+    matchPlayer.score = player.score;
+    matchPlayer.isLeft = isLeft;
+    matchPlayer.ladderPoint = user.ladderPoint;
+    matchPlayer.ladderIncrease = 0; // TODO
+    this.matchPlayerRepository.insert(matchPlayer);
+  }
+
+  async saveGameToDB(roomId: number) {
     const room = this.getGameRoom(roomId);
     if (!room) return null;
     const gameInfo = room.gameInfo;
     const match: Match = this.matchRepository.create();
-
-    if (gameInfo.player1.score >= gameInfo.player2.score) {
-      match.winner = gameInfo.player1.id;
-      match.loser = gameInfo.player2.id;
-      match.winnerScore = gameInfo.player1.score;
-      match.loserScore = gameInfo.player2.score;
-    } else {
-      match.winner = gameInfo.player2.id;
-      match.loser = gameInfo.player1.id;
-      match.winnerScore = gameInfo.player2.score;
-      match.loserScore = gameInfo.player1.score;
-    }
     const gameTime =
       (gameInfo.endAt.getTime() - gameInfo.startAt.getTime()) / 1000;
+
+    match.startAt = gameInfo.startAt;
+    match.endAt = gameInfo.endAt;
     match.gameTime = Math.round(gameTime); // second
     match.gameType = room.gameType;
-    this.matchRepository.insert(match);
-    return match;
+    await this.matchRepository.insert(match);
+    this.saveMatchPlayer(match.id, gameInfo.player1, true);
+    this.saveMatchPlayer(match.id, gameInfo.player2, false);
   }
 }

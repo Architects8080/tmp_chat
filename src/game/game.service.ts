@@ -4,7 +4,6 @@ import { GameStatus } from './data/game-status.data';
 import { GameInfo } from './data/gameinfo.data';
 import { GameRoom } from './data/gameroom.data';
 import { GameObject } from './data/object.data';
-import { Match } from './entity/match.entity';
 import { GameRepository } from './game.repository';
 
 @Injectable()
@@ -113,16 +112,15 @@ export class GameService {
   private gameLoop(
     room: GameRoom,
     onUpdate: (gameInfo: GameInfo) => any,
-    onFinish: (match: Match) => any,
+    onFinish: (gameInfo: GameInfo) => any,
   ) {
-    return () => {
+    return async () => {
       const gameInfo = room.gameInfo;
 
       this.movePlayer(gameInfo);
       this.moveBall(gameInfo);
       this.checkCollision(gameInfo);
       this.checkGoal(gameInfo);
-
       onUpdate(room.gameInfo);
       if (
         this.isGameFinished(gameInfo) ||
@@ -131,8 +129,8 @@ export class GameService {
         room.gameStatus = GameStatus.FINISHED;
         room.gameInfo.endAt = new Date();
         clearInterval(room.interval);
-        const match = this.gameRepository.saveGameToDB(room.socketRoomId);
-        if (match) onFinish(match);
+        await this.gameRepository.saveGameToDB(room.socketRoomId);
+        onFinish(room.gameInfo);
         this.gameRepository.deleteGameRoom(room.socketRoomId);
       }
     };
@@ -141,7 +139,7 @@ export class GameService {
   start(
     roomId: number,
     onUpdate: (gameInfo: GameInfo) => any,
-    onFinish: (match: Match) => any,
+    onFinish: (gameInfo: GameInfo) => any,
   ) {
     const gameRoom = this.gameRepository.getGameRoom(roomId);
     const gameInfo = new GameInfo();
