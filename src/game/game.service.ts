@@ -123,6 +123,7 @@ export class GameService {
       this.checkCollision(gameInfo);
       this.checkGoal(gameInfo);
 
+      onUpdate(room.gameInfo);
       if (
         this.isGameFinished(gameInfo) ||
         room.gameStatus == GameStatus.FINISHED
@@ -133,7 +134,7 @@ export class GameService {
         const match = this.gameRepository.saveGameToDB(room.socketRoomId);
         if (match) onFinish(match);
         this.gameRepository.deleteGameRoom(room.socketRoomId);
-      } else onUpdate(room.gameInfo);
+      }
     };
   }
 
