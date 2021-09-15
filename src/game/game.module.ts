@@ -5,6 +5,7 @@ import { UserModule } from 'src/user/user.module';
 import { MatchPlayer } from './entity/match-player.entity';
 import { Match } from './entity/match.entity';
 import { GameRoomService } from './game-room.service';
+import { GameController } from './game.controller';
 import { GameGateway } from './game.gateway';
 import { GameRepository } from './game.repository';
 import { GameService } from './game.service';
@@ -23,6 +24,7 @@ import { GameSocketUserService } from './game.socket-user.service';
     GameRepository,
     GameSocketUserService,
   ],
+  controllers: [GameController],
   exports: [GameService, GameSocketUserService, GameRepository],
 })
 export class GameModule {}
