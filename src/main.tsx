@@ -65,13 +65,12 @@ function Main() {
   return (
     <div>
       <button onClick={handleCustomMatch}>Custom Match(Invite)</button>
-      <GameSettingModal 
+      <GameSettingModal
         open={isGameSettingModalOpen}
         close={closeGameSettingModal}
         header="게임 설정"
-        targetUserId={68874}>
-        
-      </GameSettingModal>
+        targetUserId={68874}
+      ></GameSettingModal>
       <GameInviteModal
         inviteInfo={inviteUserInfo}
         open={isGameInviteModalOpen}
