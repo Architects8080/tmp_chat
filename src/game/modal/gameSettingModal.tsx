@@ -1,3 +1,4 @@
+import axios from "axios";
 import React from "react";
 import { useEffect } from "react";
 import { useRef } from "react";
@@ -15,13 +16,6 @@ type ModalProps = {
 };
 
 function GameSettingModal(prop: ModalProps) {
-  const imgURL: string[] = [
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfA4HU79bnFZF2GXuPt-G-8aW-lA7HtIvWKlrbPdvRqZUsoQSzn_K9II6tX1Xff_5A_Bo&usqp=CAU",
-    "https://rembound.com/files/pong-flash-demo.png",
-    "https://www.imaginarycloud.com/blog/content/images/2019/02/Pong.jpg",
-    "https://raw.githubusercontent.com/godotengine/godot-demo-projects/3.2-57baf0a/2d/pong/screenshots/pong.png",
-  ];
-
   const dropdownRef = useRef(null);
   const [isActive, setIsActive] = useDetectOutsideClick(dropdownRef, false);
   const [currentImageIdx, setcurrentImageIdx] = useState(0);
@@ -29,12 +23,23 @@ function GameSettingModal(prop: ModalProps) {
   const [isSelect, setIsSelect] = useState(false);
   const [buttonText, setButtonText] = useState("맵 선택");
 
+  const [mapList, setMapList] = useState<string[]>([""]);
   var isChecked = false;
+
+  const getMapList = async (): Promise<any> => {
+    const data = await axios.get(
+      process.env.REACT_APP_SERVER_ADDRESS + "/game/map/list",
+      { withCredentials: true }
+    );
+
+    setMapList(data.data);
+  };
 
   useEffect(() => {
     setButtonText("맵 선택");
     setIsSelect(false);
     setcurrentImageIdx(0);
+    getMapList();
   }, []);
 
   const onClick = (label: string) => {
@@ -59,16 +64,13 @@ function GameSettingModal(prop: ModalProps) {
 
   const handleChangeEvent = (e: React.ChangeEvent<HTMLInputElement>) => {
     isChecked = e.target.checked;
-    console.log(`isChecked`, isChecked);
   };
 
   const handleSubmit = (event: React.MouseEvent) => {
-    console.log(`user submit!`);
-    console.log(`1. map idx ? : `, currentImageIdx);
-    console.log(`2. is Obstacle? : `, isChecked);
-
-    // server send
-    io.emit('invite', prop.targetUserId, {currentImageIdx, isChecked})
+    io.emit("invite", prop.targetUserId, {
+      mapId: currentImageIdx,
+      isObstacle: isChecked,
+    });
     prop.close();
   };
 
@@ -89,7 +91,7 @@ function GameSettingModal(prop: ModalProps) {
           {/* 1번째 subtitle */}
           <div className="modal-content">
             <div className="title">맵 선택 & 미리보기</div>
-            <img src={imgURL[currentImageIdx]} />
+            <img src={mapList[currentImageIdx]} />
           </div>
 
           {/* 2번째 subtitle */}

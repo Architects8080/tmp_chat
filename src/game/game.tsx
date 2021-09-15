@@ -44,7 +44,6 @@ function Game() {
     <React.Fragment>
       {gameInfo ? (
         <div>
-          {/* {console.log(playerInfo['player1'].avatar)} */}
           <img
             src={playerInfo["player1"].avatar}
             alt="cannot display"

@@ -22,5 +22,8 @@ export type GameInfo = {
   player1: GamePlayer;
   player2: GamePlayer;
   ball: GameObject;
+  mapImage: string;
   obstacles: GameObject[];
+  startAt: Date;
+  endAt: Date;
 };

@@ -49,6 +49,9 @@ function Pong({ roomID, gameInfo }: PongProps) {
     setIsGameOver(false);
   };
 
+  const background = new Image();
+  background.src = gameInfo.mapImage;
+
   useEffect(() => {
     const canvas: HTMLCanvasElement | null = canvasRef.current;
     if (!canvas) return;
@@ -63,8 +66,13 @@ function Pong({ roomID, gameInfo }: PongProps) {
 
     const draw = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawBackground();
       drawball();
       drawpaddle();
+    };
+
+    const drawBackground = () => {
+      ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
     };
 
     const drawball = () => {
@@ -115,17 +123,6 @@ function Pong({ roomID, gameInfo }: PongProps) {
       setIsGameOver(true);
     });
   }, []);
-
-  // if (isGameOver)
-  //   return (
-  //     <GameResultModal
-  //       open={isGameOver}
-  //       close={closeGameInviteModal}
-  //       header="게임 결과"
-  //       score={gameoverInfo.score}
-  //       winnerProfile={gameoverInfo.winnerProfile}
-  //     ></GameResultModal>
-  //   );
 
   return (
     <>
