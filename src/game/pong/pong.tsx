@@ -43,6 +43,9 @@ function Pong({ roomID, gameInfo }: PongProps) {
   const paddleHeight = 75;
   const paddleWidth = 10;
 
+  const obstacleWidth = 20;
+  const obstacleHeight = 100; //canvas.height / 6;
+
   const [isGameOver, setIsGameOver] = useState(false);
   const closeGameInviteModal = () => {
     window.location.href = "http://localhost:3000/main";
@@ -67,6 +70,7 @@ function Pong({ roomID, gameInfo }: PongProps) {
     const draw = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       drawBackground();
+      drawObstacle();
       drawball();
       drawpaddle();
     };
@@ -108,6 +112,20 @@ function Pong({ roomID, gameInfo }: PongProps) {
       ctx.closePath();
     };
 
+    const drawObstacle = () => {
+      ctx.beginPath();
+      gameInfo.obstacles.forEach((element) => {
+        ctx.rect(
+          element.position.x,
+          element.position.y,
+          obstacleWidth,
+          obstacleHeight,
+        );
+      })
+      ctx.fillStyle = "#FF5C5C";
+      ctx.fill();
+      ctx.closePath();
+    }
     window.addEventListener("keydown", keyDownEvent);
 
     return () => {
@@ -118,7 +136,6 @@ function Pong({ roomID, gameInfo }: PongProps) {
 
   useEffect(() => {
     io.on("gameover", (roomId: number, gameoverInfo: gameoverInfo) => {
-      console.log("gameoverInfo: ", gameoverInfo);
       setGameoverInfo(gameoverInfo);
       setIsGameOver(true);
     });
