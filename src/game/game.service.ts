@@ -16,6 +16,9 @@ export class GameService {
   canvasHeight = 600;
   ballRadius = 10;
 
+  obstacleWidth = 20;
+  obstacleHeight = this.canvasHeight / 6;
+
   paddleWidth = 10;
   paddleHeight = 75;
 
@@ -26,10 +29,6 @@ export class GameService {
     obj.position.y = this.canvasHeight / 2;
   }
 
-  //고정값이면 그냥 안해도 될듯. 바로 position 넘겨서 사각형 그리자..
-  private drawObstacle() {}
-
-  private;
   private moveBall(gameInfo: GameInfo) {
     const ballPosition = gameInfo.ball.position;
     const ballVector = gameInfo.ball.vector;
@@ -79,6 +78,7 @@ export class GameService {
     const player1 = gameInfo.player1;
     const player2 = gameInfo.player2;
 
+    //paddle collision
     if (
       ballPosition.x + ballVector.dx <
         player1.position.x + this.paddleWidth + 5 &&
@@ -94,8 +94,42 @@ export class GameService {
     )
       ballVector.dx = -ballVector.dx;
 
-    //if isObstacle?
-    //if    ballposition & obstaclePosition?
+    //obstacle collision
+    gameInfo.obstacles.forEach((element) => {
+      const obstaclePosition = element.position;
+
+      if (
+        ballPosition.x + ballVector.dx > obstaclePosition.x &&
+        ballPosition.x + ballVector.dx <
+          obstaclePosition.x + this.obstacleWidth + 5 &&
+        ballPosition.y + ballVector.dy > obstaclePosition.y &&
+        ballPosition.y + ballVector.dy <
+          obstaclePosition.y + this.obstacleHeight
+      )
+        ballVector.dx = -ballVector.dx;
+
+      if (
+        ballPosition.x + ballVector.dx < obstaclePosition.x &&
+        ballPosition.x + ballVector.dx > obstaclePosition.x - 5 &&
+        ballPosition.y + ballVector.dy > obstaclePosition.y &&
+        ballPosition.y + ballVector.dy <
+          obstaclePosition.y + this.obstacleHeight
+      )
+        ballVector.dx = -ballVector.dx;
+
+      if (
+        ballPosition.x + ballVector.dx > obstaclePosition.x &&
+        ballPosition.x + ballVector.dx <
+          obstaclePosition.x + this.obstacleWidth &&
+        ((ballPosition.y + ballVector.dy > obstaclePosition.y - 5 &&
+          ballPosition.y + ballVector.dy < obstaclePosition.y) ||
+          (ballPosition.y + ballVector.dy >
+            obstaclePosition.y + this.obstacleHeight &&
+            ballPosition.y + ballVector.dy <
+              obstaclePosition.y + this.obstacleHeight + 5))
+      )
+        ballVector.dy = -ballVector.dy;
+    });
   }
 
   private checkGoal(gameInfo: GameInfo) {
@@ -170,6 +204,23 @@ export class GameService {
       score: 0,
     };
     gameInfo.mapImage = mapList[gameRoom.mapType];
+    if (gameRoom.isObstacle) {
+      gameInfo.obstacles.push({
+        position: {
+          x: this.canvasWidth / 2 - this.obstacleWidth / 2,
+          y: this.canvasHeight / 6,
+        },
+        vector: { dx: 0, dy: 0 },
+      });
+      gameInfo.obstacles.push({
+        position: {
+          x: this.canvasWidth / 2 - this.obstacleWidth / 2,
+          y: (this.canvasHeight / 6) * 4,
+        },
+        vector: { dx: 0, dy: 0 },
+      });
+      console.log(gameInfo.obstacles);
+    }
 
     gameRoom.gameInfo = gameInfo;
     gameRoom.gameType = 0;
