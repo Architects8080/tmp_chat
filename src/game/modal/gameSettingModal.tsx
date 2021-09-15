@@ -12,7 +12,7 @@ type ModalProps = {
   close: any;
   header: any;
   targetUserId: number;
-  children: React.ReactNode;
+  // children: React.ReactNode;
 };
 
 function GameSettingModal(prop: ModalProps) {
@@ -81,8 +81,7 @@ function GameSettingModal(prop: ModalProps) {
           <div className="modal-title">
             {prop.header}
             <button className="modal-close" onClick={prop.close}>
-              {" "}
-              X{" "}
+              {" "}X{" "}
             </button>
           </div>
           <div className="explain">
