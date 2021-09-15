@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { GamePlayer } from './data/game-player.data';
 import { GameStatus } from './data/game-status.data';
 import { GameInfo } from './data/gameinfo.data';
+import { mapList } from './data/gamemap.data';
 import { GameRoom } from './data/gameroom.data';
 import { GameObject } from './data/object.data';
 import { GameRepository } from './game.repository';
@@ -25,6 +26,10 @@ export class GameService {
     obj.position.y = this.canvasHeight / 2;
   }
 
+  //고정값이면 그냥 안해도 될듯. 바로 position 넘겨서 사각형 그리자..
+  private drawObstacle() {}
+
+  private;
   private moveBall(gameInfo: GameInfo) {
     const ballPosition = gameInfo.ball.position;
     const ballVector = gameInfo.ball.vector;
@@ -88,6 +93,9 @@ export class GameService {
       ballPosition.y + ballVector.dy < player2.position.y + this.paddleHeight
     )
       ballVector.dx = -ballVector.dx;
+
+    //if isObstacle?
+    //if    ballposition & obstaclePosition?
   }
 
   private checkGoal(gameInfo: GameInfo) {
@@ -161,6 +169,8 @@ export class GameService {
       vector: { dx: 0, dy: 0 },
       score: 0,
     };
+    gameInfo.mapImage = mapList[gameRoom.mapType];
+
     gameRoom.gameInfo = gameInfo;
     gameRoom.gameType = 0;
     gameRoom.gameStatus = GameStatus.STARTED;
