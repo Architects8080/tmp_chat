@@ -18,6 +18,7 @@ import { GameService } from './game.service';
 import { SocketUserService } from '../socket/socket-user.service';
 import { GameRoomService } from './game-room.service';
 import { GamePlayer } from './data/game-player.data';
+import { GameRoom } from './data/gameroom.data';
 
 @UseGuards(JwtAuthGuard)
 @WebSocketGateway(4000, { namespace: 'game' })
@@ -41,8 +42,19 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const userPayload = this.jwtService.verify(token);
       const user = await this.jwtStrategy.validate(userPayload);
       client.user = user;
+      const existUser = this.socketUserService.getSocketById(user.id);
+      if (existUser) {
+        existUser.rooms.forEach((room) => {
+          client.join(room);
+        });
+        existUser.disconnect(true);
+      } else {
+        const room = this.gameRoomService.getJoinedRoom(user.id);
+        if (room) client.join('gameroom:' + room);
+      }
       this.socketUserService.addSocket(client);
     } catch (error) {
+      console.log(error);
       client.disconnect(true);
     }
   }
@@ -63,6 +75,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: any[],
     @ConnectedSocket() client: SocketUser,
   ) {
+    console.log(data);
     const targetUserId = data[0];
     const mapSetting = data[1];
     const targetUser = this.socketUserService.getSocketById(targetUserId);
@@ -81,6 +94,16 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         roomId,
       );
     }
+  }
+
+  @SubscribeMessage('observe')
+  observeGame(
+    @MessageBody() data: any[],
+    @ConnectedSocket() client: SocketUser,
+  ) {
+    const roomId = data[0];
+
+    client.join('gameroom:' + roomId.toString());
   }
 
   @SubscribeMessage('accept')
@@ -157,7 +180,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.socketUserService.getSocketById(canceledPlayerId);
 
     if (canceledPlayer) canceledPlayer.emit('cancel', roomId);
-  } 
+  }
 
   @SubscribeMessage('move')
   movePlayer(
