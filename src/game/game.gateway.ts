@@ -101,9 +101,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: any[],
     @ConnectedSocket() client: SocketUser,
   ) {
-    const roomId = data[0];
-
-    client.join('gameroom:' + roomId.toString());
+    const roomId = +data[0];
+    if (this.gameRoomService.isPlayingRoom(roomId)) {
+      client.join('gameroom:' + roomId.toString());
+    } else {
+      client.emit('vanished', roomId.toString());
+    }
   }
 
   @SubscribeMessage('accept')

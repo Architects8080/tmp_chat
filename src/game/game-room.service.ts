@@ -23,6 +23,13 @@ export class GameRoomService {
     return result;
   }
 
+  isPlayingRoom(roomId: number): boolean {
+    const gameRoom = this.gameRepository.getGameRoom(roomId);
+
+    if (gameRoom && gameRoom.gameStatus == GameStatus.STARTED) return true;
+    else return false;
+  }
+
   invite(userId: number, targetUserId: number, mapSetting: any): number {
     const gameRoom = this.gameRepository.createGameRoom();
 
