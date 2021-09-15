@@ -38,6 +38,12 @@ function Game() {
         playerInfo["player2"] = player2Data.data;
       }
     });
+    io.on("vanished", (roomId: string) => {
+      if (roomId == id) {
+        window.location.href = "http://localhost:3000/main";
+      }
+    })
+    io.emit("observe", [id]);
   }, []);
 
   return (
