@@ -1,6 +1,4 @@
-// socket room 관련 repository에서는 이 클래스를 관리한다.
-// socket room + gameinfo + game entity
-
+import { GameStatus } from './game-status.data';
 import { GameInfo } from './gameinfo.data';
 import { RoomPlayer } from './room-player.data';
 
@@ -10,12 +8,14 @@ export class GameRoom {
 
   gameInfo: GameInfo | null | undefined;
 
-  gameStatus;
+  gameStatus: GameStatus;
 
   player1: RoomPlayer;
   player2: RoomPlayer;
 
   gameType: number; // need change to enum
+  mapType: number; // map index(id)
 
-  interval; // need when call clearInteravl
+  isObstacle: boolean;
+  interval: NodeJS.Timer;
 }

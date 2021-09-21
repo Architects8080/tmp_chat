@@ -1,12 +1,12 @@
-// 실제 게임 속 데이터가 들어간다. (position 등)
-// game object ...
-
 import { GamePlayer } from './game-player.data';
-import { Position } from './position.data';
+import { GameObject } from './object.data';
 
 export class GameInfo {
-  player1: GamePlayer;
-  player2: GamePlayer;
-  ball: Position;
-  obstacles: Position[];
+  player1: GamePlayer = new GamePlayer();
+  player2: GamePlayer = new GamePlayer();
+  ball: GameObject = new GameObject();
+  mapImage: string;
+  obstacles: GameObject[] = [];
+  startAt: Date = new Date();
+  endAt: Date;
 }

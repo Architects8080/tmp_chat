@@ -1,7 +1,6 @@
-import { Position } from './position.data';
+import { GameObject } from './object.data';
 
-export class GamePlayer {
+export class GamePlayer extends GameObject {
   id: number;
   score: number;
-  position: Position;
 }
