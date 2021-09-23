@@ -3,6 +3,8 @@ import { Redirect } from "react-router";
 import GameInviteModal from "./game/modal/gameInviteModal";
 import GameSettingModal from "./game/modal/gameSettingModal";
 import ShowSnackbar from "./game/snackbar/snackbar";
+import Header from "./header/header";
+import SideBar from "./sideBar/sideBar";
 import { io } from "./socket/socket";
 
 function Main() {
@@ -64,6 +66,8 @@ function Main() {
 
   return (
     <div>
+      <Header/>
+			<SideBar/>
       <button onClick={handleCustomMatch}>Custom Match(Invite)</button>
       <GameSettingModal
         open={isGameSettingModalOpen}
