@@ -17,8 +17,8 @@ export class User {
   @Column({ default: 0 })
   status: number;
 
-  @Column({ default: false })
-  useTwoFactor: boolean;
+  @Column({ nullable: true, default: null })
+  otpSecret: string;
 
   @Column({ default: 0 })
   ladderPoint: number;

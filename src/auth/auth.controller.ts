@@ -27,7 +27,10 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('test')
   async test(@Req() req, @Res({ passthrough: true }) res: Response) {
-    const token = await this.authService.sign(req.user);
+    const token = await this.authService.sign(
+      req.user,
+      req.user.otpSecret == null,
+    );
     if (token) {
       res.cookie('access_token', token);
       return res.redirect(

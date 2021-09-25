@@ -11,22 +11,21 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async sign({ id }) {
-    const payload = { id: id };
+  async sign({ id }, valid: boolean = true) {
+    const payload = { id: id, valid: valid };
     return this.jwtService.sign(payload);
   }
 
   async login(user: any, session: Record<string, User>) {
     try {
       const exist = await this.userService.getUserById(user.id);
-      if (exist) return this.sign(exist);
+      if (exist) return this.sign(exist, exist.otpSecret == null);
     } catch (error) {}
 
     const newUser = new User();
     newUser.id = user.id;
     newUser.nickname = user.login;
     newUser.intraLogin = user.login;
-    newUser.useTwoFactor = false;
     newUser.status = 0;
     newUser.avatar = user.image_url;
     newUser.ladderLevel = 0;
