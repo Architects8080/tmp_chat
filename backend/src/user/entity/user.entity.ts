@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn, OneToMany } from 'typeorm';
+import { ChannelMember } from 'src/channel/entity/channel.entity';
 
 @Entity('user')
 export class User {

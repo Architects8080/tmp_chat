@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { JwtMiddleware } from './auth/middleware/jwt.middleware';
 import { UserModule } from './user/user.module';
 import { GameModule } from './game/game.module';
+import { ChannelModule } from './channel/channel.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { GameModule } from './game/game.module';
     }),
     UserModule,
     GameModule,
+    ChannelModule,
   ],
   controllers: [AppController],
   providers: [AppService],
