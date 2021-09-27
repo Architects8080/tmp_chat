@@ -1,68 +1,170 @@
 ul {
 	padding: 0;
+	margin: 0;
 	list-style: none;
-  }
+}
 ul li {
-text-align: left;
-padding: 4px 15px;
+	text-align: left;
+}
+
+.profile {
+	border: solid 0.5px rgb(0,0,0, 0.2);
+	border-radius: 50%;
+	background: #FFF;
 }
 
 aside {
 	left: 0;
-	width: 200px;
-	height: 764px;
-	margin: 20px 20px;
+	width: 360px;
+	height: 907px;
 	border-radius: 5px;
-	box-shadow: 0 0 10px rgb(0,0,0, 0.3);
+	background: #F8F8F8;
 
-	.friendList {
-		ul {
-			height: 450px;
+	.sidebar-header {
+		display: flex;
+		justify-content: space-between;
+		padding: 32px 24px;
+		h3 {
+			font-size: 24pt;
+			font-weight: 600;
+			margin: 0;
 		}
-		ul li {
-			height: 35px;
+		button {
+			padding: 0;
+			border-style: none;
+			background: transparent;
+			img {
+				width: 32px;
+				height: 32px;
+			}
 		}
-		ul li:hover {
-			cursor: pointer;
-			background: rgb(0,0,0, 0.2);
+	}
+	.profile.medium {
+		width: 58px;
+		height: 58px;
+		margin: 0 22px;
+	}
+	.friend-list li {
+		height: 102px;
+		display: flex;
+		align-items: center;
+		font-size: 28pt;
+		div {
+			z-index: 1;
 		}
-		#alert {
-			display: inline-block;
-			width: 8px;
-			height: 8px;
-			margin-left: 10px;
-			background: chartreuse;
-			border-radius: 50%;
+		.alert-overlay {
+			position: absolute;
+			opacity: 0;
+			width: 360px;
+			height: 102px;
+			background: rgb(#FFF6C7, 0.5);
+			animation: alert-animation 1s ease-in-out;
 		}
+	}
+	.friend-list li:hover {
+		cursor: pointer;
+		background: rgb(0,0,0, 0.2);
 	}
 
 	.DM {
-		height: auto;
-		border-radius: 5px;
-		box-shadow: 0 0 5px rgb(0,0,0, 0.3);
+		height: 305px;
+		background: #EDEDED;
 		.DM-header {
-			display: flex;
-			justify-content: space-between;
-			span {
-				margin-top: 5px;
-				margin-left: 5px;
+			position: relative;
+			height: 52px;
+			align-items: center;
+			.profile.small {
+				display: inline-block;
+				width: 32px;
+				height: 32px;
+				margin-top: 10px;
+				margin-left: 10px;
+			}
+			h3 {
+				position: absolute;
+				display: inline-block;
+				font-size: 20pt;
+				font-weight: 600;
+				top: 8px;
+				margin: 0 0 0 10px;
+				padding: 0;
 			}
 			button {
-				margin-top: 5px;
-				margin-right: 5px;
+				position: absolute;
+				display: inline-block;
+				height: 100%;
+				right: 0;
+				padding: 0;
+				border-style: none;
+				background: transparent;
+				margin-right: 14px;
 			}
 		}
 		ul {
-			height: 150px;
-			border: 1px solid #d5d5d5;
+			height: 305px;
+			background: #EDEDED;
+			border-top: 1px solid #B1B1B1;
+			border-bottom: 1px solid #B1B1B1;
 			overflow:auto;
+			.dm-message {
+				display: flex;
+				min-height: 32px;
+				font-size: 12pt;
+				padding: 6px 10px;
+			}
+			.dm-message.my-dm {
+				flex-direction: column;
+				align-items: flex-end;
+				text-align: right;
+				margin-right: 10px;
+				word-break: break-all;
+			}
+			.dm-message.other-dm {
+				.profile.small {
+					width: 32px;
+					height: 32px;
+					margin-top: 2px;
+					margin-right: 8px;
+				}
+			}
+			.dm-user {
+				font-weight: 600;
+			}
+			.dm-text {
+				width: 287px;
+			}
 		}
 		ul span {
 			font-weight: 600;
 		}
 		input {
-			width: 130px;
-			margin: 0 5px;
+			width: 360px;
+			height: 40px;
+			padding-left: 10px;
+			border-style: none;
+			box-sizing: border-box;
+			background: #EDEDED;
 		}
+		::placeholder {
+			color: #B1B1B1;
+		}
+	}
+}
+
+@keyframes alert-animation {
+	0% {
+		opacity: 0;
+	}
+	25% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0;
+	}
+	75% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
 	}
 }
