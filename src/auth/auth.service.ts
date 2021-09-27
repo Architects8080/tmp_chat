@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/user/entity/user.entity';
 import { UserService } from 'src/user/user.service';
+import { LoginResult } from './data/login-result.data';
 import { JwtDto } from './dto/jwt.dto';
 
 @Injectable()
@@ -16,10 +17,13 @@ export class AuthService {
     return this.jwtService.sign(payload);
   }
 
-  async login(user: any, session: Record<string, User>) {
+  async login(user: any, session: Record<string, User>): Promise<LoginResult> {
     try {
       const exist = await this.userService.getUserById(user.id);
-      if (exist) return this.sign(exist, exist.otpSecret == null);
+      if (exist) {
+        const token = await this.sign(exist, exist.otpSecret == null);
+        return { token: token, user: exist };
+      }
     } catch (error) {}
 
     const newUser = new User();
