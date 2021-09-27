@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import './sideBar.scss';
 import axios from 'axios';
-import { useDMwith, User, useSideBarDispatch } from './sideBarContext';
-import { DM, useDMDispatch, useDMState } from './dmContext';
+import { User } from './sideBarContext';
+import { DM, useDMDispatch, useDMRef, useDMState } from './dmContext';
 
 const testUser = 69097;
 
@@ -15,10 +15,8 @@ type DMProps = {
 function DirectMessage({socket, friend, closeDM}: DMProps) {
 	const DMList = useDMState();
 	const DMDispatch = useDMDispatch();
-	const friendDispatch = useSideBarDispatch();
 	const [message, setMessage] = useState<string>('');
-	const DMwith = useDMwith();
-	const DMRef = useRef<HTMLLIElement | null>(null);
+	let DMRef = useDMRef();
 
 	const testSendMessageToMe = () => {
 		const newDM = {
@@ -61,27 +59,31 @@ function DirectMessage({socket, friend, closeDM}: DMProps) {
 		setMessage('');
 	}
 
-	const receiveDM = (newDM: DM) => {
-		if (newDM.id === DMwith.current.id || newDM.id === testUser) {
-			DMDispatch({type: "ADD", DM: newDM});
-			DMRef.current?.scrollIntoView({ behavior: 'smooth' });
-		}
-		else
-			friendDispatch({type: "ALERT", sender: newDM.id});
-	}
-	useEffect(() => {
-		socket.on('dmToClient', (newDM: DM) => { receiveDM(newDM) });
-	}, []);
-
 	return (
 		<div className="DM">
 			<div className="DM-header">
-				<span>DM from @{friend.nickname}</span>
-				<button onClick={closeDM}>닫기</button>
+				<div className="profile small"></div>
+				<h3>{friend.nickname}</h3>
+				<button onClick={closeDM}>
+					<img src="icons/dm/close.svg"/>
+				</button>
 			</div>
 			<ul>
 				{DMList.map(DM => (
-				<li ref={DMRef}><span>{DM.id} : </span>{DM.message}</li>
+					DM.id === testUser ? (
+						<li className="dm-message my-dm" ref={DMRef}>
+							<div className="dm-user">{DM.id}</div>
+							<div className="dm-text">{DM.message}</div>
+						</li>
+					):(
+						<li className="dm-message other-dm" ref={DMRef}>
+							<div className="profile small"></div>
+							<div>
+								<div className="dm-user">{DM.id}</div>
+								<div className="dm-text">{DM.message}</div>
+							</div>
+						</li>
+					)
 				))}
 			</ul>
 			<input
