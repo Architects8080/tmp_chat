@@ -48,7 +48,9 @@ function DirectMessage({socket, friend, closeDM}: DMProps) {
 	};
 	useEffect(() => { fetchDMList(testUser, friend.id) }, [friend]);
 
-	const sendDM = () => {
+	const sendDM = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e.key !== 'Enter' || message === '')
+			return;
 		console.log(`send to: ${friend.id}`);
 		const newDM = {
 			userID: testUser,
@@ -91,8 +93,8 @@ function DirectMessage({socket, friend, closeDM}: DMProps) {
 			  type="text"
 			  onChange={onChange}
 			  value={message}
+			  onKeyPress={sendDM}
 			/>
-			<button onClick={sendDM}>전송</button>
 			<button onClick={testSendMessageToMe}>친구전송</button>
 		</div>
 	);

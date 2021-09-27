@@ -115,7 +115,6 @@ aside {
 			.dm-message.my-dm {
 				flex-direction: column;
 				align-items: flex-end;
-				text-align: right;
 				margin-right: 10px;
 				word-break: break-all;
 			}
@@ -131,7 +130,7 @@ aside {
 				font-weight: 600;
 			}
 			.dm-text {
-				width: 287px;
+				max-width: 287px;
 			}
 		}
 		ul span {
