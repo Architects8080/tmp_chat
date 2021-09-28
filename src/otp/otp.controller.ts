@@ -1,23 +1,17 @@
 import {
   Body,
   Controller,
-  Get,
   HttpCode,
   Post,
-  Query,
   Req,
   Res,
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Request, Response } from 'express';
 import { AuthService } from 'src/auth/auth.service';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
-import { MatchPlayer } from 'src/game/entity/match-player.entity';
-import { Match } from 'src/game/entity/match.entity';
 import { User } from 'src/user/entity/user.entity';
-import { In, Repository } from 'typeorm';
 import { OTPAuthGuard } from './guard/otp-auth.guard';
 import { OTPService } from './otp.service';
 
@@ -26,10 +20,6 @@ export class OTPController {
   constructor(
     private otpService: OTPService,
     private authService: AuthService,
-    @InjectRepository(Match)
-    private matchRepository: Repository<Match>,
-    @InjectRepository(MatchPlayer)
-    private matchPlayerRepository: Repository<MatchPlayer>,
   ) {}
 
   @UseGuards(JwtAuthGuard)
