@@ -1,9 +1,5 @@
 import { HttpService } from '@nestjs/axios';
-import {
-  ForbiddenException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-oauth2';
@@ -36,7 +32,7 @@ export class FTStrategy extends PassportStrategy(Strategy, 'ft') {
       if (!data) throw new UnauthorizedException();
       return data;
     } catch (error) {
-      throw new ForbiddenException();
+      throw new UnauthorizedException();
     }
   }
 }

@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { JwtMiddleware } from './auth/middleware/jwt.middleware';
 import { UserModule } from './user/user.module';
 import { GameModule } from './game/game.module';
+import { OTPModule } from './otp/otp.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { GameModule } from './game/game.module';
     }),
     UserModule,
     GameModule,
+    OTPModule,
   ],
   controllers: [AppController],
   providers: [AppService],
