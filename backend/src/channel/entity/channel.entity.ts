@@ -51,7 +51,10 @@ export class ChannelMessage {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => ChannelMember, (message) => message.messages)
+  @ManyToOne(() => ChannelMember, (message) => message.messages, {
+    onDelete: 'SET NULL',
+    onUpdate: 'CASCADE',
+  })
   @JoinColumn([
     { name: 'cid', referencedColumnName: 'channelID' },
     { name: 'uid', referencedColumnName: 'userID' },
