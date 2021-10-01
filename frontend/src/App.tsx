@@ -6,6 +6,7 @@ import Main from "./main";
 import Register from "./auth/register";
 import TestLogin from "./auth/test";
 import Game from "./game/game";
+import Channel from "./channel/channel";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
       <Route path="/main" component={Main} />
       <Route path="/register" component={Register} />
       <Route path="/game/:id" component={Game} />
+      <Route path="/channel" component={Channel} />
     </div>
   );
 }
