@@ -1,0 +1,42 @@
+.page {
+  height: calc(100vh - 92px);
+  display: flex;
+  flex-direction: row;
+
+  .content {
+    flex-grow: 1;
+    margin: 40px 40px;
+  }
+}
+
+.button-list {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  .button-left-side, .button-right-side {
+    width: calc(360px + 24px);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+.button-left-side:focus {
+  background-color: red;
+
+  /* box-shadow: inset 0px 4px 8px rgba(0, 0, 0, 0.25); */
+}
+
+.chatroom-list {
+  overflow-x: hidden;
+  overflow-y: scroll;
+  max-height: calc(100vh - 92px - 40px - 53px - 32px - 40px);
+  margin-top: 32px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(30%, auto));
+  column-gap: calc(40px);
+  row-gap: 40px;
+
+  /* border: 1px solid rgba(0, 0, 0, 0.1); */
+}

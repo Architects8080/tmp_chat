@@ -1,0 +1,158 @@
+.gamelog-wrap {
+  margin-bottom: 24px;
+}
+
+.gamelog-item {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.gamelog {
+  margin-right: 24px;
+}
+
+.gamelog-item {
+  .win {
+    background: #EAEEFF;
+  }
+
+  .lose {
+    background: #FFEEEE;
+  }
+}
+
+.gamelog .gamestats {
+  width: 180px;
+  height: 100%;
+  padding: 24px;
+
+  /* display: flex;
+  flex-direction: column;
+  justify-content: space-between; */
+
+  display: grid;
+  grid-template-rows: 2fr 1fr 2fr 1fr;
+}
+
+.gamestats {
+  .gameinfo {
+    margin: auto 0;
+    font-family: Spoqa Han Sans Neo;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 18px;
+    line-height: 23px;
+  }
+
+  .timestamp {
+    margin: auto 0;
+    font-family: Spoqa Han Sans Neo;
+    font-style: normal;
+    font-weight: 300;
+    font-size: 12px;
+    line-height: 15px;
+  }
+
+  .gameresult {
+    margin-top: auto;
+    font-family: Spoqa Han Sans Neo;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 12px;
+    line-height: 15px;
+  }
+
+  .win {
+    color: #3562FF;
+  }
+
+  .lose {
+    color: #FF5C5C;
+  }
+
+  .gamelength {
+    margin: auto 0;
+    font-family: Spoqa Han Sans Neo;
+    font-style: normal;
+    font-weight: 300;
+    font-size: 10px;
+    line-height: 13px;
+  }
+}
+
+.gamelog-wrap .detail {
+  width: 100%;
+  height: 100%;
+  padding: 24px;
+  border: 1px solid rgb(231, 220, 220);
+  display: grid;
+  align-items: center;
+  justify-items: center;
+
+  /* grid-template-columns: 3fr 100px 3fr; */
+  grid-template-columns: 3fr 1fr 3fr;
+
+  /* column-gap: calc(24px); */
+}
+
+.detail {
+  .leftside, .rightside {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .leftside {
+    margin-left: auto;
+    text-align: right;
+  }
+
+  .rightside {
+    margin-right: auto;
+    text-align: left;
+  }
+
+  .userinfo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}
+
+.userinfo .nickname {
+  font-family: Spoqa Han Sans Neo;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 18px;
+  line-height: 23px;
+}
+
+.detail {
+  .ladderinfo {
+    margin-top: 10px;
+    font-family: Spoqa Han Sans Neo;
+    font-style: normal;
+    font-weight: 300;
+    font-size: 14px;
+    line-height: 18px;
+  }
+
+  .user-avater {
+    width: 82px;
+    height: 82px;
+    margin: 0px 24px;
+    object-fit: cover;
+
+    /* filter: drop-shadow(0px 8px 16px rgba(0, 0, 0, 0.25)); */
+    border-radius: 100%;
+  }
+
+  .score {
+    font-family: Spoqa Han Sans Neo;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 36px;
+    line-height: 45px;
+  }
+}

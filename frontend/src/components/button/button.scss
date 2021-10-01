@@ -1,0 +1,29 @@
+.button {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	text-align: center;
+
+	padding: 10px 0px;
+	position: relative;
+	width: 180px;
+	height: 53px;
+
+	background: rgba(255, 255, 255, 0.1);
+	border: 1px solid rgba(0, 0, 0, 0.1);
+	box-sizing: border-box;
+	border-radius: 4px;
+
+	&:hover {
+		cursor: pointer;
+	}
+}
+
+.button-title {
+	font-family: Spoqa Han Sans Neo;
+	font-style: normal;
+	font-weight: bold;
+	font-size: 16px;
+	line-height: 20px;
+	color: #000000;
+}
