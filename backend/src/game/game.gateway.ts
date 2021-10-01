@@ -36,7 +36,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   server: Server;
 
   async handleConnection(client: SocketUser, ...args: any[]) {
-    console.log('Client Connected');
+    console.log(`Client ${client.id} Connected to game`);
     try {
       const token = cookieExtractor(client); //error
       const userPayload = this.jwtService.verify(token);

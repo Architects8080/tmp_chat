@@ -9,6 +9,7 @@ import { JwtMiddleware } from './auth/middleware/jwt.middleware';
 import { UserModule } from './user/user.module';
 import { GameModule } from './game/game.module';
 import { ChannelModule } from './channel/channel.module';
+import { ChannelGateway } from './channel/channel.gateway';
 
 @Module({
   imports: [
