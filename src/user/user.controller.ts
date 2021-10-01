@@ -7,8 +7,11 @@ import {
   ParseIntPipe,
   Post,
   Req,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 import { UserService } from './user.service';
 
@@ -27,10 +30,10 @@ export class UserController {
     return req.user;
   }
 
-  @Post()
-  async creatUser(@Body() req) {
-    // req -> req.user로 변경이 필요
-    return this.userService.createUser(req);
+  @Post('me/avatar')
+  @UseInterceptors(FileInterceptor('image'))
+  async uploadAvatar(@Req() req, @UploadedFile() file: Express.Multer.File) {
+    return await this.userService.updateAvatar(req.user, file);
   }
 
   @Get(':id')

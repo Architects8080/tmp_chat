@@ -17,5 +17,13 @@ export default () => ({
   session: {
     secret: process.env.SESSION_SECRET,
   },
+  public: {
+    route: '/public',
+    path: process.env.PUBLIC_PATH,
+    avatar: {
+      path: process.env.PUBLIC_AVATAR_PATH,
+      route: '/avatar',
+    },
+  },
   client_address: process.env.CLIENT_ADDRESS,
 });
