@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useRef } from "react";
 import { useState } from "react";
 import { io } from "../../../socket/socket";
-import "./modal.css";
+import "./gameModal.scss";
 import useDetectOutsideClick from "./useDetectOutsideClick";
 
 type ModalProps = {

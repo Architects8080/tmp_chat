@@ -1,5 +1,5 @@
 import React from "react";
-import "./modal.css";
+import "./gameModal.scss";
 import { io } from "../../../socket/socket";
 import { useState } from "react";
 import { useEffect } from "react";
