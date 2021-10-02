@@ -1,0 +1,71 @@
+
+.otp-modal-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+
+  .otp-title {
+    font-family: Spoqa Han Sans Neo;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 24px;
+    line-height: 30px;
+    color: #1F1F1F;
+  }
+
+  .otp-qr {
+    margin-top: 60px;
+    width: 146px;
+    height: 146px;
+    filter: drop-shadow(0px 4px 8px rgba(0, 0, 0, 0.25));
+  }
+  
+  .otp-code {
+    margin-top: 20px;
+    font-family: Spoqa Han Sans Neo;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 16px;
+    line-height: 20px;
+    color: #000000;
+  }
+
+  .description {
+    margin-top: 40px;
+    font-family: Spoqa Han Sans Neo;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 18px;
+    line-height: 23px;
+
+    text-align: center;
+
+    color: #9C9C9C;
+  }
+
+  .submit-button {
+    margin-top: 0 auto;
+    padding: 16px 0;
+    width: 528px;
+    // width: 100vw;
+    font-family: Spoqa Han Sans Neo;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 16px;
+    line-height: 20px;
+    text-align: center;
+
+    color: #3562FF;
+    background: rgba(53, 97, 255, 0.1);
+    border-radius: 8px;
+
+    &:hover {
+      cursor: pointer;
+      background: #3562FF;
+      color: #ffffff;
+      transition: 0.3s;
+    }
+  }
+}

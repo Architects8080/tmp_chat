@@ -11,6 +11,7 @@ import ChatroomAdminDropdownList from "../../components/dropdown/dropdownList/ch
 import ChatroomOwnerDropdownList from "../../components/dropdown/dropdownList/chatroomOwner";
 import FriendDropdownList from "../../components/dropdown/dropdownList/friend";
 import HeaderDropdownList from "../../components/dropdown/dropdownList/header";
+import OTPModal from "../../components/modal/otp/otpModal";
 
 enum ChatroomCategory {
   AllChatroomList,
@@ -24,6 +25,7 @@ function Main() {
     chatroomCreate: false,
     chatroomSetting: false,
     enterPassword: false,
+    otp: false,
   });
 
   const handleModalOpen = (key: string) => {
