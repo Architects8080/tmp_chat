@@ -8,21 +8,21 @@ import InviteGameItem from "../dropdownItem/inviteGame";
 import ObserveGameItem from "../dropdownItem/observeGame";
 import ViewProfileItem from "../dropdownItem/viewProfile";
 
-import './dropdownList.scss';
+import "./dropdownList.scss";
 function ChatroomOwnerDropdownList() {
   return (
     <div className="dropdown-list-wrap">
-      <ViewProfileItem/>
-      <AddFriendItem/>
-      <InviteGameItem/>
-      <ObserveGameItem/>
+      <ViewProfileItem />
+      <AddFriendItem />
+      <InviteGameItem />
+      <ObserveGameItem />
 
-      <AddAdminITem/>
-      <RemoveAdminItem/>
+      <AddAdminITem />
+      <RemoveAdminItem />
 
-      <BanUserItem/>
-      <MuteUserItem/>
-      <UnmuteUserItem/>
+      <BanUserItem />
+      <MuteUserItem />
+      <UnmuteUserItem />
     </div>
   );
 }

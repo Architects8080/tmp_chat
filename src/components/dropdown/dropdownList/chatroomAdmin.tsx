@@ -5,19 +5,19 @@ import UnmuteUserItem from "../dropdownItem/chatroom/admin/unmute";
 import InviteGameItem from "../dropdownItem/inviteGame";
 import ObserveGameItem from "../dropdownItem/observeGame";
 import ViewProfileItem from "../dropdownItem/viewProfile";
-import './dropdownList.scss';
+import "./dropdownList.scss";
 
 function ChatroomAdminDropdownList() {
   return (
     <div className="dropdown-list-wrap">
-      <ViewProfileItem/>
-      <AddFriendItem/>
-      <InviteGameItem/>
-      <ObserveGameItem/>
+      <ViewProfileItem />
+      <AddFriendItem />
+      <InviteGameItem />
+      <ObserveGameItem />
 
-      <BanUserItem/>
-      <MuteUserItem/>
-      <UnmuteUserItem/>
+      <BanUserItem />
+      <MuteUserItem />
+      <UnmuteUserItem />
     </div>
   );
 }
