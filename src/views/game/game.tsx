@@ -3,10 +3,10 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { io } from "../../socket/socket";
 import { GameInfo } from "./gameType";
-import Header from '../../components/header/header';
-import Pong from './pong/pong';
-import SideBar from '../../components/sideBar/sideBar';
-import './game.scss';
+import Header from "../../components/header/header";
+import Pong from "./pong/pong";
+import SideBar from "../../components/sideBar/sideBar";
+import "./game.scss";
 
 function Game() {
   const { id } = useParams<{ id: string }>();
@@ -45,35 +45,49 @@ function Game() {
       if (roomId == id) {
         window.location.href = "http://localhost:3000/main";
       }
-    })
+    });
     io.emit("observe", [id]);
   }, []);
 
   return (
     <>
-      <Header isLoggedIn={true}/>
+      <Header isLoggedIn={true} />
       <div className="page">
-        <SideBar/>
-        {gameInfo 
-          ? 
-            <div className="game-wrap">
-              <div className="game-scoreboard">
-                <div className="userinfo">
-                  <img className="user-avater" alt="user-avater" src={playerInfo["player1"].avatar}/>
-                  <div className="user-nickname">{playerInfo["player1"].nickname}</div>
-                </div>
-                <div className="score">{gameInfo?.player1.score} : {gameInfo?.player2.score}</div>
-                <div className="userinfo">
-                  <img className="user-avater" alt="user-avater" src={playerInfo["player2"].avatar}/>
-                  <div className="user-nickname">{playerInfo["player2"].nickname}</div>
+        <SideBar />
+        {gameInfo ? (
+          <div className="game-wrap">
+            <div className="game-scoreboard">
+              <div className="userinfo">
+                <img
+                  className="user-avater"
+                  alt="user-avater"
+                  src={playerInfo["player1"].avatar}
+                />
+                <div className="user-nickname">
+                  {playerInfo["player1"].nickname}
                 </div>
               </div>
-              <div className="game-window">
-                <Pong roomID={id} gameInfo={gameInfo}></Pong>
+              <div className="score">
+                {gameInfo?.player1.score} : {gameInfo?.player2.score}
+              </div>
+              <div className="userinfo">
+                <img
+                  className="user-avater"
+                  alt="user-avater"
+                  src={playerInfo["player2"].avatar}
+                />
+                <div className="user-nickname">
+                  {playerInfo["player2"].nickname}
+                </div>
               </div>
             </div>
-          : ""
-        }
+            <div className="game-window">
+              <Pong roomID={id} gameInfo={gameInfo}></Pong>
+            </div>
+          </div>
+        ) : (
+          ""
+        )}
       </div>
     </>
   );

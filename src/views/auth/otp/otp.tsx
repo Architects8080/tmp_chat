@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
-import Header from '../../../components/header/header';
-import './otp.scss';
+import React, { useState } from "react";
+import Header from "../../../components/header/header";
+import "./otp.scss";
 
 function OTP() {
-
   const [OTP, setOTP] = useState("");
 
   const handleUserInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -20,21 +19,25 @@ function OTP() {
       if (userInput === "123123") {
         console.log("accepted!");
         //redirect to main
-      }
-      else {
+      } else {
         console.log("rejected!");
         //snackbar error
       }
     }
-  }
-
+  };
 
   return (
     <>
-      <Header isLoggedIn={false}/>
+      <Header isLoggedIn={false} />
       <div className="otp-page">
         <div className="otp-title">OTP 코드를 입력하세요.</div>
-        <input className="otp-input" type="text" value={OTP} maxLength={6} onChange={handleUserInputChange}/>
+        <input
+          className="otp-input"
+          type="text"
+          value={OTP}
+          maxLength={6}
+          onChange={handleUserInputChange}
+        />
       </div>
     </>
   );

@@ -19,30 +19,34 @@
 }
 
 $char-w: 1ch;
-$gap: .7*$char-w;
+$gap: 0.7 * $char-w;
 $n-char: 6;
-$in-w: $n-char*($char-w + $gap);
+$in-w: $n-char * ($char-w + $gap);
 
 .otp-input {
-	display: block;
-	margin: 40px 0;
-	border: none;
-	padding: 0;
-	width: $in-w;
-	background: repeating-linear-gradient(90deg, 
-  #F0F0F0 0, #F0F0F0 $char-w, 
-		transparent 0, transparent $char-w + $gap) 
-		0 100%/ #{$in-w - $gap} 4px no-repeat;
-	letter-spacing: $gap;
-	
+  display: block;
+  margin: 40px 0;
+  border: none;
+  padding: 0;
+  width: $in-w;
+  background: repeating-linear-gradient(
+      90deg,
+      #f0f0f0 0,
+      #f0f0f0 $char-w,
+      transparent 0,
+      transparent $char-w + $gap
+    )
+    0 100% / #{$in-w - $gap} 4px no-repeat;
+  letter-spacing: $gap;
+
   font-family: Spoqa Han Sans Neo;
   font-style: normal;
   font-weight: bold;
   font-size: 48px;
   line-height: 60px;
 
-	&:focus {
-		outline: none;
-		// color: dodgerblue;
-	}
+  &:focus {
+    outline: none;
+    // color: dodgerblue;
+  }
 }

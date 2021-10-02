@@ -81,10 +81,11 @@ function GameSettingModal(prop: ModalProps) {
           <div className="modal-title">
             {prop.header}
             <button className="modal-close" onClick={prop.close}>
-              {" "}X{" "}
+              {" "}
+              X{" "}
             </button>
           </div>
-          <div className="explain">
+          <div className="description">
             커스텀 게임을 진행하기 전에 맵, 장애물 여부를 선택해주세요.
           </div>
           {/* 1번째 subtitle */}

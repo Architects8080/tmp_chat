@@ -20,7 +20,8 @@
   display: flex;
   justify-content: space-around;
 
-  .menu-avater, .menu-otp {
+  .menu-avater,
+  .menu-otp {
     display: flex;
     flex-direction: column;
     align-items: center;

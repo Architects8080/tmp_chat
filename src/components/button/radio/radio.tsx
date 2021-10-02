@@ -1,12 +1,12 @@
-import React from 'react';
-import './radio.scss';
+import React from "react";
+import "./radio.scss";
 type RadioButtonProps = {
-  name: string,
-  label: string,
-  value: any,
-  isChecked: boolean,
-  handleChange: any,
-}
+  name: string;
+  label: string;
+  value: any;
+  isChecked: boolean;
+  handleChange: any;
+};
 
 function RadioButton(prop: RadioButtonProps) {
   const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {

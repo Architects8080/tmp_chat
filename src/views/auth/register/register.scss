@@ -1,75 +1,75 @@
 .register {
-	flex-grow: 1;
-	height: calc(100vh - 92px);
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	.nickname {
-		width: calc(100vh - 200px);
-		height: 64px;
-		padding: 16px;
-		margin-top: 24px;
-		background: #FFFFFF;
-		border: 1px solid #000000;
-		box-sizing: border-box;
-		border-radius: 7px;
-		font-family: Spoqa Han Sans Neo;
-		font-style: normal;
-		font-weight: 300;
-		font-size: 24px;
-		line-height: 30px;
-	}
+  flex-grow: 1;
+  height: calc(100vh - 92px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  .nickname {
+    width: calc(100vh - 200px);
+    height: 64px;
+    padding: 16px;
+    margin-top: 24px;
+    background: #ffffff;
+    border: 1px solid #000000;
+    box-sizing: border-box;
+    border-radius: 7px;
+    font-family: Spoqa Han Sans Neo;
+    font-style: normal;
+    font-weight: 300;
+    font-size: 24px;
+    line-height: 30px;
+  }
 }
 
 .register-title {
-	font-family: Spoqa Han Sans Neo;
-	font-style: normal;
-	font-weight: bold;
-	font-size: 48px;
-	line-height: 60px;
+  font-family: Spoqa Han Sans Neo;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 48px;
+  line-height: 60px;
 }
 
 .register-form {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-	.register-description {
-		margin-top: 36px;
-		font-family: Spoqa Han Sans Neo;
-		font-style: normal;
-		font-weight: normal;
-		font-size: 24px;
-		line-height: 30px;
-		color: #303030;
-	}
-	.button {
-		margin-top: 80px;
-		height: 52px;
-		width: 180px;
-		background: rgba(255, 255, 255, 0.1);
-		border: 1px solid rgba(0, 0, 0, 0.1);
-		box-sizing: border-box;
-		border-radius: 4px;
-		font-family: Spoqa Han Sans Neo;
-		font-style: normal;
-		font-weight: bold;
-		font-size: 16px;
-		line-height: 20px;
-	}
-	.submit {
-		margin-top: 80px;
-		height: 52px;
-		width: 180px;
-		background: rgba(255, 255, 255, 0.1);
-		border: 1px solid rgba(0, 0, 0, 0.1);
-		box-sizing: border-box;
-		border-radius: 4px;
-		font-family: Spoqa Han Sans Neo;
-		font-style: normal;
-		font-weight: bold;
-		font-size: 16px;
-		line-height: 20px;
-	}
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  .register-description {
+    margin-top: 36px;
+    font-family: Spoqa Han Sans Neo;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 24px;
+    line-height: 30px;
+    color: #303030;
+  }
+  .button {
+    margin-top: 80px;
+    height: 52px;
+    width: 180px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+    border-radius: 4px;
+    font-family: Spoqa Han Sans Neo;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 16px;
+    line-height: 20px;
+  }
+  .submit {
+    margin-top: 80px;
+    height: 52px;
+    width: 180px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+    border-radius: 4px;
+    font-family: Spoqa Han Sans Neo;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 16px;
+    line-height: 20px;
+  }
 }

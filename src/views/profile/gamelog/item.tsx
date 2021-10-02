@@ -1,36 +1,38 @@
-import React from 'react';
-import './item.scss';
+import React from "react";
+import "./item.scss";
 
 type matchUserInfo = {
-  isLeft: boolean,
-  score: number,
-  nickname: string,
-  ladderRank: number,
-  ladderPoint: number,
-  ladderIncrease: number,
-}
+  isLeft: boolean;
+  score: number;
+  nickname: string;
+  ladderRank: number;
+  ladderPoint: number;
+  ladderIncrease: number;
+};
 
 type matchInfo = {
-  gameType: number,
-  startAt: NodeJS.Timer,
-  endAt: NodeJS.Timer,
-  gameTime: number,
-}
+  gameType: number;
+  startAt: NodeJS.Timer;
+  endAt: NodeJS.Timer;
+  gameTime: number;
+};
 
 type gameLogItemProps = {
   matchInfo: matchInfo;
-  leftUser: matchUserInfo,
-  rightUser: matchUserInfo,
-}
+  leftUser: matchUserInfo;
+  rightUser: matchUserInfo;
+};
 
 // prop: gameLogItemProps | null
 function GameLogItem() {
-
   //raw Info? or retailed Info?
   return (
-    <div className="gamelog-wrap">{/* margin-bottom */}
+    <div className="gamelog-wrap">
+      {/* margin-bottom */}
       <div className="gamelog-item">
-        <div className="gamelog win"> {/* gameLog lose*/}
+        <div className="gamelog win">
+          {" "}
+          {/* gameLog lose*/}
           <div className="gamestats">
             <div className="gameinfo">Custom</div>
             <div className="timestamp">42 minutes ago</div>
@@ -48,13 +50,21 @@ function GameLogItem() {
                 <div className="point">Ladder Point : 4221 (+21)</div>
               </div>
             </div>
-            <img className="user-avater" alt="user-avater" src="https://cdn.intra.42.fr/users/chlee.png"/>
+            <img
+              className="user-avater"
+              alt="user-avater"
+              src="https://cdn.intra.42.fr/users/chlee.png"
+            />
           </div>
 
           <div className="score">2 : 4</div>
 
           <div className="rightside">
-            <img className="user-avater" alt="user-avater" src="https://cdn.intra.42.fr/users/yhan.jpg"/>
+            <img
+              className="user-avater"
+              alt="user-avater"
+              src="https://cdn.intra.42.fr/users/yhan.jpg"
+            />
             <div className="userinfo">
               <div className="nickname">yhan</div>
               <div className="ladderinfo">
@@ -64,8 +74,8 @@ function GameLogItem() {
             </div>
           </div>
         </div>
+      </div>
     </div>
-  </div>
   );
 }
 
