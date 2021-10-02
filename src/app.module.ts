@@ -9,6 +9,7 @@ import { JwtMiddleware } from './auth/middleware/jwt.middleware';
 import { UserModule } from './user/user.module';
 import { GameModule } from './game/game.module';
 import { OTPModule } from './otp/otp.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
 
 @Module({
   imports: [
@@ -30,6 +31,16 @@ import { OTPModule } from './otp/otp.module';
         entities: ['dist/**/*.entity{.ts,.js}'],
         synchronize: true,
       }),
+    }),
+    ServeStaticModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => [
+        {
+          rootPath: configService.get<string>('public.path'),
+          serveRoot: configService.get<string>('public.route'),
+        },
+      ],
     }),
     UserModule,
     GameModule,
