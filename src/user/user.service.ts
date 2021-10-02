@@ -17,7 +17,7 @@ export class UserService {
   ) {}
 
   createAvatarUrl(filename: string): string {
-    if (!filename.startsWith('http://')) {
+    if (!filename.match('^https?://')) {
       const route = this.configService.get<string>('public.route');
       const avatarRoute = this.configService.get<string>('public.avatar.route');
       return `http://localhost:5000${route}${avatarRoute}/${filename}`;
