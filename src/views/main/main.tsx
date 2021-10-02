@@ -258,7 +258,7 @@ function Main() {
       <FriendDropdownList/>
       <HeaderDropdownList/> */}
       <div className="page">
-        {/* <SideBar/> */}
+        <SideBar/>
         <div className="content">
           <div className="button-list">
             <div className="button-left-side">

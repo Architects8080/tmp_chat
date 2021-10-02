@@ -18,6 +18,17 @@
   color: #000000;
 }
 
+.otp-description {
+  margin-top: 4px;
+  font-family: Spoqa Han Sans Neo;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 18px;
+  line-height: 23px;
+
+  color: #9C9C9C;
+}
+
 $char-w: 1ch;
 $gap: 0.7 * $char-w;
 $n-char: 6;

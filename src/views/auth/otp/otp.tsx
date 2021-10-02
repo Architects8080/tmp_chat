@@ -30,7 +30,8 @@ function OTP() {
     <>
       <Header isLoggedIn={false} />
       <div className="otp-page">
-        <div className="otp-title">OTP 코드를 입력하세요.</div>
+        <div className="otp-title">OTP를 입력하세요.</div>
+        <div className="otp-description">Google OTP 앱에서 생성된 6자리 코드를 입력하세요.</div>
         <input
           className="otp-input"
           type="text"
