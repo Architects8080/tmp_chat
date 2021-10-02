@@ -36,14 +36,14 @@ export class UserService {
   }
 
   async getUsers() {
-    return (await this.userRepository.find()).map((user) => {
+    return (await this.userRepository.find()).map(({ otpSecret, ...user }) => {
       user.avatar = this.createAvatarUrl(user.avatar);
       return user;
     });
   }
 
   async getUserById(id: number) {
-    const user: User = await this.userRepository.findOne({ where: { id: id } });
+    const user = await this.userRepository.findOne({ where: { id: id } });
     if (!user) throw new NotFoundException();
     user.avatar = this.createAvatarUrl(user.avatar);
     return user;
