@@ -9,7 +9,9 @@
 }
 
 .notification-item-box {
-  width: 178px;
+  word-break: keep-all;
+  min-width: 176px;
+  max-width: 176px;
   height: auto;
   display: flex;
   flex-direction: column;
@@ -26,6 +28,7 @@
 }
 
 .description {
+
   font-family: Spoqa Han Sans Neo;
   font-style: normal;
   font-weight: 300;

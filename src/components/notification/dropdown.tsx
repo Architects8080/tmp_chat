@@ -15,13 +15,13 @@ function NotificationOverlay(prop: DropdownProps) {
       <div className={`dropdown ${prop.isActive ? "active" : "inactive"}`}>
         <NotificationItem
           title="test"
-          description="verylongdescriptionverylongdescriptionverylongdescriptionverylongdescription"
+          description="polarbear 님의 친구 신청입니다. 수락하시겠습니까?"
           acceptCallback={() => {}}
           rejectCallback={() => {}}
         />
         <NotificationItem
           title="test"
-          description="description"
+          description="polarbear 님의 채팅방 초대입니다. 수락하시겠습니까?"
           acceptCallback={() => {}}
           rejectCallback={() => {}}
         />
