@@ -14,18 +14,18 @@
   flex-direction: row;
   justify-content: space-between;
 
-  .button-left-side, .button-right-side {
+  .button-left-side,
+  .button-right-side {
     width: calc(360px + 24px);
     display: flex;
     flex-direction: row;
     justify-content: space-between;
   }
-}
 
-.button-left-side:focus {
-  background-color: red;
-
-  /* box-shadow: inset 0px 4px 8px rgba(0, 0, 0, 0.25); */
+  .focusable-button:focus {
+    border-radius: 4px;
+    box-shadow: inset 0px 4px 8px rgba(0, 0, 0, 0.15);
+  }
 }
 
 .chatroom-list {
