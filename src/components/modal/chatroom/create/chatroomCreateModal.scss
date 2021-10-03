@@ -90,6 +90,10 @@
   border: 1px solid rgba(0, 0, 0, 0.5);
   box-sizing: border-box;
   padding: 8px;
+
+  &:focus {
+    outline: none;
+  }
 }
 
 .select {
@@ -141,6 +145,10 @@
     background: #ffffff;
     border: 1px solid rgba(0, 0, 0, 0.5);
     box-sizing: border-box;
+
+    &:focus {
+      outline: none;
+    }
   }
 }
 

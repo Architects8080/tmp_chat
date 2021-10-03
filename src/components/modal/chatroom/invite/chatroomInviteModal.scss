@@ -92,6 +92,10 @@
     align-items: center;
     color: #000000;
     border: hidden;
+
+    &:focus {
+      outline: none;
+    }
   }
   .submit {
     display: flex;
