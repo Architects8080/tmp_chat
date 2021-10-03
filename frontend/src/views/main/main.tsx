@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 import Button from '../../components/button/button';
 import EmptyPageInfo from '../../components/emptyPage/empty';
 import Header from '../../components/header/header';
 import ChatroomCreateModal from '../../components/modal/chatroom/create/chatroomCreateModal';
 import SideBar from '../../components/sideBar/sideBar';
-import ChatroomItem from './chatroomItem/item';
+import ChatroomItem, { chatroomItemProps } from './chatroomItem/item';
 import './main.scss';
 
 enum ChatroomCategory {
@@ -44,7 +45,27 @@ function Main() {
       setChatroomCategory(category);
     }
   }
+  const [channels, setChannels] = useState<chatroomItemProps[] | null>(null);
+  const [myChannels, setMyChannels] = useState<chatroomItemProps[] | null>(null);
 
+	useEffect(() => {
+		const fetchData = async () => {
+			try {
+				const response = await axios.get(`http://localhost:5000/channel`);
+        console.log(response);
+				setChannels(response.data);
+			}
+			catch (e) { console.log(e); }
+		};
+		fetchData();
+	}, []);
+
+	if (!channels) {
+		return (
+			<div>Loading..</div>
+		)
+	}
+  /*
   var tempAllChatroomList = [{ roomId: 42, title: "Libft 평가자 모십니다", memberCount: 42, isProtected: true }, 
                             { roomId: 42, title: "gnl에서 메모리 누수 어케 잡으셨나요..?", memberCount: 42, isProtected: true },
                             { roomId: 42, title: "netwhat 공부 어케했어요", memberCount: 42, isProtected: false },
@@ -78,7 +99,7 @@ function Main() {
                             { roomId: 42, title: "피아노 알려주세요 ㅠㅠ", memberCount: 42, isProtected: false },
                             { roomId: 42, title: "테트리스 잘하는 사람들의 모임", memberCount: 42, isProtected: false },
                             { roomId: 42, title: "슈퍼 겁쟁이들의 모임", memberCount: 42, isProtected: false }, ];
-
+  */
   // to test empty info
   // tempAllChatroomList = [];
   // tempJoinedChatroomList = [];
@@ -100,18 +121,21 @@ function Main() {
             </div>
           </div>
 
-          {(chatroomCategory === ChatroomCategory.AllChatroomList && tempAllChatroomList.length === 0) 
+          {(chatroomCategory === ChatroomCategory.AllChatroomList && !channels) 
             ? <EmptyPageInfo description={`공개 채팅방이 존재하지 않습니다.\n'채팅방 만들기' 버튼으로 채팅방을 생성해보세요!`}/>
-            : (chatroomCategory === ChatroomCategory.JoinedChatroomList && tempJoinedChatroomList.length === 0)
+            : (chatroomCategory === ChatroomCategory.JoinedChatroomList && !myChannels)
               ? <EmptyPageInfo description={`현재 참여중인 채팅방이 없습니다.\n전체 채팅방 목록에서 참가해보세요!`}/> 
               : <div className="chatroom-list">
                   {chatroomCategory === ChatroomCategory.AllChatroomList 
-                    ? tempAllChatroomList.map(item => (
-                        <ChatroomItem roomId={item.roomId} title={item.title} memberCount={item.memberCount} isProtected={item.isProtected}/>
+                    ? channels.map(item => (
+                        <ChatroomItem 
+                        channel = {item} 
+                        key = {item.roomId}/>
                       ))
-                    : tempJoinedChatroomList.map(item => (
-                        <ChatroomItem roomId={item.roomId} title={item.title} memberCount={item.memberCount} isProtected={item.isProtected}/>
-                      ))
+                    // : myChannels.map(item => (
+                    //     <ChatroomItem roomId={item.roomId} title={item.title} memberCount={item.memberCount} isProtected={item.isProtected}/>
+                    //   ))
+                       : null
                   }
                 </div>
           }
