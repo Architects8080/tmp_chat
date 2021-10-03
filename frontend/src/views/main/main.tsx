@@ -51,9 +51,12 @@ function Main() {
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
-				const response = await axios.get(`http://localhost:5000/channel`);
+				let response = await axios.get(`http://localhost:5000/channel`, { withCredentials: true });
         console.log(response);
 				setChannels(response.data);
+        response = await axios.get(`http://localhost:5000/channel/me`, { withCredentials: true });
+        setMyChannels(response.data);
+        console.log(response.data);
 			}
 			catch (e) { console.log(e); }
 		};
@@ -135,7 +138,11 @@ function Main() {
                     // : myChannels.map(item => (
                     //     <ChatroomItem roomId={item.roomId} title={item.title} memberCount={item.memberCount} isProtected={item.isProtected}/>
                     //   ))
-                       : null
+                       : myChannels ? myChannels.map(item => (
+                          <ChatroomItem 
+                          channel = {item} 
+                          key = {item.roomId}/>
+                        )) : null
                   }
                 </div>
           }
