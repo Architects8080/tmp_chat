@@ -21,15 +21,11 @@ export class UserController {
 
   @Get()
   async getUsers() {
-    return this.userService.getUsers();
+    return await this.userService.getUsers();
   }
 
   @Get('me')
   getMe(@Req() req) {
-    if (req.user) {
-      const { otpSecret, ...user } = req.user;
-      return user;
-    }
     return req.user;
   }
 
@@ -41,8 +37,7 @@ export class UserController {
 
   @Get(':id')
   async getUserById(@Param('id', ParseIntPipe) id: number) {
-    const { otpSecret, ...user } = await this.userService.getUserById(id);
-    return user;
+    return await this.userService.getUserById(id);
   }
 
   @Delete(':id')
