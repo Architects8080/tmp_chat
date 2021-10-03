@@ -35,6 +35,7 @@ export class ChannelGateway
       const userPayload = this.jwtService.verify(token);
       const user = await this.jwtStrategy.validate(userPayload);
       client.user = user;
+      console.log(client.rooms);
       console.log(user.id, user.intraLogin);
       this.socketUserService.addSocket(client);
     } catch (error) {
@@ -43,7 +44,7 @@ export class ChannelGateway
     }
   }
   async handleDisconnect(client: SocketUser) {
-    console.log('Client Disconnected');
+    console.log(`Client ${client.id} Disconnected`);
     try {
       const token = cookieExtractor(client);
       const userPayload = this.jwtService.verify(token);
@@ -53,11 +54,21 @@ export class ChannelGateway
     } catch (error) {}
   }
 
+  @SubscribeMessage('joinChannel')
+  joinChannel(@MessageBody() data: any, @ConnectedSocket() client: SocketUser) {
+    client.join(data.toString());
+    console.log(client.rooms);
+  }
+
   @SubscribeMessage('msgToChannel')
   handleMessage(
-    @MessageBody() data: string,
+    @MessageBody() data: any,
     @ConnectedSocket() client: SocketUser,
   ) {
-    this.server.emit('msgToClient', data);
+    const payload = {
+      ...data,
+      name: client.user.intraLogin,
+    };
+    this.server.emit('msgToClient', payload);
   }
 }
