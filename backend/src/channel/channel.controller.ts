@@ -8,7 +8,7 @@ export class ChannelController {
 
   @Get()
   async getAll() {
-    return this.channelService.getAll();
+    return this.channelService.getAllChannel();
   }
 
   @Post()
