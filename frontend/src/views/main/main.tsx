@@ -52,11 +52,9 @@ function Main() {
 		const fetchData = async () => {
 			try {
 				let response = await axios.get(`http://localhost:5000/channel`, { withCredentials: true });
-        console.log(response);
 				setChannels(response.data);
         response = await axios.get(`http://localhost:5000/channel/me`, { withCredentials: true });
         setMyChannels(response.data);
-        console.log(response.data);
 			}
 			catch (e) { console.log(e); }
 		};
