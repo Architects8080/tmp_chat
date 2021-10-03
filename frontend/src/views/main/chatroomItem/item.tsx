@@ -2,18 +2,19 @@ import React, { useState } from 'react';
 import EnterPasswordModal from '../../../components/modal/chatroom/join/enterPasswordModal';
 import './item.scss';
 
-type chatroomItemProps = {
+export type chatroomItemProps = {
   roomId: number,
   title: string,
   memberCount: number,
   isProtected: boolean
 }
-function ChatroomItem(prop: chatroomItemProps) {
+
+const ChatroomItem = ({channel} : {channel:any}) => {
 
   const [modalopen, setModalOpen] = useState(false);
 
   const handleOnClick = () => {
-    if (prop.isProtected)
+    if (channel.isProtected)
       setModalOpen(true);
     else
       console.log("io.emit join!!")
@@ -28,10 +29,10 @@ function ChatroomItem(prop: chatroomItemProps) {
     <>
       <div className="chatroom-item" onClick={handleOnClick}>
         <div className="chatroom-header">
-          <div className="chatroom-title">{prop.title}</div>
-          { prop.isProtected ? <img className="chatroom-locked" alt="chatroom-locked" src="/icons/lock.svg"/> : ""}
+          <div className="chatroom-title">{channel.title}</div>
+          { channel.isProtected ? <img className="chatroom-locked" alt="chatroom-locked" src="/icons/lock.svg"/> : ""}
         </div>
-        <div className="chatroom-member-count">{prop.memberCount}명 참여중</div>
+        <div className="chatroom-member-count">{channel.memberCount}명 참여중</div>
       </div>
       {modalopen ? <EnterPasswordModal open={modalopen} close={handleModalClose}/> : ""}
     </>
