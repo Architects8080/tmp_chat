@@ -68,8 +68,14 @@ export class ChannelGateway
   }
 
   @SubscribeMessage('joinChannel')
-  joinChannel(@MessageBody() data: any, @ConnectedSocket() client: SocketUser) {
+  async joinChannel(
+    @MessageBody() data: any,
+    @ConnectedSocket() client: SocketUser,
+  ) {
     client.join(data.toString());
+    const myChannel = await this.channelService.getMyChannel(client);
+    if (!myChannel.some((channel) => channel.roomId == data))
+      this.channelService.joinChannel(data, client.user.id);
     console.log(client.rooms);
   }
 

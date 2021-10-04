@@ -116,4 +116,14 @@ export class ChannelService {
     }
     return myChannel;
   }
+
+  async joinChannel(roomId, userId) {
+    const newChannelMember: ChannelMember =
+      this.channelMemberRepository.create();
+    newChannelMember.userID = userId;
+    newChannelMember.channelID = roomId;
+    newChannelMember.permissionType = 0;
+    newChannelMember.penalty = 0;
+    await this.channelMemberRepository.insert(newChannelMember);
+  }
 }
