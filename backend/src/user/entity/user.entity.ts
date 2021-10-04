@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Relationship } from 'src/community/entity/relationship.entity';
+import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 
 @Entity('user')
 export class User {
@@ -25,4 +26,7 @@ export class User {
 
   @Column({ default: 0 })
   ladderLevel: number;
+
+  @OneToMany(() => Relationship, rel => rel.other)
+  relationships: Relationship[];
 }

@@ -9,6 +9,7 @@ import { JwtMiddleware } from './auth/middleware/jwt.middleware';
 import { UserModule } from './user/user.module';
 import { GameModule } from './game/game.module';
 import { DmModule } from './dm/dm.module';
+import { ComunityModule } from './community/community.module';
 
 @Module({
   imports: [
@@ -33,7 +34,8 @@ import { DmModule } from './dm/dm.module';
     }),
     UserModule,
     GameModule,
-    DmModule
+    DmModule,
+    ComunityModule
   ],
   controllers: [AppController],
   providers: [AppService],
