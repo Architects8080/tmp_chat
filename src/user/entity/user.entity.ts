@@ -1,3 +1,4 @@
+import { Exclude } from 'class-transformer';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity('user')
@@ -17,6 +18,7 @@ export class User {
   @Column({ default: 0 })
   status: number;
 
+  @Exclude()
   @Column({ nullable: true, default: null })
   otpSecret: string;
 

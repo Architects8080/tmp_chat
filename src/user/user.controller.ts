@@ -1,5 +1,4 @@
 import {
-  Body,
   Controller,
   Delete,
   Get,
@@ -22,11 +21,11 @@ export class UserController {
 
   @Get()
   async getUsers() {
-    return this.userService.getUsers();
+    return await this.userService.getUsers();
   }
 
   @Get('me')
-  async getMe(@Req() req) {
+  getMe(@Req() req) {
     return req.user;
   }
 
@@ -38,7 +37,7 @@ export class UserController {
 
   @Get(':id')
   async getUserById(@Param('id', ParseIntPipe) id: number) {
-    return this.userService.getUserById(id);
+    return await this.userService.getUserById(id);
   }
 
   @Delete(':id')

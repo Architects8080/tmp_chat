@@ -3,7 +3,6 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entity/user.entity';
@@ -13,17 +12,7 @@ export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    private readonly configService: ConfigService,
   ) {}
-
-  createAvatarUrl(filename: string): string {
-    if (!filename.match('^https?://')) {
-      const route = this.configService.get<string>('public.route');
-      const avatarRoute = this.configService.get<string>('public.avatar.route');
-      return `http://localhost:5000${route}${avatarRoute}/${filename}`;
-    }
-    return filename;
-  }
 
   async createUser(user: User) {
     let newUser: User = this.userRepository.create(user);
@@ -36,16 +25,12 @@ export class UserService {
   }
 
   async getUsers() {
-    return (await this.userRepository.find()).map((user) => {
-      user.avatar = this.createAvatarUrl(user.avatar);
-      return user;
-    });
+    return await this.userRepository.find();
   }
 
   async getUserById(id: number) {
-    const user: User = await this.userRepository.findOne({ where: { id: id } });
+    const user = await this.userRepository.findOne({ where: { id: id } });
     if (!user) throw new NotFoundException();
-    user.avatar = this.createAvatarUrl(user.avatar);
     return user;
   }
 
