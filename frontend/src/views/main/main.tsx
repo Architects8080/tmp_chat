@@ -59,7 +59,7 @@ function Main() {
 			catch (e) { console.log(e); }
 		};
 		fetchData();
-	}, []);
+	}, [channels]);
 
 	if (!channels) {
 		return (

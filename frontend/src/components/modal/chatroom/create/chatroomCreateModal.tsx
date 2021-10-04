@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useEffect } from 'react';
-import { Redirect } from 'react-router-dom';
 import { ioChannel } from '../../../../socket/socket';
 import RadioButton from '../../../button/radio/radio';
 import './chatroomCreateModal.scss';

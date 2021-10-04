@@ -19,7 +19,6 @@ const ChatroomItem = ({channel} : {channel:any}) => {
     if (channel.isProtected)
       setModalOpen(true);
     else
-      console.log("io.emit join!!")
       ioChannel.emit("joinChannel", channel.roomId);
   }
 
