@@ -66,9 +66,10 @@ export class ChannelGateway
     @ConnectedSocket() client: SocketUser,
   ) {
     const payload = {
-      ...data,
+      text: data.text,
       name: client.user.intraLogin,
     };
-    this.server.emit('msgToClient', payload);
+    console.log(data);
+    this.server.to(data.roomId).emit('msgToClient', payload);
   }
 }
