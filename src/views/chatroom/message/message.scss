@@ -1,0 +1,78 @@
+.other-message-wrap {
+  margin-bottom: 24px;
+
+  display: flex;
+  flex-direction: row;
+
+  .other-message-avater {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border: 0.5px solid rgba(0, 0, 0, 0.5);
+    border-radius: 100%;
+
+    margin-right: 24px;
+  }
+
+  .other-message-content {
+    word-break: break-all;
+    max-width: calc(100vw - 360px - 48px - 48px - 64px - 24px - 150px);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .message-username {
+      font-family: Spoqa Han Sans Neo;
+      font-style: normal;
+      font-weight: bold;
+      font-size: 24px;
+      line-height: 30px;
+      color: #000000;
+    }
+
+    .message-content {
+      font-family: Spoqa Han Sans Neo;
+      font-style: normal;
+      font-weight: 300;
+      font-size: 24px;
+      line-height: 30px;
+      color: #000000;
+    }
+  }
+}
+
+.self-message-wrap {
+  margin-bottom: 24px;
+
+  .self-message-content {
+    word-break: break-all;
+    max-width: calc(100vw - 360px - 48px - 48px - 64px - 24px - 150px);
+
+    display: flex;
+    flex-direction: column;
+    margin-left: auto;
+
+    .message-username {
+      font-family: Spoqa Han Sans Neo;
+      font-style: normal;
+      font-weight: bold;
+      font-size: 24px;
+      line-height: 30px;
+
+      text-align: right;
+      color: #000000;
+    }
+
+    .message-content {
+      font-family: Spoqa Han Sans Neo;
+      font-style: normal;
+      font-weight: 300;
+      font-size: 24px;
+      line-height: 30px;
+
+      text-align: right;
+      color: #000000;
+    }
+  }
+}
