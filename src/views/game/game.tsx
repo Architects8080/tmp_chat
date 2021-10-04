@@ -7,6 +7,7 @@ import Header from "../../components/header/header";
 import Pong from "./pong/pong";
 import SideBar from "../../components/sideBar/sideBar";
 import "./game.scss";
+import { sidebarProperty } from "../../components/sideBar/sideBarType";
 
 function Game() {
   const { id } = useParams<{ id: string }>();
@@ -53,14 +54,14 @@ function Game() {
     <>
       <Header isLoggedIn={true} />
       <div className="page">
-        <SideBar />
+        <SideBar title={sidebarProperty.observerList}/>
         {gameInfo ? (
           <div className="game-wrap">
             <div className="game-scoreboard">
               <div className="userinfo">
                 <img
-                  className="user-avater"
-                  alt="user-avater"
+                  className="user-avatar"
+                  alt="user-avatar"
                   src={playerInfo["player1"].avatar}
                 />
                 <div className="user-nickname">
@@ -72,8 +73,8 @@ function Game() {
               </div>
               <div className="userinfo">
                 <img
-                  className="user-avater"
-                  alt="user-avater"
+                  className="user-avatar"
+                  alt="user-avatar"
                   src={playerInfo["player2"].avatar}
                 />
                 <div className="user-nickname">

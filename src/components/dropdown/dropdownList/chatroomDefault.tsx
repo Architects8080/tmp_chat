@@ -5,13 +5,16 @@ import ViewProfileItem from "../dropdownItem/viewProfile";
 import "./dropdownList.scss";
 
 function ChatroomDefaultDropdownList() {
+
   return (
-    <div className="dropdown-list-wrap">
-      <ViewProfileItem />
-      <AddFriendItem />
-      <InviteGameItem />
-      <ObserveGameItem />
-    </div>
+    <>
+        <div className="dropdown-list-wrap">
+          <ViewProfileItem />
+          <AddFriendItem />
+          <InviteGameItem />
+          <ObserveGameItem />
+        </div>
+    </>
   );
 }
 

@@ -6,12 +6,7 @@ import ChatroomCreateModal from "../../components/modal/chatroom/create/chatroom
 import SideBar from "../../components/sideBar/sideBar";
 import ChatroomItem from "./chatroomItem/item";
 import "./main.scss";
-import ChatroomDefaultDropdownList from "../../components/dropdown/dropdownList/chatroomDefault";
-import ChatroomAdminDropdownList from "../../components/dropdown/dropdownList/chatroomAdmin";
-import ChatroomOwnerDropdownList from "../../components/dropdown/dropdownList/chatroomOwner";
-import FriendDropdownList from "../../components/dropdown/dropdownList/friend";
-import HeaderDropdownList from "../../components/dropdown/dropdownList/header";
-import OTPModal from "../../components/modal/otp/otpModal";
+import { sidebarProperty } from "../../components/sideBar/sideBarType";
 
 enum ChatroomCategory {
   AllChatroomList,
@@ -253,14 +248,8 @@ function Main() {
   return (
     <>
       <Header isLoggedIn={true} />
-      {/* <ChatroomOwnerDropdownList/> */}
-
-      {/* <ChatroomDefaultDropdownList/>
-      <ChatroomAdminDropdownList/>
-      <FriendDropdownList/>
-      <HeaderDropdownList/> */}
       <div className="page">
-        <SideBar/>
+        <SideBar title={sidebarProperty.friendList}/>
         <div className="content">
           <div className="button-list">
             <div className="button-left-side">

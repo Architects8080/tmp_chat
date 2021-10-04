@@ -6,7 +6,7 @@ import { useEffect } from "react";
 
 type inviteInfo = {
   nickname: string;
-  avater: string;
+  avatar: string;
   roomID: number;
 };
 
@@ -46,7 +46,7 @@ function GameInviteModal(prop: ModalProps) {
           {/* from Server get ImageURL*/}
           <div className="modal-content center">
             <div className="image-cropper">
-              <img src={prop.inviteInfo.avater} className="rounded" />
+              <img src={prop.inviteInfo.avatar} className="rounded" />
             </div>
           </div>
 

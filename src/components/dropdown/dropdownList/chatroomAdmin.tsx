@@ -7,18 +7,23 @@ import ObserveGameItem from "../dropdownItem/observeGame";
 import ViewProfileItem from "../dropdownItem/viewProfile";
 import "./dropdownList.scss";
 
-function ChatroomAdminDropdownList() {
-  return (
-    <div className="dropdown-list-wrap">
-      <ViewProfileItem />
-      <AddFriendItem />
-      <InviteGameItem />
-      <ObserveGameItem />
+function ChatroomAdminDropdownList(anchorPoint: any) { //
 
-      <BanUserItem />
-      <MuteUserItem />
-      <UnmuteUserItem />
-    </div>
+  const position = {top: anchorPoint.y, left: anchorPoint.x}
+  console.log(anchorPoint);
+  return (
+    <>
+      <div className="dropdown-list-wrap" style={position}>
+        <ViewProfileItem />
+        <AddFriendItem />
+        <InviteGameItem />
+        <ObserveGameItem />
+
+        <BanUserItem />
+        <MuteUserItem />
+        <UnmuteUserItem />
+      </div> 
+    </>
   );
 }
 

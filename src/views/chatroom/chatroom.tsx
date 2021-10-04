@@ -1,6 +1,7 @@
 import React from "react";
 import Header from "../../components/header/header";
 import SideBar from "../../components/sideBar/sideBar";
+import { sidebarProperty } from "../../components/sideBar/sideBarType";
 import "./chatroom.scss";
 import ChatMessage from "./message/message";
 
@@ -9,7 +10,7 @@ function Chatroom() {
     <>
       <Header isLoggedIn={true} />
       <div className="page">
-        <SideBar />
+        <SideBar title={sidebarProperty.chatMemberList}/>
         <div className="chatroom-wrap">
           <div className="chatroom-message-list">
             {/* map->showing message */}

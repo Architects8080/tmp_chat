@@ -3,6 +3,7 @@ import AchievementItem from "../../components/achievement/achievement";
 import EmptyPageInfo from "../../components/emptyPage/empty";
 import Header from "../../components/header/header";
 import SideBar from "../../components/sideBar/sideBar";
+import { sidebarProperty } from "../../components/sideBar/sideBarType";
 import GameLogItem from "./gamelog/item";
 import "./profile.scss";
 
@@ -13,14 +14,14 @@ function Profile() {
     <>
       <Header isLoggedIn={true} />
       <div className="page">
-        <SideBar />
+        <SideBar title={sidebarProperty.friendList}/>
         <div className="profile-wrap">
           <div className="profile-header">
             <div className="profile-info">
               {/* show info from server */}
               <img
-                className="user-avater"
-                alt="user-avater"
+                className="user-avatar"
+                alt="user-avatar"
                 src="https://cdn.intra.42.fr/users/chlee.png"
               />
               <div className="profile-description">
