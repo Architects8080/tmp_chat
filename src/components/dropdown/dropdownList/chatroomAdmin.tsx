@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import AddFriendItem from "../dropdownItem/chatroom/addFriend";
 import BanUserItem from "../dropdownItem/chatroom/admin/ban";
 import MuteUserItem from "../dropdownItem/chatroom/admin/mute";
@@ -10,9 +11,9 @@ import "./dropdownList.scss";
 function ChatroomAdminDropdownList(anchorPoint: any) { //
 
   const position = {top: anchorPoint.y, left: anchorPoint.x}
-  console.log(anchorPoint);
   return (
     <>
+    {anchorPoint ?
       <div className="dropdown-list-wrap" style={position}>
         <ViewProfileItem />
         <AddFriendItem />
@@ -23,6 +24,7 @@ function ChatroomAdminDropdownList(anchorPoint: any) { //
         <MuteUserItem />
         <UnmuteUserItem />
       </div> 
+    : ""}
     </>
   );
 }

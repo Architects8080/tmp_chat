@@ -49,10 +49,10 @@ function SideBar(prop: sidebarProps) {
       setShow(false);
   }, [show]);
 
+  window.addEventListener("click", handleClick)
   useEffect(() => {
-    document.addEventListener("click", handleClick);
     return () => {
-      document.removeEventListener("click", handleClick);
+      window.removeEventListener("click", handleClick);
     }
   }, []);
 
@@ -87,7 +87,7 @@ function SideBar(prop: sidebarProps) {
         {/* itemProps & userid & otherId */}
         <SidebarItem itemType={sidebarProperty.friendList} itemInfo={tempType} contextMenuHandler={contextMenuHandler} />
       </div>
-        { show && prop.title === sidebarProperty.friendList ? <ChatroomAdminDropdownList anchorPoint={anchorPoint}/> : ""}
+      { show && prop.title === sidebarProperty.friendList ? <ChatroomAdminDropdownList {...anchorPoint}/> : ""}
     </aside>
   );
 }
