@@ -21,6 +21,8 @@ export class MatchPlayer {
   @Column()
   isLeft: boolean;
   @Column()
+  isWinner: boolean;
+  @Column()
   ladderPoint: number;
   @Column()
   ladderIncrease: number;

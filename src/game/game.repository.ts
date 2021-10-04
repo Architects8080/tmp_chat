@@ -5,8 +5,8 @@ import { Repository } from 'typeorm';
 import { GamePlayer } from './data/game-player.data';
 import { GameStatus } from './data/game-status.data';
 import { GameRoom } from './data/gameroom.data';
-import { MatchPlayer } from './entity/match-player.entity';
-import { Match } from './entity/match.entity';
+import { MatchPlayer } from '../match/entity/match-player.entity';
+import { Match } from '../match/entity/match.entity';
 
 @Injectable()
 export class GameRepository {
@@ -53,7 +53,12 @@ export class GameRepository {
     return this.gameRoomMap.set(roomId, gameRoom);
   }
 
-  async saveMatchPlayer(matchId: number, player: GamePlayer, isLeft: boolean) {
+  async saveMatchPlayer(
+    matchId: number,
+    player: GamePlayer,
+    isLeft: boolean,
+    isWinner: boolean,
+  ) {
     const matchPlayer = this.matchPlayerRepository.create();
     const user = await this.userService.getUserById(player.id);
     matchPlayer.matchId = matchId;
@@ -62,6 +67,7 @@ export class GameRepository {
     matchPlayer.isLeft = isLeft;
     matchPlayer.ladderPoint = user.ladderPoint;
     matchPlayer.ladderIncrease = 0; // TODO
+    matchPlayer.isWinner = isWinner;
     this.matchPlayerRepository.insert(matchPlayer);
   }
 
@@ -72,13 +78,13 @@ export class GameRepository {
     const match: Match = this.matchRepository.create();
     const gameTime =
       (gameInfo.endAt.getTime() - gameInfo.startAt.getTime()) / 1000;
-
+    const isPlayer1Win = gameInfo.player1 > gameInfo.player2;
     match.startAt = gameInfo.startAt;
     match.endAt = gameInfo.endAt;
     match.gameTime = Math.round(gameTime); // second
     match.gameType = room.gameType;
     await this.matchRepository.insert(match);
-    this.saveMatchPlayer(match.id, gameInfo.player1, true);
-    this.saveMatchPlayer(match.id, gameInfo.player2, false);
+    this.saveMatchPlayer(match.id, gameInfo.player1, true, isPlayer1Win);
+    this.saveMatchPlayer(match.id, gameInfo.player2, false, !isPlayer1Win);
   }
 }
