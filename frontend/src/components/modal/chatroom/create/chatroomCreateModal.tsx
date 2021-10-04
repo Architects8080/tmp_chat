@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useEffect } from 'react';
+import { ioChannel } from '../../../../socket/socket';
 import RadioButton from '../../../button/radio/radio';
 import './chatroomCreateModal.scss';
 
@@ -7,18 +9,31 @@ type chatroomCreateModalProps = {
   close: any;
 }
 
-function ChatroomCreateModal(prop: chatroomCreateModalProps) {
+type channelCreateDto = {
+  title: string;
+  type: number;
+  password?: string;
+}
 
-  const Title = "채팅방 생성";
+const ChatroomCreateModal = (prop: chatroomCreateModalProps) => {
+
+  const modalTitle = "채팅방 생성";
   const Explain = "채팅방을 만들어 다른 유저와 소통해보세요!";
 
   const roomPlaceholder = "방 제목";
   const buttonTitle = "생성하기";
 
+  const [title, setTitle] = useState("");
   const [password, setPassword] = useState("");
 
   const [explainText, setExplainText] = useState("비밀번호는 숫자 4자리로 구성 가능합니다.");
   const [errorText, setErrorText] = useState("");
+
+  useEffect(() => {
+    ioChannel.on('channelCreated', (channelId) => {
+      window.location.href = `http://localhost:3000/chatroom/${channelId}`
+    });
+  }, []);
 
   const handleUserInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
@@ -40,32 +55,41 @@ function ChatroomCreateModal(prop: chatroomCreateModalProps) {
   }
 
   const handleSubmitEvent = () => {
-
     if (errorText === "") {
-      console.log(`emit password : `, password);
-      //io.emit(password) to create gameroom
+      const newChannel: channelCreateDto = {
+        title: title,
+        type: selectedRoomType,
+        password: password,
+      }
+      ioChannel.emit('createChannel', newChannel); 
+      prop.close();
     }
   }
 
-  const [selectedInput, setSelectedInput] = useState("");
+  const [selectedRoomType, setSelectedRoomType] = useState(0);
 
   const handleChange = (inputValue: string) => {
-    setSelectedInput(inputValue);
+    (inputValue === 'option-0') ? setSelectedRoomType(0) :
+      (inputValue === 'option-1') ? setSelectedRoomType(1) : setSelectedRoomType(2);
   };
 
   return (
     <div className={prop.open ? "modal-open modal-background" : "modal-background"}>
       <div className="chatroom-create-modal-wrap">
         <div className="modal-header">
-          <div className="title">{Title}</div>
+          <div className="title">{modalTitle}</div>
           <img className="close" alt="close" src="/icons/modal/close.svg" onClick={handleClose}/>
         </div>
         <div className="explain">{Explain}</div>
 
         <div className="content">
           <div className="subtitle">방 제목</div>
-          {/* value={} onChage={}  */}
-          <input className="room-title" type="text" placeholder={roomPlaceholder}></input>
+          <input 
+            className="room-title" 
+            type="text" 
+            value={title} 
+            onChange={e => setTitle(e.target.value)} 
+            placeholder={roomPlaceholder}></input>
         </div>
 
         <div className="content">
@@ -73,26 +97,26 @@ function ChatroomCreateModal(prop: chatroomCreateModalProps) {
           <div className="select">
             <RadioButton
               name="option"
-              value="option-1"
+              value="option-0"
               label="Public"
-              isChecked={selectedInput === "option-1"}
+              isChecked={selectedRoomType === 0}
+              handleChange={handleChange}
+            />
+            <RadioButton
+              name="option"
+              value="option-1"
+              label="Private"
+              isChecked={selectedRoomType === 1}
               handleChange={handleChange}
             />
             <RadioButton
               name="option"
               value="option-2"
-              label="Private"
-              isChecked={selectedInput === "option-2"}
-              handleChange={handleChange}
-            />
-            <RadioButton
-              name="option"
-              value="option-3"
               label="Protected"
-              isChecked={selectedInput === "option-3"}
+              isChecked={selectedRoomType === 2}
               handleChange={handleChange}
             />
-            <div className={selectedInput === "option-3" ? "password-open" : "password-close"}>
+            <div className={selectedRoomType === 2 ? "password-open" : "password-close"}>
               <img className="password-icon" alt="password-icon" src="/icons/modal/password.svg"/>
               <input className="password-input" type="password" maxLength={4} value={password} onChange={handleUserInputChange} placeholder={"password"}/>
             </div>
@@ -100,7 +124,7 @@ function ChatroomCreateModal(prop: chatroomCreateModalProps) {
         </div>
 
         {/* show or not */}
-        <div className={selectedInput === "option-3" ? "protected-open" : "protected-close"}>
+        <div className={selectedRoomType === 2 ? "protected-open" : "protected-close"}>
           <div className="protected-explain">{explainText}</div>
           <div className="protected-error">{errorText}</div>
         </div>

@@ -8,7 +8,6 @@ import Game from './views/game/game';
 import Setting from './views/setting/setting';
 import OTP from './views/auth/otp/otp';
 import Chatroom from './views/chatroom/chatroom';
-import Channel from './channel/channel';
 
 function App() {
   return (
@@ -21,8 +20,7 @@ function App() {
       <Route path="/setting" component={Setting}/>
       <Route path="/otp" component={OTP}/>
       <Route path="/register" component={Register}/>
-      <Route path="/chatroom/:id" component={Chatroom}/>
-      <Route path="/channel" component={Channel}/>
+      <Route exact path="/chatroom/:id" component={Chatroom}/>
     </div>
   );
 }
