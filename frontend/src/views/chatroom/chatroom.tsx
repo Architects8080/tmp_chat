@@ -7,6 +7,7 @@ import SideBar from '../../components/sideBar/sideBar';
 import './chatroom.scss';
 import ChatMessage from './message/message';
 import { ioChannel } from '../../socket/socket';
+import { useParams } from 'react-router-dom';
 
 // 서버로부터 받아서 message state 에 넣을 때 들어가는 형태
 type Message = {
@@ -26,7 +27,7 @@ const Chatroom = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   
   const [text, setText] = useState('');
-
+  let { id } : any = useParams();
   useEffect(() => {
     function receivedMessage(message: Payload) {
       const newMessage: Message = {
@@ -47,7 +48,8 @@ const Chatroom = () => {
 		if (e.key !== 'Enter' || text === '')
 			return;
 		const newMessageSend = {
-      text
+      roomId: id,
+      text: text,
 		};
 		ioChannel.emit('msgToChannel', newMessageSend);
 		setText('');
