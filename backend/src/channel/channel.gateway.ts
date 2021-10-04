@@ -14,6 +14,8 @@ import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 import { cookieExtractor, JwtStrategy } from 'src/auth/strategy/jwt.strategy';
 import { SocketUser } from 'src/socket/socket-user';
 import { SocketUserService } from 'src/socket/socket-user.service';
+import { ChannelService } from './channel.service';
+import { CreateChannelDto } from './dto/create-channel.dto';
 
 @UseGuards(JwtAuthGuard)
 @WebSocketGateway(4501, { namespace: 'channel' })
@@ -23,6 +25,7 @@ export class ChannelGateway
   constructor(
     private jwtService: JwtService,
     private jwtStrategy: JwtStrategy,
+    private channelService: ChannelService,
     @Inject('CHANNEL_SOCKET_USER_SERVICE')
     private socketUserService: SocketUserService,
   ) {}
@@ -54,6 +57,16 @@ export class ChannelGateway
     } catch (error) {}
   }
 
+  @SubscribeMessage('createChannel')
+  async createChannel(
+    @MessageBody() data: CreateChannelDto,
+    @ConnectedSocket() client: SocketUser,
+  ) {
+    data.ownerId = client.user.id;
+    const channelId = await this.channelService.createChannel(data);
+    this.server.emit('channelCreated', channelId);
+  }
+
   @SubscribeMessage('joinChannel')
   joinChannel(@MessageBody() data: any, @ConnectedSocket() client: SocketUser) {
     client.join(data.toString());
@@ -69,7 +82,6 @@ export class ChannelGateway
       text: data.text,
       name: client.user.intraLogin,
     };
-    console.log(data);
     this.server.to(data.roomId).emit('msgToClient', payload);
   }
 }

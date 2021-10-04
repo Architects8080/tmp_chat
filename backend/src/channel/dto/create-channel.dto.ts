@@ -10,4 +10,6 @@ export class CreateChannelDto {
   // @IsOptional()
   // @IsString()
   readonly password: string;
+
+  ownerId: number;
 }

@@ -4,6 +4,7 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
+  PrimaryColumn,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '../../user/entity/user.entity';
@@ -28,13 +29,20 @@ export class Channel {
 
 @Entity('channel_member')
 export class ChannelMember {
-  @ManyToOne(() => Channel, (channel) => channel.channelIDs, { primary: true })
+  @ManyToOne(() => Channel, (channel) => channel.channelIDs, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   @JoinColumn({ name: 'channelID' })
-  channelID: Channel;
+  channel: Channel;
+  @PrimaryColumn()
+  channelID: number;
 
-  @ManyToOne(() => User, { primary: true })
+  @ManyToOne(() => User)
   @JoinColumn({ name: 'userID' })
-  userID: User;
+  user: User;
+  @PrimaryColumn()
+  userID: number;
 
   @OneToMany(() => ChannelMessage, (message) => message.sentBy)
   messages: ChannelMessage[];
