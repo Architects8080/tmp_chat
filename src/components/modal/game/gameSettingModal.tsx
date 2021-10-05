@@ -8,10 +8,9 @@ import "./gameModal.scss";
 import useDetectOutsideClick from "./useDetectOutsideClick";
 
 type ModalProps = {
-  open: any;
+  open: boolean;
   close: any;
-  header: any;
-  targetUserId: number;
+  targetId: number;
   // children: React.ReactNode;
 };
 
@@ -67,7 +66,7 @@ function GameSettingModal(prop: ModalProps) {
   };
 
   const handleSubmit = (event: React.MouseEvent) => {
-    io.emit("invite", prop.targetUserId, {
+    io.emit("invite", prop.targetId, {
       mapId: currentImageIdx,
       isObstacle: isChecked,
     });
@@ -79,7 +78,7 @@ function GameSettingModal(prop: ModalProps) {
       {prop.open ? (
         <section>
           <div className="modal-title">
-            {prop.header}
+            게임 설정
             <button className="modal-close" onClick={prop.close}>
               {" "}
               X{" "}

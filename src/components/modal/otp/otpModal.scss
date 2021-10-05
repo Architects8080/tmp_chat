@@ -1,4 +1,3 @@
-
 .otp-modal-wrap {
   display: flex;
   flex-direction: column;
@@ -12,7 +11,7 @@
     font-weight: bold;
     font-size: 24px;
     line-height: 30px;
-    color: #1F1F1F;
+    color: #1f1f1f;
   }
 
   .otp-qr {
@@ -21,7 +20,7 @@
     height: 146px;
     filter: drop-shadow(0px 4px 8px rgba(0, 0, 0, 0.25));
   }
-  
+
   .otp-code {
     margin-top: 20px;
     font-family: Spoqa Han Sans Neo;
@@ -42,7 +41,7 @@
 
     text-align: center;
 
-    color: #9C9C9C;
+    color: #9c9c9c;
   }
 
   .submit-button {
@@ -57,13 +56,13 @@
     line-height: 20px;
     text-align: center;
 
-    color: #3562FF;
+    color: #3562ff;
     background: rgba(53, 97, 255, 0.1);
     border-radius: 8px;
 
     &:hover {
       cursor: pointer;
-      background: #3562FF;
+      background: #3562ff;
       color: #ffffff;
       transition: 0.3s;
     }
