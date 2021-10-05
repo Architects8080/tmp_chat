@@ -10,6 +10,7 @@ import { UserModule } from './user/user.module';
 import { GameModule } from './game/game.module';
 import { OTPModule } from './otp/otp.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { DmModule } from './dm/dm.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
     UserModule,
     GameModule,
     OTPModule,
+    DmModule
   ],
   controllers: [AppController],
   providers: [AppService],
