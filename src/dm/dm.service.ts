@@ -43,17 +43,12 @@ export class DmService {
     }
   }
 
-  async getDMList(userID, friendID) {
+  async getDMList(userID: number, friendID: number) {
     return await this.dmInfoRepository.find({
+      relations: ["dm"],
       where: {
         userID: userID,
         friendID: friendID
-      },
-      join: {
-        alias: "DMInfo",
-        leftJoinAndSelect: {
-          dm: "DMInfo.dm",
-        },
       },
       order: {
         timestamp: "ASC"
