@@ -1,16 +1,23 @@
 import React from "react";
 import Header from "../../components/header/header";
+import ModalHandler from "../../components/modal/modalhandler";
 import SideBar from "../../components/sideBar/sideBar";
 import { sidebarProperty } from "../../components/sideBar/sideBarType";
 import "./chatroom.scss";
 import ChatMessage from "./message/message";
 
 function Chatroom() {
+  const modalHandler = ModalHandler();
+
   return (
     <>
       <Header isLoggedIn={true} />
       <div className="page">
-        <SideBar title={sidebarProperty.chatMemberList}/>
+        <SideBar
+          title={sidebarProperty.chatMemberList}
+          roomId={42}
+          modalHandler={modalHandler}
+        />
         <div className="chatroom-wrap">
           <div className="chatroom-message-list">
             {/* map->showing message */}

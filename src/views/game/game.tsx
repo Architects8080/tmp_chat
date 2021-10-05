@@ -8,10 +8,12 @@ import Pong from "./pong/pong";
 import SideBar from "../../components/sideBar/sideBar";
 import "./game.scss";
 import { sidebarProperty } from "../../components/sideBar/sideBarType";
+import ModalHandler from "../../components/modal/modalhandler";
 
 function Game() {
   const { id } = useParams<{ id: string }>();
 
+  const modalHandler = ModalHandler();
   const [gameInfo, setGameInfo] = useState<GameInfo | null>(null);
   var temp: GameInfo | null = null;
 
@@ -54,7 +56,11 @@ function Game() {
     <>
       <Header isLoggedIn={true} />
       <div className="page">
-        <SideBar title={sidebarProperty.observerList}/>
+        <SideBar
+          title={sidebarProperty.observerList}
+          roomId={42}
+          modalHandler={modalHandler}
+        />
         {gameInfo ? (
           <div className="game-wrap">
             <div className="game-scoreboard">

@@ -2,19 +2,25 @@ import React, { useState } from "react";
 import AchievementItem from "../../components/achievement/achievement";
 import EmptyPageInfo from "../../components/emptyPage/empty";
 import Header from "../../components/header/header";
+import ModalHandler from "../../components/modal/modalhandler";
 import SideBar from "../../components/sideBar/sideBar";
 import { sidebarProperty } from "../../components/sideBar/sideBarType";
 import GameLogItem from "./gamelog/item";
 import "./profile.scss";
 
 function Profile() {
+  const modalHandler = ModalHandler();
   const [isEmpty, setIsEmpty] = useState(false);
 
   return (
     <>
       <Header isLoggedIn={true} />
       <div className="page">
-        <SideBar title={sidebarProperty.friendList}/>
+        <SideBar
+          title={sidebarProperty.friendList}
+          roomId={0}
+          modalHandler={modalHandler}
+        />
         <div className="profile-wrap">
           <div className="profile-header">
             <div className="profile-info">
@@ -68,7 +74,6 @@ function Profile() {
             />
           ) : (
             <div className="gameLogList">
-              {" "}
               {/* margin-top */}
               <GameLogItem />
               <GameLogItem />
