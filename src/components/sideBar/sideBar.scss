@@ -45,8 +45,9 @@ aside {
     }
   }
 
-  .friend-list {
-    
+  .user-list {
+    max-height: calc(100vh - 92px - 96px);
+    overflow-y: scroll;
   }
 
   // .DM {

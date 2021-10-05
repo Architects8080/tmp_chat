@@ -1,10 +1,14 @@
 type iconProps = {
-  onClick: any
-}
+  onClick: any;
+};
 
 function InviteUserIcon(prop: iconProps) {
   return (
-    <img className="icon" src="/icons/sidebar/inviteUser.svg" onClick={prop.onClick}/>
+    <img
+      className="icon"
+      src="/icons/sidebar/inviteUser.svg"
+      onClick={prop.onClick}
+    />
   );
 }
 
