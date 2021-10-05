@@ -1,14 +1,17 @@
 import React from "react";
+import { io } from "../../../../socket/socket";
 import DefaultDropdownItem from "../../itemTemplate/default/item";
 
 function LogoutItem() {
+  const handleLogout = () => {
+    io.emit("logout"); //TODO
+  };
+
   return (
     <DefaultDropdownItem
       title="로그아웃"
       color="black"
-      callback={() => {
-        // window.location.href = "http://localhost:3000/setting";
-      }}
+      callback={handleLogout}
     />
   );
 }

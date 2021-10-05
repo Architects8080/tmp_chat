@@ -6,18 +6,18 @@ type props = {
   targetId: number;
 };
 
-function BlockDMItem(prop: props) {
-  const handleBlockDM = () => {
-    io.emit("dm/block", prop.targetId); //TODO
+function DeleteFriendItem(prop: props) {
+  const handleDeleteFriend = () => {
+    io.emit("friend/delete", prop.targetId); //TODO
   };
 
   return (
     <DefaultDropdownItem
-      title="DM 차단하기 (Block)"
+      title="친구 끊기"
       color="red"
-      callback={handleBlockDM}
+      callback={handleDeleteFriend}
     />
   );
 }
 
-export default BlockDMItem;
+export default DeleteFriendItem;
