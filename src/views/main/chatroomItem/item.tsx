@@ -1,20 +1,23 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import EnterPasswordModal from "../../../components/modal/chatroom/join/enterPasswordModal";
+import { ioChannel } from "../../../socket/socket";
 import "./item.scss";
 
-type chatroomItemProps = {
-  roomId: number;
-  title: string;
-  memberCount: number;
-  isProtected: boolean;
-};
-function ChatroomItem(prop: chatroomItemProps) {
+export type chatroomItemProps = {
+  roomId: number,
+  title: string,
+  memberCount: number,
+  isProtected: boolean
+}
+
+const ChatroomItem = ({channel} : {channel:any}) => {
   const [modalopen, setModalOpen] = useState(false);
 
   const handleOnClick = () => {
-    if (prop.isProtected) setModalOpen(true);
+    if (channel.isProtected) setModalOpen(true);
     else console.log("io.emit join!!");
-    //io.emit(join, prop.roomId);
+      ioChannel.emit("joinChannel", channel.roomId);
   };
 
   const handleModalClose = () => {
@@ -22,28 +25,16 @@ function ChatroomItem(prop: chatroomItemProps) {
   };
 
   return (
-    <>
+    <Link to={`/chatroom/${channel.roomId}`} style={{ color: 'inherit', textDecoration: 'inherit' }}>
       <div className="chatroom-item" onClick={handleOnClick}>
         <div className="chatroom-header">
-          <div className="chatroom-title">{prop.title}</div>
-          {prop.isProtected ? (
-            <img
-              className="chatroom-locked"
-              alt="chatroom-locked"
-              src="/icons/lock.svg"
-            />
-          ) : (
-            ""
-          )}
+          <div className="chatroom-title">{channel.title}</div>
+          { channel.isProtected ? <img className="chatroom-locked" alt="chatroom-locked" src="/icons/lock.svg"/> : ""}
         </div>
-        <div className="chatroom-member-count">{prop.memberCount}명 참여중</div>
+        <div className="chatroom-member-count">{channel.memberCount}명 참여중</div>
       </div>
-      {modalopen ? (
-        <EnterPasswordModal open={modalopen} close={handleModalClose} />
-      ) : (
-        ""
-      )}
-    </>
+      {modalopen ? <EnterPasswordModal open={modalopen} close={handleModalClose}/> : ""}
+    </Link>
   );
 }
 
