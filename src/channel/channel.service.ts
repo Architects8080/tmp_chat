@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { cookieExtractor, JwtStrategy } from 'src/auth/strategy/jwt.strategy';
 import { Repository } from 'typeorm';
 import { ChannelListDto } from './dto/channel-list.dto';
+import { CreateChannelDto } from './dto/create-channel.dto';
 import { Channel, ChannelMember } from './entity/channel.entity';
 
 @Injectable()
@@ -90,5 +91,39 @@ export class ChannelService {
       myChannel.push(instance);
     }
     return myChannel;
+  }
+
+  async createChannel(channelData: CreateChannelDto) {
+    const newChannel: Channel = this.channelRepository.create({
+      title: channelData.title,
+      type: channelData.type,
+      password: channelData.password,
+    });
+    await this.channelRepository.insert(newChannel);
+    const newChannelMember: ChannelMember =
+      this.channelMemberRepository.create();
+    newChannelMember.userID = channelData.ownerId;
+    const tmpChannelId = await this.channelRepository.find({
+      select: ['id'],
+      order: {
+        id: 'DESC',
+      },
+      take: 1,
+    });
+    newChannelMember.channelID = tmpChannelId[0].id;
+    newChannelMember.permissionType = 2;
+    newChannelMember.penalty = 0;
+    await this.channelMemberRepository.insert(newChannelMember);
+    return tmpChannelId[0].id;
+  }
+
+  async joinChannel(roomId: number, userId: number) {
+    const newChannelMember: ChannelMember =
+      this.channelMemberRepository.create();
+    newChannelMember.userID = userId;
+    newChannelMember.channelID = roomId;
+    newChannelMember.permissionType = 0;
+    newChannelMember.penalty = 0;
+    await this.channelMemberRepository.insert(newChannelMember);
   }
 }
