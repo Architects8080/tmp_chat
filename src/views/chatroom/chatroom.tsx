@@ -9,6 +9,7 @@ import SideBar from "../../components/sideBar/sideBar";
 import { sidebarProperty } from "../../components/sideBar/sideBarType";
 import ChatMessage from "./message/message";
 import { ioChannel } from "../../socket/socket";
+import "./chatroom.scss";
 
 // 서버로부터 받아서 message state 에 넣을 때 들어가는 형태
 type Message = {
