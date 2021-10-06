@@ -1,4 +1,5 @@
-import { Exclude } from 'class-transformer';
+import { Exclude, Transform, TransformFnParams } from 'class-transformer';
+import { configuration } from 'config/configuration';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity('user')
@@ -13,6 +14,16 @@ export class User {
   intraLogin: string;
 
   @Column()
+  @Transform((avatar: TransformFnParams) => {
+    if (avatar.value == null) return '';
+    if (!avatar.value.match('^https?://')) {
+      const route = configuration.public.route;
+      const avatarRoute = configuration.public.avatar.route;
+      const serverAddress = configuration.server_address;
+      return `${serverAddress}${route}${avatarRoute}/${avatar.value}`;
+    }
+    return avatar.value;
+  })
   avatar: string;
 
   @Column({ default: 0 })

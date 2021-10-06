@@ -5,7 +5,6 @@ import * as cookieParser from 'cookie-parser';
 import { SocketCorsAdapter } from './socket/socket-cors.adapter';
 import { ConfigService } from '@nestjs/config';
 import { ClassSerializerInterceptor } from '@nestjs/common';
-import { AvatarTransformInterceptor } from './user/avatar-transform.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -24,7 +23,6 @@ async function bootstrap() {
   }); // to resolve CORS problem
   app.useWebSocketAdapter(new SocketCorsAdapter(app, configService));
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
-  app.useGlobalInterceptors(new AvatarTransformInterceptor(configService));
   await app.listen(5000);
 }
 bootstrap();

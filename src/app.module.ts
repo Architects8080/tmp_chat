@@ -16,11 +16,11 @@ import { DmModule } from './dm/dm.module';
 
 @Module({
   imports: [
-    AuthModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
     }),
+    AuthModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -32,7 +32,6 @@ import { DmModule } from './dm/dm.module';
         password: configService.get<string>('database.password'),
         database: configService.get<string>('database.name'),
         entities: ['dist/**/*.entity{.ts,.js}'],
-        synchronize: true,
       }),
     }),
     ServeStaticModule.forRootAsync({
@@ -49,7 +48,7 @@ import { DmModule } from './dm/dm.module';
     GameModule,
     OTPModule,
     MatchModule,
-    DmModule
+    DmModule,
   ],
   controllers: [AppController],
   providers: [AppService],
