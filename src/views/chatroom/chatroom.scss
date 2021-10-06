@@ -13,9 +13,19 @@
     display: flex;
     flex-direction: column;
 
-    .chatroom-message-list {
-      padding: 32px;
+    .chatroom-message-list-wrap {
+      margin: 32px;
       margin-top: auto;
+    }
+
+    .chatroom-message-list {
+      overflow-y: hidden;
+      max-height: calc(100vh - 92px - 194px - 32px);
+    }
+
+    .chatroom-message-list:hover {
+      overflow-y: auto;
+      max-height: calc(100vh - 92px - 194px - 32px);
     }
 
     .chatroom-user-input {
@@ -23,8 +33,8 @@
       background: #ffffff;
       border: 1px solid #000000;
       box-sizing: border-box;
-      border-radius: 7px;
-
+      border-radius: 8px;
+      margin: 0 32px 32px 32px;
       .input-field {
         width: 100%;
         border: none;
