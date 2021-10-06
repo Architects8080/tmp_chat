@@ -49,6 +49,7 @@ import { ChannelModule } from './channel/channel.module';
     OTPModule,
     MatchModule,
     DmModule,
+    ChannelModule,
   ],
   controllers: [AppController],
   providers: [AppService],
