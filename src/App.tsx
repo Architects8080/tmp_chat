@@ -14,7 +14,8 @@ function App() {
   return (
     // wip
     <div className="app">
-      <Route exact path="/" component={Main} />
+      <Route exact path="/" component={Login} />
+      <Route path="/login" component={Login} />
       <Route path="/main" component={Main} />
       <Route path="/profile/:id" component={Profile} />
       <Route path="/game/:id" component={Game} />

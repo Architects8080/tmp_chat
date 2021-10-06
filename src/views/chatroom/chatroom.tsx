@@ -25,12 +25,19 @@ type Payload = {
   text: string;
 }
 
+const AlwaysScrollToBottom = () => {
+  const elementRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => elementRef.current?.scrollIntoView());
+  return <div ref={elementRef} />;
+};
+
 const Chatroom = () => {
   const modalHandler = ModalHandler();
   const [messages, setMessages] = useState<Message[]>([]);
   
   const [text, setText] = useState('');
   let { id } : any = useParams();
+
   useEffect(() => {
     function receivedMessage(message: Payload) {
       const newMessage: Message = {
@@ -38,7 +45,6 @@ const Chatroom = () => {
         name: message.name,
         text: message.text,
       };
-
       setMessages([...messages, newMessage]);
     }
 
@@ -57,34 +63,36 @@ const Chatroom = () => {
 		ioChannel.emit('msgToChannel', newMessageSend);
 		setText('');
 	}
+
   return (
     <>
       <Header isLoggedIn={true} />
       <div className="page">
+        {/* TODO: modify roomId */}
         <SideBar
           title={sidebarProperty.chatMemberList}
-          roomId={42}
+          roomId={42} 
           modalHandler={modalHandler}
         />
         <div className="chatroom-wrap">
-          <div className="chatroom-message-list">
-            {messages.map(message => (
-              <ChatMessage key={message.id} isSelfMessage={true} nickname={message.name} content={message.text}/>
-            ))}
-            <ChatMessage isSelfMessage={false} nickname="chlee" content="test" />
-            <div className="chatroom-user-input">
-              <input 
-                className="input-field"
-                placeholder="내용을 입력하세요"
-                value={text}
-                onChange={e => setText(e.target.value)}
-                onKeyPress={sendMessage}
-              />
+          <div className="chatroom-message-list-wrap">
+            <div className="chatroom-message-list">
+              {/* map->showing message */}
+              {messages.map(message => (
+                <ChatMessage key={message.id} isSelfMessage={true} nickname={message.name} content={message.text}/>
+              ))}
+              <AlwaysScrollToBottom />
             </div>
+          </div>
+          <div className="chatroom-user-input">
+            <input
+              className="input-field"
+              type="text"
+              placeholder="내용을 입력하세요"
+            />
           </div>
         </div>
       </div>
-
       <div
         className="button-chatroom-exit"
         onClick={() => {

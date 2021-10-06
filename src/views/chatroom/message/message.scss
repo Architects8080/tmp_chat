@@ -1,10 +1,10 @@
 .other-message-wrap {
   margin-bottom: 24px;
-
   display: flex;
   flex-direction: row;
-
-  .other-message-avatar {
+  align-items: left;
+ 
+  .other-message-avater {
     width: 64px;
     height: 64px;
     object-fit: cover;
