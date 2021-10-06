@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Button from "../../components/button/button";
 import EmptyPageInfo from "../../components/emptyPage/empty";
 import Header from "../../components/header/header";
@@ -15,7 +15,6 @@ import FriendDropdownList from "../../components/dropdown/dropdownList/friend";
 import HeaderDropdownList from "../../components/dropdown/dropdownList/header";
 import OTPModal from "../../components/modal/otp/otpModal";
 import axios from "axios";
-import { useEffect } from "react";
 
 enum ChatroomCategory {
   AllChatroomList,
@@ -74,12 +73,12 @@ const Main = () => {
 		};
 		fetchData();
 	}, []);
-
+/*
   if (!channels) {
 		return (
 			<div>Loading..</div>
 		)
-	}
+	}*/
   // to test empty info
   // tempAllChatroomList = [];
   // tempJoinedChatroomList = [];
@@ -126,15 +125,12 @@ const Main = () => {
             : (chatroomCategory === ChatroomCategory.JoinedChatroomList && !myChannels)
               ? <EmptyPageInfo description={`현재 참여중인 채팅방이 없습니다.\n전체 채팅방 목록에서 참가해보세요!`}/> 
               : <div className="chatroom-list">
-                  {chatroomCategory === ChatroomCategory.AllChatroomList 
+                  {chatroomCategory === ChatroomCategory.AllChatroomList && channels
                     ? channels.map(item => (
                         <ChatroomItem 
                         channel = {item} 
                         key = {item.roomId}/>
                       ))
-                    // : myChannels.map(item => (
-                    //     <ChatroomItem roomId={item.roomId} title={item.title} memberCount={item.memberCount} isProtected={item.isProtected}/>
-                    //   ))
                        : myChannels ? myChannels.map(item => (
                           <ChatroomItem 
                           channel = {item} 
