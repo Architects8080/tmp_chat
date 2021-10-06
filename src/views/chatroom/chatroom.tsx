@@ -7,7 +7,6 @@ import Header from "../../components/header/header";
 import ModalHandler from "../../components/modal/modalhandler";
 import SideBar from "../../components/sideBar/sideBar";
 import { sidebarProperty } from "../../components/sideBar/sideBarType";
-import "./chatroom.scss";
 import ChatMessage from "./message/message";
 import { ioChannel } from "../../socket/socket";
 
