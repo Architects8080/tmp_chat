@@ -20,7 +20,7 @@
   display: flex;
   justify-content: space-around;
 
-  .menu-avater,
+  .menu-avatar,
   .menu-otp {
     display: flex;
     flex-direction: column;
@@ -36,7 +36,7 @@
   }
 }
 
-.menu-avater {
+.menu-avatar {
   > input {
     display: none;
   }

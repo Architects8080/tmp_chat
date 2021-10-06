@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import Header from "../../components/header/header";
+import ModalHandler from "../../components/modal/modalhandler";
 import SideBar from "../../components/sideBar/sideBar";
+import { sidebarProperty } from "../../components/sideBar/sideBarType";
 import "./chatroom.scss";
 import ChatMessage from "./message/message";
 
@@ -11,11 +13,17 @@ const AlwaysScrollToBottom = () => {
 };
 
 function Chatroom() {
+  const modalHandler = ModalHandler();
+
   return (
     <>
       <Header isLoggedIn={true} />
       <div className="page">
-        <SideBar />
+        <SideBar
+          title={sidebarProperty.chatMemberList}
+          roomId={42}
+          modalHandler={modalHandler}
+        />
         <div className="chatroom-wrap">
           <div className="chatroom-message-list-wrap">
             <div className="chatroom-message-list">

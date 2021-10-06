@@ -5,7 +5,7 @@ import Button from "../../components/button/button";
 import "./setting.scss";
 
 function Setting() {
-  const avaterImgInput = useRef<HTMLInputElement>(null);
+  const avatarImgInput = useRef<HTMLInputElement>(null);
   const [test, setTest] = useState<any>({
     file: "",
     previewURL: "",
@@ -14,7 +14,7 @@ function Setting() {
   const onImgInputButtonClick = (event: any) => {
     event.preventDefault();
 
-    if (avaterImgInput.current) avaterImgInput.current.click();
+    if (avatarImgInput.current) avatarImgInput.current.click();
   };
 
   const onImgChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,10 +48,10 @@ function Setting() {
         <div className="setting-title">환경설정</div>
 
         <div className="setting-menu">
-          <div className="menu-avater">
+          <div className="menu-avatar">
             <div className="menu-title">프로필 사진 변경</div>
             <input
-              ref={avaterImgInput}
+              ref={avatarImgInput}
               className="img-input"
               type="file"
               accept="image/*"

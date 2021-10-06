@@ -19,7 +19,7 @@
 }
 
 .chatroom-setting-modal-wrap {
-  width: 544px;
+  // width: 544px;
   background: #ffffff;
   box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.05);
   border-radius: 16px;
@@ -74,6 +74,7 @@
 
 .content {
   .subtitle {
+    flex-shrink: 0;
     font-family: Spoqa Han Sans Neo;
     font-style: normal;
     font-weight: bold;
@@ -204,6 +205,7 @@
 }
 
 .modal-background {
+  z-index: 10;
   display: none;
   position: fixed;
   top: 0;
