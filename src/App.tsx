@@ -8,12 +8,14 @@ import Game from "./views/game/game";
 import Setting from "./views/setting/setting";
 import OTP from "./views/auth/otp/otp";
 import Chatroom from "./views/chatroom/chatroom";
+import Login from "./views/auth/login";
 
 function App() {
   return (
     // wip
     <div className="app">
-      <Route exact path="/" component={Main} />
+      <Route exact path="/" component={Login} />
+      <Route path="/login" component={Login} />
       <Route path="/main" component={Main} />
       <Route path="/profile" component={Profile} />
       <Route path="/game/:id" component={Game} />
