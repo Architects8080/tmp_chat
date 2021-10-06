@@ -6,12 +6,8 @@ import ChatroomCreateModal from "../../components/modal/chatroom/create/chatroom
 import SideBar from "../../components/sideBar/sideBar";
 import ChatroomItem from "./chatroomItem/item";
 import "./main.scss";
-import ChatroomDefaultDropdownList from "../../components/dropdown/dropdownList/chatroomDefault";
-import ChatroomAdminDropdownList from "../../components/dropdown/dropdownList/chatroomAdmin";
-import ChatroomOwnerDropdownList from "../../components/dropdown/dropdownList/chatroomOwner";
-import FriendDropdownList from "../../components/dropdown/dropdownList/friend";
-import HeaderDropdownList from "../../components/dropdown/dropdownList/header";
-import OTPModal from "../../components/modal/otp/otpModal";
+import { sidebarProperty } from "../../components/sideBar/sideBarType";
+import ModalHandler from "../../components/modal/modalhandler";
 
 enum ChatroomCategory {
   AllChatroomList,
@@ -19,32 +15,11 @@ enum ChatroomCategory {
 }
 
 function Main() {
-  const [isModalOpen, setIsModalOpen] = useState({
-    addFriend: false,
-    chatroomInvite: false,
-    chatroomCreate: false,
-    chatroomSetting: false,
-    enterPassword: false,
-    otp: false,
-  });
-
-  const handleModalOpen = (key: string) => {
-    setIsModalOpen({
-      ...isModalOpen,
-      [key]: true,
-    });
-  };
-
-  const handleModalClose = (key: string) => {
-    setIsModalOpen({
-      ...isModalOpen,
-      [key]: false,
-    });
-  };
-
+  const modalHandler = ModalHandler();
   const [chatroomCategory, setChatroomCategory] = useState(
     ChatroomCategory.AllChatroomList
   );
+
   const changeChatroomList = (category: ChatroomCategory) => {
     //io.emit : by category
     //io.on   : get Chatrooms object
@@ -60,187 +35,12 @@ function Main() {
       memberCount: 42,
       isProtected: true,
     },
-    {
-      roomId: 42,
-      title: "gnl에서 메모리 누수 어케 잡으셨나요..?",
-      memberCount: 42,
-      isProtected: true,
-    },
-    {
-      roomId: 42,
-      title: "netwhat 공부 어케했어요",
-      memberCount: 42,
-      isProtected: false,
-    },
-    {
-      roomId: 42,
-      title: "cub3d sprite 어떻게 그려요 ㅠㅠ",
-      memberCount: 42,
-      isProtected: false,
-    },
-    {
-      roomId: 42,
-      title: "cub3d sprite 어떻게 그려요 ㅠㅠ",
-      memberCount: 42,
-      isProtected: false,
-    },
-    {
-      roomId: 42,
-      title: "cub3d sprite 어떻게 그려요 ㅠㅠ",
-      memberCount: 42,
-      isProtected: false,
-    },
-    {
-      roomId: 42,
-      title: "cub3d sprite 어떻게 그려요 ㅠㅠ",
-      memberCount: 42,
-      isProtected: false,
-    },
-    {
-      roomId: 42,
-      title: "cub3d sprite 어떻게 그려요 ㅠㅠ",
-      memberCount: 42,
-      isProtected: false,
-    },
-    {
-      roomId: 42,
-      title: "cub3d sprite 어떻게 그려요 ㅠㅠ",
-      memberCount: 42,
-      isProtected: false,
-    },
-    {
-      roomId: 42,
-      title: "cub3d sprite 어떻게 그려요 ㅠㅠ",
-      memberCount: 42,
-      isProtected: false,
-    },
-    {
-      roomId: 42,
-      title: "cub3d sprite 어떻게 그려요 ㅠㅠ",
-      memberCount: 42,
-      isProtected: false,
-    },
-    {
-      roomId: 42,
-      title: "cub3d sprite 어떻게 그려요 ㅠㅠ",
-      memberCount: 42,
-      isProtected: false,
-    },
-    {
-      roomId: 42,
-      title: "cub3d sprite 어떻게 그려요 ㅠㅠ",
-      memberCount: 42,
-      isProtected: false,
-    },
-    {
-      roomId: 42,
-      title: "cub3d sprite 어떻게 그려요 ㅠㅠ",
-      memberCount: 42,
-      isProtected: false,
-    },
-    {
-      roomId: 42,
-      title: "cub3d sprite 어떻게 그려요 ㅠㅠ",
-      memberCount: 42,
-      isProtected: false,
-    },
-    {
-      roomId: 42,
-      title: "cub3d sprite 어떻게 그려요 ㅠㅠ",
-      memberCount: 42,
-      isProtected: false,
-    },
-    {
-      roomId: 42,
-      title: "cub3d sprite 어떻게 그려요 ㅠㅠ",
-      memberCount: 42,
-      isProtected: false,
-    },
-    {
-      roomId: 42,
-      title: "cub3d sprite 어떻게 그려요 ㅠㅠ",
-      memberCount: 42,
-      isProtected: false,
-    },
-    {
-      roomId: 42,
-      title: "cub3d sprite 어떻게 그려요 ㅠㅠ",
-      memberCount: 42,
-      isProtected: false,
-    },
-    {
-      roomId: 42,
-      title: "cub3d sprite 어떻게 그려요 ㅠㅠ",
-      memberCount: 42,
-      isProtected: false,
-    },
-    {
-      roomId: 42,
-      title: "cub3d sprite 어떻게 그려요 ㅠㅠ",
-      memberCount: 42,
-      isProtected: false,
-    },
-    {
-      roomId: 42,
-      title: "cub3d sprite 어떻게 그려요 ㅠㅠ",
-      memberCount: 42,
-      isProtected: false,
-    },
-    {
-      roomId: 42,
-      title: "cub3d sprite 어떻게 그려요 ㅠㅠ",
-      memberCount: 42,
-      isProtected: false,
-    },
-    {
-      roomId: 42,
-      title: "cub3d sprite 어떻게 그려요 ㅠㅠ",
-      memberCount: 42,
-      isProtected: false,
-    },
-    {
-      roomId: 42,
-      title: "minishell 같이 하실분들?",
-      memberCount: 42,
-      isProtected: false,
-    },
-    {
-      roomId: 42,
-      title: "Webserv 평가자 모십니다",
-      memberCount: 42,
-      isProtected: true,
-    },
-    { roomId: 42, title: "Youpi.bla", memberCount: 42, isProtected: false },
-    {
-      roomId: 42,
-      title: "stl 헤더 뜯어봐도 이해가 안됩니다..",
-      memberCount: 42,
-      isProtected: true,
-    },
   ];
 
   var tempJoinedChatroomList = [
     {
       roomId: 42,
       title: "트랜센던스 팀원구함",
-      memberCount: 42,
-      isProtected: false,
-    },
-    {
-      roomId: 42,
-      title: "피아노 알려주세요 ㅠㅠ",
-      memberCount: 42,
-      isProtected: false,
-    },
-    {
-      roomId: 42,
-      title: "테트리스 잘하는 사람들의 모임",
-      memberCount: 42,
-      isProtected: false,
-    },
-    {
-      roomId: 42,
-      title: "슈퍼 겁쟁이들의 모임",
       memberCount: 42,
       isProtected: false,
     },
@@ -253,15 +53,13 @@ function Main() {
   return (
     <>
       <Header isLoggedIn={true} />
-      {/* <ChatroomOwnerDropdownList/> */}
-
-      {/* <ChatroomDefaultDropdownList/>
-      <ChatroomAdminDropdownList/>
-      <FriendDropdownList/>
-      <HeaderDropdownList/> */}
       <div className="page">
-        <SideBar/>
-        <div className="content">
+        <SideBar
+          title={sidebarProperty.friendList}
+          roomId={1}
+          modalHandler={modalHandler}
+        />
+        <div className="main-wrap">
           <div className="button-list">
             <div className="button-left-side">
               {/* to make a non-focusable element focusable */}
@@ -284,7 +82,7 @@ function Main() {
               <Button title="게임 찾기" onClick={() => {}} />
               <Button
                 title="채팅방 만들기"
-                onClick={() => handleModalOpen("chatroomCreate")}
+                onClick={() => modalHandler.handleModalOpen("chatroomCreate")}
               />
             </div>
           </div>
@@ -322,11 +120,11 @@ function Main() {
           )}
         </div>
       </div>
-      {isModalOpen.chatroomCreate ? (
+      {modalHandler.isModalOpen.chatroomCreate ? (
         <ChatroomCreateModal
-          open={isModalOpen.chatroomCreate}
-          close={() => handleModalClose("chatroomCreate")}
-        ></ChatroomCreateModal>
+          open={modalHandler.isModalOpen.chatroomCreate}
+          close={() => modalHandler.handleModalClose("chatroomCreate")}
+        />
       ) : (
         ""
       )}

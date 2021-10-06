@@ -147,6 +147,7 @@
 }
 
 .modal-background {
+  z-index: 10;
   display: none;
   position: fixed;
   top: 0;

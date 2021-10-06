@@ -11,6 +11,7 @@ enum Result {
 type chatroomInviteModalProps = {
   open: boolean;
   close: any;
+  roomId: number;
 };
 
 function ChatroomInviteModal(prop: chatroomInviteModalProps) {
@@ -41,7 +42,7 @@ function ChatroomInviteModal(prop: chatroomInviteModalProps) {
   const handleSubmitEvent = () => {
     console.log(`userInput : `, input);
 
-    //io.emit -> nickname send
+    //io.emit -> nickname & roomId send
     //io.on -> get result code
     if (input == "ina") resultCode.current = 3;
     else if (input == "yhan") resultCode.current = 1;

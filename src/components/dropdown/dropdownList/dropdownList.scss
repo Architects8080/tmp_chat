@@ -3,6 +3,9 @@
   overflow: hidden;
   width: 260px;
 
+  z-index: 5;
+  position: absolute;
+
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -13,5 +16,5 @@
 }
 
 .dropdown-header {
-  width: calc(122px);
+  width: calc(126px);
 }

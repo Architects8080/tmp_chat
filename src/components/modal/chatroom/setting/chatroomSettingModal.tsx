@@ -5,6 +5,7 @@ import "./chatroomSettingModal.scss";
 type chatroomSettingModalProps = {
   open: boolean;
   close: any;
+  roomId: number;
 };
 
 function ChatroomSettingModal(prop: chatroomSettingModalProps) {
@@ -12,7 +13,7 @@ function ChatroomSettingModal(prop: chatroomSettingModalProps) {
   const Description = "채팅방 설정을 변경해보세요.";
 
   const roomPlaceholder = "방 제목";
-  const buttonTitle = "생성하기";
+  const buttonTitle = "변경하기";
 
   const [descriptionText, setDescriptionText] = useState(
     "비밀번호는 숫자 4자리로 구성 가능합니다."

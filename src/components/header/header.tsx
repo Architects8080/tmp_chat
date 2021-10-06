@@ -58,8 +58,8 @@ function Header(prop: headerProps) {
             <div className="profile-icon" onClick={handleProfileDropdown}>
               <div className="user-nickname">chlee</div>
               <img
-                className="user-avater"
-                alt="user-avater"
+                className="user-avatar"
+                alt="user-avatar"
                 src="https://cdn.intra.42.fr/users/chlee.png"
               />
             </div>

@@ -15,7 +15,7 @@ function App() {
     <div className="app">
       <Route exact path="/" component={Main} />
       <Route path="/main" component={Main} />
-      <Route path="/profile" component={Profile} />
+      <Route path="/profile/:id" component={Profile} />
       <Route path="/game/:id" component={Game} />
       <Route path="/setting" component={Setting} />
       <Route path="/otp" component={OTP} />

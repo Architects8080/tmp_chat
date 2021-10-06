@@ -12,7 +12,7 @@ function ChatMessage(prop: chatMessageProp) {
     <>
       {!prop.isSelfMessage ? (
         <div className="other-message-wrap">
-          <img className="other-message-avater" />
+          <img className="other-message-avatar" />
           <div className="other-message-content">
             <div className="message-username">{prop.nickname}</div>
             <div className="message-content">{prop.content}</div>

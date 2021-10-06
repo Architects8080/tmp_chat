@@ -51,8 +51,8 @@ function GameLogItem() {
               </div>
             </div>
             <img
-              className="user-avater"
-              alt="user-avater"
+              className="user-avatar"
+              alt="user-avatar"
               src="https://cdn.intra.42.fr/users/chlee.png"
             />
           </div>
@@ -61,8 +61,8 @@ function GameLogItem() {
 
           <div className="rightside">
             <img
-              className="user-avater"
-              alt="user-avater"
+              className="user-avatar"
+              alt="user-avatar"
               src="https://cdn.intra.42.fr/users/yhan.jpg"
             />
             <div className="userinfo">
