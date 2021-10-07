@@ -7,15 +7,9 @@ import Header from "../../components/header/header";
 import ModalHandler from "../../components/modal/modalhandler";
 import SideBar from "../../components/sideBar/sideBar";
 import { sidebarProperty } from "../../components/sideBar/sideBarType";
+import ChatMessage from "./message/message";
 import { ioChannel } from "../../socket/socket";
 import "./chatroom.scss";
-import ChatMessage from "./message/message";
-
-const AlwaysScrollToBottom = () => {
-  const elementRef = useRef<HTMLDivElement | null>(null);
-  useEffect(() => elementRef.current?.scrollIntoView());
-  return <div ref={elementRef} />;
-};
 
 // 서버로부터 받아서 message state 에 넣을 때 들어가는 형태
 type Message = {
@@ -31,6 +25,12 @@ type Payload = {
   text: string;
 }
 
+const AlwaysScrollToBottom = () => {
+  const elementRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => elementRef.current?.scrollIntoView());
+  return <div ref={elementRef} />;
+};
+
 const Chatroom = () => {
   const modalHandler = ModalHandler();
   const [messages, setMessages] = useState<Message[]>([]);
@@ -44,7 +44,6 @@ const Chatroom = () => {
         name: message.name,
         text: message.text,
       };
-
       setMessages([...messages, newMessage]);
     }
 
@@ -67,6 +66,7 @@ const Chatroom = () => {
     <>
       <Header isLoggedIn={true} />
       <div className="page">
+        {/* TODO: modify roomId */}
         <SideBar
           title={sidebarProperty.chatMemberList}
           roomId={id}
