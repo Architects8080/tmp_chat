@@ -23,31 +23,6 @@ enum ChatroomCategory {
 
 const Main = () => {
   const modalHandler = ModalHandler();
-<<<<<<< HEAD
-=======
-  const [isModalOpen, setIsModalOpen] = useState({
-    addFriend: false,
-    chatroomInvite: false,
-    chatroomCreate: false,
-    chatroomSetting: false,
-    enterPassword: false,
-    otp: false,
-  });
-
-  const handleModalOpen = (key: string) => {
-    setIsModalOpen({
-      ...isModalOpen,
-      [key]: true,
-    });
-  };
-
-  const handleModalClose = (key: string) => {
-    setIsModalOpen({
-      ...isModalOpen,
-      [key]: false,
-    });
-  };
->>>>>>> b9a8d514710f206946ad967e65a4aa98cef4fdfc
 
   const [chatroomCategory, setChatroomCategory] = useState(
     ChatroomCategory.AllChatroomList
