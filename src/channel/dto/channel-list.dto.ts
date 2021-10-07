@@ -3,7 +3,7 @@ export class ChannelListDto {
 
   title: string;
 
-  isProtected: boolean;
+  isProtected: number;
 
   memberCount: number;
 }

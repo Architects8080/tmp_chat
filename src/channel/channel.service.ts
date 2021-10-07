@@ -31,7 +31,8 @@ export class ChannelService {
       const instance = new ChannelListDto();
       instance.roomId = channel.id;
       instance.title = channel.title;
-      instance.isProtected = channel.type === 2 ? true : false;
+      instance.isProtected =
+        channel.type === 2 ? 2 : channel.type === 1 ? 1 : 0;
       const memCnt = await this.channelMemberRepository.findAndCount({
         where: {
           channelID: channel.id,
@@ -75,7 +76,8 @@ export class ChannelService {
       const instance = new ChannelListDto();
       instance.roomId = channel.channelID;
       instance.title = channel.channel.title;
-      instance.isProtected = channel.channel.type === 2 ? true : false;
+      instance.isProtected =
+        channel.channel.type === 2 ? 2 : channel.channel.type === 1 ? 1 : 0;
       const memCnt = await this.channelMemberRepository.findAndCount({
         where: {
           channelID: channel.channelID,

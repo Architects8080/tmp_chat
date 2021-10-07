@@ -86,7 +86,7 @@ export class ChannelGateway
   ) {
     const payload = {
       text: data.text,
-      name: client.user.intraLogin,
+      name: client.user.nickname,
     };
     this.server.to(data.roomId).emit('msgToClient', payload);
   }

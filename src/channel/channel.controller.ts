@@ -8,8 +8,10 @@ export class ChannelController {
   constructor(private readonly channelService: ChannelService) {}
 
   @Get()
-  async getAll() {
-    return this.channelService.getAllChannel();
+  async getAllChannel() {
+    const allChannels = await this.channelService.getAllChannel();
+    console.log(allChannels);
+    return allChannels.filter((channel) => channel.isProtected !== 1);
   }
 
   @Get('me')
