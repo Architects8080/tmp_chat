@@ -15,6 +15,12 @@ type channelCreateDto = {
   password?: string;
 }
 
+enum roomType {
+  publicRoom,
+  privateRoom,
+  protectedRoom
+}
+
 const ChatroomCreateModal = (prop: chatroomCreateModalProps) => {
   const modalTitle = "채팅방 생성";
   const Description = "채팅방을 만들어 다른 유저와 소통해보세요!";
@@ -72,9 +78,9 @@ const ChatroomCreateModal = (prop: chatroomCreateModalProps) => {
 
   const [selectedRoomType, setSelectedRoomType] = useState(0);
 
-  const handleChange = (inputValue: string) => {
-    (inputValue === 'option-0') ? setSelectedRoomType(0) :
-      (inputValue === 'option-1') ? setSelectedRoomType(1) : setSelectedRoomType(2);
+  const handleChange = (type: roomType) => {
+    (type == roomType.publicRoom) ? setSelectedRoomType(0) :
+      (type == roomType.privateRoom) ? setSelectedRoomType(1) : setSelectedRoomType(2);
   };
 
   return (
@@ -110,21 +116,21 @@ const ChatroomCreateModal = (prop: chatroomCreateModalProps) => {
           <div className="select">
             <RadioButton
               name="option"
-              value="option-1"
+              value="0"
               label="Public"
               isChecked={selectedRoomType === 0}
               handleChange={handleChange}
             />
             <RadioButton
               name="option"
-              value="option-2"
+              value="1"
               label="Private"
               isChecked={selectedRoomType === 1}
               handleChange={handleChange}
             />
             <RadioButton
               name="option"
-              value="option-3"
+              value="2"
               label="Protected"
               isChecked={selectedRoomType === 2}
               handleChange={handleChange}

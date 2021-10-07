@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import EnterPasswordModal from "../../../components/modal/chatroom/join/enterPasswordModal";
 import { ioChannel } from "../../../socket/socket";
 import "./item.scss";
@@ -14,9 +13,15 @@ export type chatroomItemProps = {
 const ChatroomItem = ({channel} : {channel:any}) => {
   const [modalopen, setModalOpen] = useState(false);
 
+  useEffect(() => {
+    ioChannel.on("joinChannel", (roomId) => {
+      window.location.href = `process.env.REACT_APP_SERVER_ADDRESS/chatroom/${roomId}`
+    });
+  }, []);
+
   const handleOnClick = () => {
     if (channel.isProtected) setModalOpen(true);
-    else console.log("io.emit join!!");
+    else
       ioChannel.emit("joinChannel", channel.roomId);
   };
 
@@ -25,7 +30,7 @@ const ChatroomItem = ({channel} : {channel:any}) => {
   };
 
   return (
-    <Link to={`/chatroom/${channel.roomId}`} style={{ color: 'inherit', textDecoration: 'inherit' }}>
+    <>
       <div className="chatroom-item" onClick={handleOnClick}>
         <div className="chatroom-header">
           <div className="chatroom-title">{channel.title}</div>
@@ -34,7 +39,7 @@ const ChatroomItem = ({channel} : {channel:any}) => {
         <div className="chatroom-member-count">{channel.memberCount}명 참여중</div>
       </div>
       {modalopen ? <EnterPasswordModal open={modalopen} close={handleModalClose}/> : ""}
-    </Link>
+    </>
   );
 }
 

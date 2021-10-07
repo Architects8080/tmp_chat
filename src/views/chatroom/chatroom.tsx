@@ -69,15 +69,15 @@ const Chatroom = () => {
       <div className="page">
         <SideBar
           title={sidebarProperty.chatMemberList}
-          roomId={42}
+          roomId={id}
           modalHandler={modalHandler}
         />
         <div className="chatroom-wrap">
           <div className="chatroom-message-list">
+            <ChatMessage isSelfMessage={false} nickname="chlee" content="test" />
             {messages.map(message => (
               <ChatMessage key={message.id} isSelfMessage={true} nickname={message.name} content={message.text}/>
             ))}
-            <ChatMessage isSelfMessage={false} nickname="chlee" content="test" />
             <div className="chatroom-user-input">
               <input 
                 className="input-field"
@@ -87,13 +87,6 @@ const Chatroom = () => {
                 onKeyPress={sendMessage}
               />
             </div>
-          </div>
-          <div className="chatroom-user-input">
-            <input
-              className="input-field"
-              type="text"
-              placeholder="내용을 입력하세요"
-            />
           </div>
         </div>
       </div>
