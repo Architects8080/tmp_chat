@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import EnterPasswordModal from "../../../components/modal/chatroom/join/enterPasswordModal";
 import { ioChannel } from "../../../socket/socket";
@@ -31,7 +31,7 @@ const ChatroomItem = ({channel} : {channel:any}) => {
   };
 
   return (
-    <Link to={`/chatroom/${channel.roomId}`} style={{ color: 'inherit', textDecoration: 'inherit' }}>
+    <>
       <div className="chatroom-item" onClick={handleOnClick}>
         <div className="chatroom-header">
           <div className="chatroom-title">{channel.title}</div>
@@ -40,7 +40,7 @@ const ChatroomItem = ({channel} : {channel:any}) => {
         <div className="chatroom-member-count">{channel.memberCount}명 참여중</div>
       </div>
       {modalopen ? <EnterPasswordModal open={modalopen} close={handleModalClose}/> : ""}
-    </Link>
+    </>
   );
 }
 
