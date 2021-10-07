@@ -23,6 +23,7 @@ function App() {
       <Route path="/otp" component={OTP} />
       <Route path="/register" component={Register} />
       <Route path="/chatroom/:id" component={Chatroom} />
+      <Route path="/login" component={Login} />
     </div>
   );
 }

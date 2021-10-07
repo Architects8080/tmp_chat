@@ -1,20 +1,28 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import EnterPasswordModal from "../../../components/modal/chatroom/join/enterPasswordModal";
+import { ioChannel } from "../../../socket/socket";
 import "./item.scss";
 
-type chatroomItemProps = {
-  roomId: number;
-  title: string;
-  memberCount: number;
-  isProtected: boolean;
-};
-function ChatroomItem(prop: chatroomItemProps) {
+export type chatroomItemProps = {
+  roomId: number,
+  title: string,
+  memberCount: number,
+  isProtected: boolean
+}
+
+const ChatroomItem = ({channel} : {channel:any}) => {
   const [modalopen, setModalOpen] = useState(false);
 
+  useEffect(() => {
+    ioChannel.on("joinChannel", (roomId) => {
+      window.location.href = `process.env.REACT_APP_SERVER_ADDRESS/chatroom/${roomId}`
+    });
+  }, []);
+
   const handleOnClick = () => {
-    if (prop.isProtected) setModalOpen(true);
-    else console.log("io.emit join!!");
-    //io.emit(join, prop.roomId);
+    if (channel.isProtected) setModalOpen(true);
+    else
+      ioChannel.emit("joinChannel", channel.roomId);
   };
 
   const handleModalClose = () => {
@@ -25,24 +33,12 @@ function ChatroomItem(prop: chatroomItemProps) {
     <>
       <div className="chatroom-item" onClick={handleOnClick}>
         <div className="chatroom-header">
-          <div className="chatroom-title">{prop.title}</div>
-          {prop.isProtected ? (
-            <img
-              className="chatroom-locked"
-              alt="chatroom-locked"
-              src="/icons/lock.svg"
-            />
-          ) : (
-            ""
-          )}
+          <div className="chatroom-title">{channel.title}</div>
+          { channel.isProtected ? <img className="chatroom-locked" alt="chatroom-locked" src="/icons/lock.svg"/> : ""}
         </div>
-        <div className="chatroom-member-count">{prop.memberCount}명 참여중</div>
+        <div className="chatroom-member-count">{channel.memberCount}명 참여중</div>
       </div>
-      {modalopen ? (
-        <EnterPasswordModal open={modalopen} close={handleModalClose} />
-      ) : (
-        ""
-      )}
+      {modalopen ? <EnterPasswordModal open={modalopen} close={handleModalClose}/> : ""}
     </>
   );
 }
