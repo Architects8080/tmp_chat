@@ -32,6 +32,7 @@ import { DmModule } from './dm/dm.module';
         password: configService.get<string>('database.password'),
         database: configService.get<string>('database.name'),
         entities: ['dist/**/*.entity{.ts,.js}'],
+        synchronize: true,
       }),
     }),
     ServeStaticModule.forRootAsync({
