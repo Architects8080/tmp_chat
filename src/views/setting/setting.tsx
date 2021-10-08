@@ -1,15 +1,20 @@
 import React, { useRef, useState } from "react";
 import Header from "../../components/header/header";
 import Button from "../../components/button/button";
-
+import ModalHandler from "../../components/modal/modalhandler";
 import "./setting.scss";
+import OTPModal from "../../components/modal/otp/otpModal";
+import axios from "axios";
+import snackbar from "../../components/snackbar/snackbar";
 
 function Setting() {
+  const modalHandler = ModalHandler();
   const avatarImgInput = useRef<HTMLInputElement>(null);
-  const [test, setTest] = useState<any>({
+  const [avatar, setAvatar] = useState<any>({
     file: "",
     previewURL: "",
   });
+  const [otpCode, setOTPCode] = useState<string>("");
 
   const onImgInputButtonClick = (event: any) => {
     event.preventDefault();
@@ -17,28 +22,67 @@ function Setting() {
     if (avatarImgInput.current) avatarImgInput.current.click();
   };
 
-  const onImgChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // console.log(e.currentTarget.files.item(0).name);
-    // var test;
+  const onImgChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.currentTarget.files) {
       var reader = new FileReader();
       var image = e.currentTarget.files[0];
       reader.onloadend = () => {
-        setTest({
+        console.log(reader.result);
+        setAvatar({
           file: image,
           previewURL: reader.result,
         });
       };
-      reader.readAsDataURL(image);
+      const formData = new FormData();
+      formData.append("image", image);
+      await axios
+        .post(
+          process.env.REACT_APP_SERVER_ADDRESS + "/user/me/avatar",
+          formData,
+          {
+            withCredentials: true,
+            headers: { "Content-Type": "multipart/form-data" },
+          }
+        )
+        .then((res) => {
+          reader.readAsDataURL(image);
+        })
+        .catch((err) => {
+          snackbar.error("프로필 변경에 실패했습니다.");
+        });
     }
+  };
 
-    // if (e.currentTarget.files.item(0))
-    // setImageURL(e.currentTarget.files.item(0).name)
-    //is add spinner?
+  const onOTPRegisterClick = () => {
+    axios
+      .post(
+        process.env.REACT_APP_SERVER_ADDRESS + "/otp/register",
+        {},
+        { withCredentials: true }
+      )
+      .then((res) => {
+        console.log(res);
+        setOTPCode(res.data);
+        modalHandler.isModalOpen.otp = true;
+      })
+      .catch(() => {
+        snackbar.error("OTP 설정에 실패했습니다.");
+      });
+  };
 
-    // const formData = new FormData();
-    // formData.append('file', e?.target.files[0]);
-    // const response = await post ~
+  const onOTPDeregisterClick = () => {
+    axios
+      .post(
+        process.env.REACT_APP_SERVER_ADDRESS + "/otp/deregister",
+        {},
+        { withCredentials: true }
+      )
+      .then((res) => {
+        console.log(res);
+      })
+      .catch(() => {
+        snackbar.error("OTP 설정에 실패했습니다.");
+      });
   };
 
   return (
@@ -61,9 +105,9 @@ function Setting() {
             <img
               className="changeButton"
               src={
-                test.file === ""
+                avatar.file === ""
                   ? "https://cdn.intra.42.fr/users/chlee.png"
-                  : test.previewURL
+                  : avatar.previewURL
               }
               alt="profile"
               onClick={onImgInputButtonClick}
@@ -74,14 +118,24 @@ function Setting() {
               <br />
               💡 정방향 사진을 업로드 하는 것을 추천드립니다. 💡
             </div>
-            {/* <div className="menu-button" onClick={}>test</div> */}
           </div>
           <div className="menu-otp">
             <div className="menu-title">2단계 인증 활성화</div>
-            <Button title="활성화 하기" onClick={() => {}} />
+            {/* TODO user에 맞춰보여주기 */}
+            <Button title="활성화 하기" onClick={onOTPRegisterClick} />
+            <Button title="비활성화 하기" onClick={onOTPDeregisterClick} />
           </div>
         </div>
       </div>
+      {modalHandler.isModalOpen.otp ? (
+        <OTPModal
+          code={otpCode}
+          open={modalHandler.isModalOpen.otp}
+          close={() => modalHandler.handleModalClose("otp")}
+        />
+      ) : (
+        ""
+      )}
     </>
   );
 }
