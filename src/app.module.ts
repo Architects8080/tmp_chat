@@ -12,6 +12,7 @@ import { OTPModule } from './otp/otp.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { MatchModule } from './match/match.module';
 import { DmModule } from './dm/dm.module';
+import { CommunityModule } from './community/community.module';
 
 
 @Module({
@@ -32,6 +33,7 @@ import { DmModule } from './dm/dm.module';
         password: configService.get<string>('database.password'),
         database: configService.get<string>('database.name'),
         entities: ['dist/**/*.entity{.ts,.js}'],
+        synchronize: true,
       }),
     }),
     ServeStaticModule.forRootAsync({
@@ -49,6 +51,7 @@ import { DmModule } from './dm/dm.module';
     OTPModule,
     MatchModule,
     DmModule,
+    CommunityModule,
   ],
   controllers: [AppController],
   providers: [AppService],
