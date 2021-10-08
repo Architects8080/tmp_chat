@@ -35,7 +35,8 @@ function Setting() {
       };
       const formData = new FormData();
       formData.append("image", image);
-      await axios
+      try {
+        await axios
         .post(
           process.env.REACT_APP_SERVER_ADDRESS + "/user/me/avatar",
           formData,
@@ -44,45 +45,39 @@ function Setting() {
             headers: { "Content-Type": "multipart/form-data" },
           }
         )
-        .then((res) => {
-          reader.readAsDataURL(image);
-        })
-        .catch((err) => {
-          snackbar.error("프로필 변경에 실패했습니다.");
-        });
+        reader.readAsDataURL(image);
+      } catch (error) {
+        snackbar.error("프로필 변경에 실패했습니다.");
+      }
     }
   };
 
-  const onOTPRegisterClick = () => {
-    axios
+  const onOTPRegisterClick = async () => {
+    try {
+      const res = await axios
       .post(
         process.env.REACT_APP_SERVER_ADDRESS + "/otp/register",
         {},
         { withCredentials: true }
       )
-      .then((res) => {
-        console.log(res);
-        setOTPCode(res.data);
-        modalHandler.isModalOpen.otp = true;
-      })
-      .catch(() => {
-        snackbar.error("OTP 설정에 실패했습니다.");
-      });
+      setOTPCode(res.data);
+      modalHandler.handleModalOpen("otp")
+    } catch (error) {
+      snackbar.error("OTP 설정에 실패했습니다.");
+    }
   };
 
-  const onOTPDeregisterClick = () => {
-    axios
+  const onOTPDeregisterClick = async () => {
+    try {
+      await axios
       .post(
         process.env.REACT_APP_SERVER_ADDRESS + "/otp/deregister",
         {},
         { withCredentials: true }
       )
-      .then((res) => {
-        console.log(res);
-      })
-      .catch(() => {
-        snackbar.error("OTP 설정에 실패했습니다.");
-      });
+    } catch (error) {
+      snackbar.error("OTP 설정에 실패했습니다.");
+    }
   };
 
   return (
