@@ -25,14 +25,11 @@ type gameLogItemProps = {
 
 // prop: gameLogItemProps | null
 function GameLogItem() {
-  //raw Info? or retailed Info?
   return (
     <div className="gamelog-wrap">
-      {/* margin-bottom */}
       <div className="gamelog-item">
         <div className="gamelog win">
           {" "}
-          {/* gameLog lose*/}
           <div className="gamestats">
             <div className="gameinfo">Custom</div>
             <div className="timestamp">42 minutes ago</div>
