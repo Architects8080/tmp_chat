@@ -111,7 +111,7 @@ function Setting() {
             <div className="description">
               위 사진을 클릭해 프로필을 변경해보세요.
               <br />
-              💡 정방향 사진을 업로드 하는 것을 추천드립니다. 💡
+              💡 정방형 사진을 업로드 하는 것을 추천드립니다. 💡
             </div>
           </div>
           <div className="menu-otp">
@@ -122,15 +122,11 @@ function Setting() {
           </div>
         </div>
       </div>
-      {modalHandler.isModalOpen.otp ? (
-        <OTPModal
-          code={otpCode}
-          open={modalHandler.isModalOpen.otp}
-          close={() => modalHandler.handleModalClose("otp")}
-        />
-      ) : (
-        ""
-      )}
+      <OTPModal
+        code={otpCode}
+        open={modalHandler.isModalOpen.otp}
+        close={() => modalHandler.handleModalClose("otp")}
+      />
     </>
   );
 }
