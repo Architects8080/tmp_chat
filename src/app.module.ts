@@ -13,6 +13,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { MatchModule } from './match/match.module';
 import { DmModule } from './dm/dm.module';
 import { CommunityModule } from './community/community.module';
+import { ChannelModule } from './channel/channel.module';
 
 
 @Module({
@@ -52,6 +53,7 @@ import { CommunityModule } from './community/community.module';
     MatchModule,
     DmModule,
     CommunityModule,
+    ChannelModule,
   ],
   controllers: [AppController],
   providers: [AppService],
