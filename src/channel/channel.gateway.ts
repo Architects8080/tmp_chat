@@ -88,4 +88,12 @@ export class ChannelGateway
     };
     this.server.to(data.roomId).emit('msgToClient', payload);
   }
+
+  @SubscribeMessage('leaveChannel')
+  leaveChannel(
+    @MessageBody() data: any,
+    @ConnectedSocket() client: SocketUser,
+  ) {
+    this.channelService.leaveChannel(data, client.user.id);
+  }
 }

@@ -151,4 +151,23 @@ export class ChannelService {
       );
     }
   }
+
+  async leaveChannel(roomId: number, userId: number) {
+    await this.channelMemberRepository.delete({
+      userID: userId,
+      channelID: roomId,
+    });
+    const memCnt = await this.channelMemberRepository.findAndCount({
+      where: {
+        channelID: roomId,
+      },
+      join: {
+        alias: 'channel_member',
+        leftJoinAndSelect: {
+          channel: 'channel_member.channel',
+        },
+      },
+    });
+    if (memCnt[1] === 0) await this.channelRepository.delete({ id: roomId });
+  }
 }
