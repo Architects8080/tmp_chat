@@ -62,6 +62,12 @@ const Chatroom = () => {
 		ioChannel.emit('msgToChannel', newMessageSend);
 		setText('');
 	}
+
+  const leaveChannel = () => {
+    ioChannel.emit("leaveChannel", id);
+    window.location.href = "http://localhost:3000/main";
+  }
+
   return (
     <>
       <Header isLoggedIn={true} />
@@ -91,9 +97,7 @@ const Chatroom = () => {
       </div>
       <div
         className="button-chatroom-exit"
-        onClick={() => {
-          window.location.href = "http://localhost:3000/";
-        }}
+        onClick={leaveChannel}
       >
         채팅방 나가기
       </div>
