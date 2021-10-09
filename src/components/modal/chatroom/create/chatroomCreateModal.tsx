@@ -65,22 +65,22 @@ const ChatroomCreateModal = (prop: chatroomCreateModalProps) => {
   };
 
   const handleSubmitEvent = () => {
-    if (errorText === "") {
+    if (errorText === "" && title !== '') {
       const newChannel: channelCreateDto = {
         title: title,
         type: selectedRoomType,
         password: password,
       }
-      ioChannel.emit('createChannel', newChannel); 
+      ioChannel.emit('createChannel', newChannel);
       prop.close();
     }
   };
 
-  const [selectedRoomType, setSelectedRoomType] = useState(0);
+  const [selectedRoomType, setSelectedRoomType] = useState(roomType.publicRoom);
 
   const handleChange = (type: roomType) => {
-    (type == roomType.publicRoom) ? setSelectedRoomType(0) :
-      (type == roomType.privateRoom) ? setSelectedRoomType(1) : setSelectedRoomType(2);
+    (type == roomType.publicRoom) ? setSelectedRoomType(roomType.publicRoom) :
+      (type == roomType.privateRoom) ? setSelectedRoomType(roomType.privateRoom) : setSelectedRoomType(roomType.protectedRoom);
   };
 
   return (
@@ -116,28 +116,28 @@ const ChatroomCreateModal = (prop: chatroomCreateModalProps) => {
           <div className="select">
             <RadioButton
               name="option"
-              value="0"
+              value={0}
               label="Public"
-              isChecked={selectedRoomType === 0}
+              isChecked={selectedRoomType === roomType.publicRoom}
               handleChange={handleChange}
             />
             <RadioButton
               name="option"
-              value="1"
+              value={1}
               label="Private"
-              isChecked={selectedRoomType === 1}
+              isChecked={selectedRoomType === roomType.privateRoom}
               handleChange={handleChange}
             />
             <RadioButton
               name="option"
-              value="2"
+              value={2}
               label="Protected"
-              isChecked={selectedRoomType === 2}
+              isChecked={selectedRoomType === roomType.protectedRoom}
               handleChange={handleChange}
             />
             <div
               className={
-                selectedRoomType === 2
+                selectedRoomType === roomType.protectedRoom
                   ? "password-open"
                   : "password-close"
               }

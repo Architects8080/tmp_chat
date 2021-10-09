@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { useState, useEffect } from "react";
 import EnterPasswordModal from "../../../components/modal/chatroom/join/enterPasswordModal";
 import { ioChannel } from "../../../socket/socket";
@@ -13,16 +14,18 @@ export type chatroomItemProps = {
 const ChatroomItem = ({channel} : {channel:any}) => {
   const [modalopen, setModalOpen] = useState(false);
 
-  useEffect(() => {
-    ioChannel.on("joinChannel", (roomId) => {
-      window.location.href = `process.env.REACT_APP_SERVER_ADDRESS/chatroom/${roomId}`
-    });
-  }, []);
-
-  const handleOnClick = () => {
-    if (channel.isProtected) setModalOpen(true);
-    else
-      ioChannel.emit("joinChannel", channel.roomId);
+  const handleOnClick = async () => {
+    if (channel.isProtected) {
+      try {
+        const response = await axios.get(`http://localhost:5000/channel/me`, { withCredentials: true });
+        if (response.data.find((mychannel: any) => mychannel.roomId === channel.roomId)) {
+          window.location.href = `http://localhost:3000/chatroom/${channel.roomId}`
+        } else
+          setModalOpen(true);
+      }
+      catch (e) { console.log(e); }
+    } else
+      window.location.href = `http://localhost:3000/chatroom/${channel.roomId}`
   };
 
   const handleModalClose = () => {
@@ -38,7 +41,7 @@ const ChatroomItem = ({channel} : {channel:any}) => {
         </div>
         <div className="chatroom-member-count">{channel.memberCount}명 참여중</div>
       </div>
-      {modalopen ? <EnterPasswordModal open={modalopen} close={handleModalClose}/> : ""}
+      {modalopen ? <EnterPasswordModal open={modalopen} close={handleModalClose} roomId={channel.roomId}/> : ""}
     </>
   );
 }

@@ -46,11 +46,11 @@ const Chatroom = () => {
       };
       setMessages([...messages, newMessage]);
     }
-
+    ioChannel.emit("joinChannel", id);
     ioChannel.on('msgToClient', (message: Payload) => {
       receivedMessage(message);
     });
-  }, [messages, text]);
+  }, [messages, id]);
 
   const sendMessage = (e: React.KeyboardEvent<HTMLInputElement>) => {
 		if (e.key !== 'Enter' || text === '')
@@ -66,7 +66,6 @@ const Chatroom = () => {
     <>
       <Header isLoggedIn={true} />
       <div className="page">
-        {/* TODO: modify roomId */}
         <SideBar
           title={sidebarProperty.chatMemberList}
           roomId={id}
@@ -78,15 +77,15 @@ const Chatroom = () => {
             {messages.map(message => (
               <ChatMessage key={message.id} isSelfMessage={true} nickname={message.name} content={message.text}/>
             ))}
-            <div className="chatroom-user-input">
-              <input 
-                className="input-field"
-                placeholder="내용을 입력하세요"
-                value={text}
-                onChange={e => setText(e.target.value)}
-                onKeyPress={sendMessage}
-              />
-            </div>
+          </div>
+          <div className="chatroom-user-input">
+            <input 
+              className="input-field"
+              placeholder="내용을 입력하세요"
+              value={text}
+              onChange={e => setText(e.target.value)}
+              onKeyPress={sendMessage}
+            />
           </div>
         </div>
       </div>
