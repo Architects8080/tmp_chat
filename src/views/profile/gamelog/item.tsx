@@ -1,72 +1,112 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./item.scss";
 
-type matchUserInfo = {
-  isLeft: boolean;
-  score: number;
+type User = {
+  id: number;
   nickname: string;
-  ladderRank: number;
+  intraLogin: string;
+  avatar: string;
+  status: number;
+  ladderPoint: number;
+  ladderLevel: number;
+}
+
+type Match = {
+  id: number;
+  gameType: number;
+  startAt: Date;
+  endAt: Date;
+  gameTime: number;
+  players: MatchPlayer[];
+  targetId: number;
+}
+
+type MatchPlayer = {
+  match: Match;
+  matchId: number;
+  user: User;
+  userId: number;
+  score: number;
+  isLeft: boolean;
+  isWinner: boolean;
   ladderPoint: number;
   ladderIncrease: number;
-};
+}
 
-type matchInfo = {
-  gameType: number;
-  startAt: NodeJS.Timer;
-  endAt: NodeJS.Timer;
-  gameTime: number;
-};
+function GameLogItem(match: Match) {
 
-type gameLogItemProps = {
-  matchInfo: matchInfo;
-  leftUser: matchUserInfo;
-  rightUser: matchUserInfo;
-};
+  const [leftPlayer, setLeftPlayer] = useState<MatchPlayer>(match.players[0]);
+  const [rightPlayer, setRightPlayer] = useState<MatchPlayer>(match.players[1]);
+  const [isVictory, setIsVictory] = useState(false);
+  const [timestamp, setTimestamp] = useState<string>("");
+  const [gamelength, setGamelength] = useState<string>("");
 
-// prop: gameLogItemProps | null
-function GameLogItem() {
+  const getTimestamp = () => {
+    var dateDiff = Math.trunc((new Date().getTime() - new Date(match.endAt).getTime()) / 1000);
+
+    if (Math.trunc(dateDiff / 60) == 0) //60 second = 1 minute
+      setTimestamp(dateDiff + " seconds ago");
+    else if (Math.trunc(dateDiff / 3600) == 0) // 60 minute = 1 hour
+      setTimestamp(Math.trunc(dateDiff / 60) + " minutes ago");
+    else if (Math.trunc(dateDiff / (3600 * 24)) == 0) //1 hour * 24 = 1 day
+      setTimestamp(Math.trunc(dateDiff / 3600) + " hours ago");
+    else if (Math.trunc(dateDiff / (3600 * 24 * 30)) == 0) //1 day * 30 = 1 month
+      setTimestamp(Math.trunc(dateDiff / (3600 * 24)) + " days ago");
+    else if (Math.trunc(dateDiff / (3600 * 24 * 30 * 12)) == 0) //1 month * 12 = 1 year
+      setTimestamp(Math.trunc(dateDiff / (3600 * 24 * 30)) + " months ago");
+    else
+      setTimestamp(Math.trunc(dateDiff / (3600 * 24 * 30 * 12)) + " years ago")
+  };
+
+  useEffect(() => {
+    getTimestamp();
+    setGamelength(Math.trunc((match.gameTime / 60)) + "m " + (match.gameTime % 60) + "s");
+    if (match.targetId === leftPlayer.userId && leftPlayer.isWinner ||
+        match.targetId === rightPlayer.userId && rightPlayer.isWinner)
+      setIsVictory(true);
+  }, []);
+
   return (
     <div className="gamelog-wrap">
       <div className="gamelog-item">
-        <div className="gamelog win">
-          {" "}
+        <div className={"gamelog " + (isVictory ? "win" : "lose")}>
           <div className="gamestats">
-            <div className="gameinfo">Custom</div>
-            <div className="timestamp">42 minutes ago</div>
-            <div className="gameresult win">Victory</div> {/* gameResult lose*/}
-            <div className="gamelength">12m 42s</div>
+            <div className="gameinfo">{match.gameType}</div> {/* TODO */}
+            <div className="timestamp">{timestamp}</div>
+            <div className={"gameresult " + (isVictory ? "win" : "lose")}>{isVictory ? "Victory" : "Defeat"}</div> {/* gameResult lose*/}
+            <div className="gamelength">{gamelength}</div>
           </div>
         </div>
 
         <div className="detail">
           <div className="leftside">
             <div className="userinfo">
-              <div className="nickname">chlee</div>
+              <div className="nickname">{leftPlayer.user.nickname}</div>
               <div className="ladderinfo">
-                <div className="rank">Ladder Rank: #1</div>
-                <div className="point">Ladder Point : 4221 (+21)</div>
+                <div className="rank">Ladder Rank: #{leftPlayer.user.ladderLevel}</div>
+                <div className="point">Ladder Point : {leftPlayer.ladderPoint} ({(leftPlayer.ladderIncrease <= 0 ? "" : "+") + leftPlayer.ladderIncrease})</div>
               </div>
             </div>
             <img
               className="user-avatar"
               alt="user-avatar"
-              src="https://cdn.intra.42.fr/users/chlee.png"
+              src={leftPlayer.user.avatar}
             />
           </div>
 
-          <div className="score">2 : 4</div>
+          <div className="score">{leftPlayer.score} : {rightPlayer.score}</div>
 
           <div className="rightside">
             <img
               className="user-avatar"
               alt="user-avatar"
-              src="https://cdn.intra.42.fr/users/yhan.jpg"
+              src={rightPlayer.user.avatar}
             />
             <div className="userinfo">
-              <div className="nickname">yhan</div>
+              <div className="nickname">{rightPlayer.user.nickname}</div>
               <div className="ladderinfo">
-                <div className="rank">Ladder Rank: #1</div>
-                <div className="point">Ladder Point : 4221 (+21)</div>
+                <div className="rank">Ladder Rank: #{rightPlayer.user.ladderLevel}</div>
+                <div className="point">Ladder Point : {rightPlayer.ladderPoint} ({(rightPlayer.ladderIncrease <= 0 ? "" : "+") + rightPlayer.ladderIncrease})</div>
               </div>
             </div>
           </div>

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { userInfo } from "os";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import AchievementItem from "../../components/achievement/achievement";
@@ -28,6 +29,7 @@ type Match = {
   endAt: Date;
   gameTime: number;
   players: MatchPlayer[];
+  targetId: number;
 }
 
 type MatchPlayer = {
@@ -74,6 +76,7 @@ function Profile() {
     //window.location.href = "http://localhost:3000/profile/" + id;
 	}
 
+  // var gameLog;
   useEffect(() => {
     var win = 0;
     var total = 0;
@@ -87,8 +90,13 @@ function Profile() {
     ])
     .then(
       axios.spread((userList, userInfo, matchList) => { //achievementList
+
+        console.log(`userList : `, userList.data);
+        console.log(`userInfo : `, userInfo.data);
+        console.log(`matchList : `, matchList.data);
         setUser(userInfo.data);
         setTopRate(((userInfo.data.ladderLevel) / userList.data.length * 1.0).toString());
+        setMatchList(matchList.data);
 
         matchList.data.map((match: any) => {
           if (match.players[0].userId == userInfo.data.id && match.players[0].isWinner == true ||
@@ -96,8 +104,8 @@ function Profile() {
             win++;
           total++;
         });
-        setWinRatio({win: win, total: total, lose: total - win})
-        setMatchList(matchList.data);
+
+        setWinRatio({win: win, total: total, lose: total - win});
       })
     )
     .catch((err) => {
@@ -173,8 +181,9 @@ function Profile() {
               />
             :
               <div className="gameLogList">
-                {matchList.map((match) => {
-                  <GameLogItem />
+                {user && matchList.map((match: any) => {
+                  match.targetId = user.id;
+                  return (<GameLogItem {...match}/>);
                 })}
               </div>
           }

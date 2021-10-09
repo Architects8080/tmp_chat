@@ -9,6 +9,7 @@ import Setting from "./views/setting/setting";
 import OTP from "./views/auth/otp/otp";
 import Chatroom from "./views/chatroom/chatroom";
 import Login from "./views/auth/login";
+import TestLogin from "./views/auth/test";
 
 function App() {
   return (
@@ -23,7 +24,7 @@ function App() {
       <Route path="/otp" component={OTP} />
       <Route path="/register" component={Register} />
       <Route path="/chatroom/:id" component={Chatroom} />
-      <Route path="/login" component={Login} />
+      <Route path="/test" component={TestLogin} />
     </div>
   );
 }
