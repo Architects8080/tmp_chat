@@ -1,4 +1,5 @@
 import {
+  BeforeInsert,
   Column,
   Entity,
   JoinColumn,
@@ -8,6 +9,8 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '../../user/entity/user.entity';
+import * as bcrypt from 'bcrypt';
+import { InternalServerErrorException } from '@nestjs/common';
 
 @Entity('channel')
 export class Channel {
@@ -25,6 +28,16 @@ export class Channel {
 
   @OneToMany(() => ChannelMember, (channelMember) => channelMember.channelID)
   channelIDs: ChannelMember[];
+
+  @BeforeInsert()
+  async hashPassword(): Promise<void> {
+    try {
+      this.password = await bcrypt.hash(this.password, 10);
+    } catch (e) {
+      console.log(e);
+      throw new InternalServerErrorException();
+    }
+  }
 }
 
 @Entity('channel_member')

@@ -1,4 +1,4 @@
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 import { ChannelService } from './channel.service';
 
@@ -15,6 +15,11 @@ export class ChannelController {
 
   @Get('me')
   async getMyChannel(@Req() req) {
-    return this.channelService.getMyChannel(req.user);
+    return this.channelService.getMyChannel(req.user.id);
+  }
+
+  @Post('enter-pw')
+  async logIn(@Body() req) {
+    return this.channelService.checkPassword(req.roomId, req.password);
   }
 }

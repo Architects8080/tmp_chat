@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JwtStrategy } from 'src/auth/strategy/jwt.strategy';
@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { ChannelListDto } from './dto/channel-list.dto';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { Channel, ChannelMember } from './entity/channel.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class ChannelService {
@@ -56,12 +57,12 @@ export class ChannelService {
     return [...this.channelMap.values()];
   }
 
-  async getMyChannel(user: User) {
+  async getMyChannel(userId: number) {
     const myChannel = [];
     const channels = await this.channelMemberRepository.find({
       select: ['channel'],
       where: {
-        userID: user.id,
+        userID: userId,
       },
       join: {
         alias: 'channel_member',
@@ -118,12 +119,36 @@ export class ChannelService {
   }
 
   async joinChannel(roomId: number, userId: number) {
-    const newChannelMember: ChannelMember =
-      this.channelMemberRepository.create();
-    newChannelMember.userID = userId;
-    newChannelMember.channelID = roomId;
-    newChannelMember.permissionType = 0;
-    newChannelMember.penalty = 0;
-    await this.channelMemberRepository.insert(newChannelMember);
+    const myChannel = await this.getMyChannel(userId);
+    if (myChannel.find((myChannel) => myChannel.roomId == roomId)) {
+    } else {
+      const newChannelMember: ChannelMember =
+        this.channelMemberRepository.create();
+      newChannelMember.userID = userId;
+      newChannelMember.channelID = roomId;
+      newChannelMember.permissionType = 0;
+      newChannelMember.penalty = 0;
+      await this.channelMemberRepository.insert(newChannelMember);
+    }
+  }
+
+  async checkPassword(roomId: number, password: string) {
+    try {
+      const hashedpw = await this.channelRepository.findOne({
+        where: {
+          id: roomId,
+        },
+      });
+      const isPasswordMatching = await bcrypt.compare(
+        password,
+        hashedpw.password,
+      );
+      return isPasswordMatching ? true : false;
+    } catch (error) {
+      throw new HttpException(
+        'Wrong credentials provided',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 }
