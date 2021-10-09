@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import { cookieExtractor, JwtStrategy } from 'src/auth/strategy/jwt.strategy';
+import { JwtStrategy } from 'src/auth/strategy/jwt.strategy';
+import { User } from 'src/user/entity/user.entity';
 import { Repository } from 'typeorm';
 import { ChannelListDto } from './dto/channel-list.dto';
 import { CreateChannelDto } from './dto/create-channel.dto';
@@ -55,10 +56,7 @@ export class ChannelService {
     return [...this.channelMap.values()];
   }
 
-  async getMyChannel(req) {
-    const token = cookieExtractor(req); //error
-    const userPayload = this.jwtService.verify(token);
-    const user = await this.jwtStrategy.validate(userPayload);
+  async getMyChannel(user: User) {
     const myChannel = [];
     const channels = await this.channelMemberRepository.find({
       select: ['channel'],
