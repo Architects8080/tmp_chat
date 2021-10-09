@@ -95,7 +95,7 @@ function Profile() {
         console.log(`userInfo : `, userInfo.data);
         console.log(`matchList : `, matchList.data);
         setUser(userInfo.data);
-        setTopRate(((userInfo.data.ladderLevel) / userList.data.length * 1.0).toString());
+        setTopRate(((userInfo.data.ladderLevel) / userList.data.length).toFixed(2).toString());
         setMatchList(matchList.data);
 
         matchList.data.map((match: any) => {
@@ -141,7 +141,7 @@ function Profile() {
                     </div>
                     <div className="ladder-point">Ladder Point : {user.ladderPoint}</div>
                     <div className="win-ratio-title">{winRatio.total}G {winRatio.win}W {winRatio.lose}L</div>
-                    <div className="win-ratio">Win ratio {winRatio.win / winRatio.total * 100}%</div>
+                    <div className="win-ratio">Win ratio {(winRatio.win / winRatio.total * 100).toFixed(2)}%</div>
                   </div>
                 </div>
               {/* show info from server */}
