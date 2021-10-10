@@ -18,13 +18,13 @@ function App() {
       <Route exact path="/" component={Login} />
       <Route path="/login" component={Login} />
       <Route path="/main" component={Main} />
+      <Route path="/test" component={TestLogin} />
       <Route path="/profile/:id" component={Profile} />
       <Route path="/game/:id" component={Game} />
       <Route path="/setting" component={Setting} />
       <Route path="/otp" component={OTP} />
       <Route path="/register" component={Register} />
       <Route path="/chatroom/:id" component={Chatroom} />
-      <Route path="/test" component={TestLogin} />
     </div>
   );
 }
