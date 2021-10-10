@@ -72,11 +72,19 @@ export class ChannelGateway
     @MessageBody() data: any,
     @ConnectedSocket() client: SocketUser,
   ) {
-    client.join(data.toString());
-    const myChannel = await this.channelService.getMyChannel(client);
-    if (!myChannel.some((channel) => channel.roomId == data))
+    if (this.channelService.channelMap.get(+data).isProtected > 0) {
+      const myChannel = await this.channelService.getMyChannel(client.user.id);
+      if (myChannel.find((myChannel) => myChannel.roomId == data)) {
+        client.join(data.toString());
+        this.channelService.joinChannel(data, client.user.id);
+      } else {
+        this.server.emit('joinRefused', false);
+      }
+    } else {
+      client.join(data.toString());
       this.channelService.joinChannel(data, client.user.id);
-    console.log(client.rooms);
+      console.log(client.rooms);
+    }
   }
 
   @SubscribeMessage('msgToChannel')
@@ -89,5 +97,13 @@ export class ChannelGateway
       name: client.user.nickname,
     };
     this.server.to(data.roomId).emit('msgToClient', payload);
+  }
+
+  @SubscribeMessage('leaveChannel')
+  leaveChannel(
+    @MessageBody() data: any,
+    @ConnectedSocket() client: SocketUser,
+  ) {
+    this.channelService.leaveChannel(data, client.user.id);
   }
 }

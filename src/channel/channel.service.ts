@@ -1,11 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import { cookieExtractor, JwtStrategy } from 'src/auth/strategy/jwt.strategy';
+import { JwtStrategy } from 'src/auth/strategy/jwt.strategy';
+import { User } from 'src/user/entity/user.entity';
 import { Repository } from 'typeorm';
 import { ChannelListDto } from './dto/channel-list.dto';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { Channel, ChannelMember } from './entity/channel.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class ChannelService {
@@ -55,15 +57,12 @@ export class ChannelService {
     return [...this.channelMap.values()];
   }
 
-  async getMyChannel(req) {
-    const token = cookieExtractor(req); //error
-    const userPayload = this.jwtService.verify(token);
-    const user = await this.jwtStrategy.validate(userPayload);
+  async getMyChannel(userId: number) {
     const myChannel = [];
     const channels = await this.channelMemberRepository.find({
       select: ['channel'],
       where: {
-        userID: user.id,
+        userID: userId,
       },
       join: {
         alias: 'channel_member',
@@ -120,12 +119,55 @@ export class ChannelService {
   }
 
   async joinChannel(roomId: number, userId: number) {
-    const newChannelMember: ChannelMember =
-      this.channelMemberRepository.create();
-    newChannelMember.userID = userId;
-    newChannelMember.channelID = roomId;
-    newChannelMember.permissionType = 0;
-    newChannelMember.penalty = 0;
-    await this.channelMemberRepository.insert(newChannelMember);
+    const myChannel = await this.getMyChannel(userId);
+    if (myChannel.find((myChannel) => myChannel.roomId == roomId)) {
+    } else {
+      const newChannelMember: ChannelMember =
+        this.channelMemberRepository.create();
+      newChannelMember.userID = userId;
+      newChannelMember.channelID = roomId;
+      newChannelMember.permissionType = 0;
+      newChannelMember.penalty = 0;
+      await this.channelMemberRepository.insert(newChannelMember);
+    }
+  }
+
+  async checkPassword(roomId: number, password: string) {
+    try {
+      const hashedpw = await this.channelRepository.findOne({
+        where: {
+          id: roomId,
+        },
+      });
+      const isPasswordMatching = await bcrypt.compare(
+        password,
+        hashedpw.password,
+      );
+      return isPasswordMatching ? true : false;
+    } catch (error) {
+      throw new HttpException(
+        'Wrong credentials provided',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  async leaveChannel(roomId: number, userId: number) {
+    await this.channelMemberRepository.delete({
+      userID: userId,
+      channelID: roomId,
+    });
+    const memCnt = await this.channelMemberRepository.findAndCount({
+      where: {
+        channelID: roomId,
+      },
+      join: {
+        alias: 'channel_member',
+        leftJoinAndSelect: {
+          channel: 'channel_member.channel',
+        },
+      },
+    });
+    if (memCnt[1] === 0) await this.channelRepository.delete({ id: roomId });
   }
 }
