@@ -1,8 +1,6 @@
 import React from "react";
 import "./gameModal.scss";
 import { io } from "../../../socket/socket";
-import { useState } from "react";
-import { useEffect } from "react";
 
 type inviteInfo = {
   nickname: string;
@@ -13,7 +11,6 @@ type inviteInfo = {
 type ModalProps = {
   open: any;
   close: any;
-  header: any;
   inviteInfo: inviteInfo;
 };
 
@@ -35,7 +32,7 @@ function GameInviteModal(prop: ModalProps) {
       {prop.open ? (
         <section>
           <div className="modal-title">
-            {prop.header}
+            게임 참가
             <button className="modal-close" onClick={handleReject}>
               {" "}
               X{" "}

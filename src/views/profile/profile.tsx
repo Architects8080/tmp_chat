@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import AchievementItem from "../../components/achievement/achievement";
 import EmptyPageInfo from "../../components/emptyPage/empty";
 import Header from "../../components/header/header";
+import GameModalListener from "../../components/modal/gameModalListener";
 import ModalHandler from "../../components/modal/modalhandler";
 import SideBar from "../../components/sideBar/sideBar";
 import { sidebarProperty } from "../../components/sideBar/sideBarType";
@@ -84,6 +85,7 @@ function Profile() {
           )}
         </div>
       </div>
+      <GameModalListener modalHandler={modalHandler}/>
     </>
   );
 }
