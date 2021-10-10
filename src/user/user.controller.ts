@@ -5,6 +5,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Query,
   Req,
   UploadedFile,
   UseGuards,
@@ -18,6 +19,13 @@ import { UserService } from './user.service';
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @Get('search?')
+  async getUserByNickname(@Query() query) {
+    console.log(query);
+    console.log(query.nickname);
+    return await this.userService.getUserByNickname(query.nickname);
+  }
 
   @Get()
   async getUsers() {

@@ -34,6 +34,12 @@ export class UserService {
     return user;
   }
 
+  async getUserByNickname(nickname: string) {
+    const user = await this.userRepository.findOne({ where: { nickname: nickname } });
+    if (!user) throw new NotFoundException();
+    return user;
+  }
+
   async deleteUserById(id: number) {
     await this.userRepository.delete({ id: id });
   }
