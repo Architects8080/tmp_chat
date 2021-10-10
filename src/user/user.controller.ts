@@ -20,13 +20,6 @@ import { UserService } from './user.service';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Get('search?')
-  async getUserByNickname(@Query() query) {
-    console.log(query);
-    console.log(query.nickname);
-    return await this.userService.getUserByNickname(query.nickname);
-  }
-
   @Get()
   async getUsers() {
     return await this.userService.getUsers();
@@ -51,5 +44,10 @@ export class UserController {
   @Delete(':id')
   async deleteUserById(@Param('id', ParseIntPipe) id: number) {
     return this.userService.deleteUserById(id);
+  }
+
+  @Get('search/:nickname')
+  async getUserByNickname(@Param('nickname') nickname: string) {
+    return await this.userService.getUserByNickname(nickname);
   }
 }
