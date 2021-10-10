@@ -47,11 +47,15 @@ const Chatroom = () => {
       };
       setMessages([...messages, newMessage]);
     }
-
+    ioChannel.emit("joinChannel", id);
+    ioChannel.on("joinRefused", () => {
+      window.location.href = "http://localhost:3000/main";
+      window.alert("비정상적인 접근입니다");
+    });
     ioChannel.on('msgToClient', (message: Payload) => {
       receivedMessage(message);
     });
-  }, [messages, text]);
+  }, [messages, id]);
 
   const sendMessage = (e: React.KeyboardEvent<HTMLInputElement>) => {
 		if (e.key !== 'Enter' || text === '')
@@ -63,11 +67,16 @@ const Chatroom = () => {
 		ioChannel.emit('msgToChannel', newMessageSend);
 		setText('');
 	}
+
+  const leaveChannel = () => {
+    ioChannel.emit("leaveChannel", id);
+    window.location.href = "http://localhost:3000/main";
+  }
+
   return (
     <>
       <Header isLoggedIn={true} />
       <div className="page">
-        {/* TODO: modify roomId */}
         <SideBar
           title={sidebarProperty.chatMemberList}
           roomId={id}
@@ -79,23 +88,21 @@ const Chatroom = () => {
             {messages.map(message => (
               <ChatMessage key={message.id} isSelfMessage={true} nickname={message.name} content={message.text}/>
             ))}
-            <div className="chatroom-user-input">
-              <input 
-                className="input-field"
-                placeholder="내용을 입력하세요"
-                value={text}
-                onChange={e => setText(e.target.value)}
-                onKeyPress={sendMessage}
-              />
-            </div>
+          </div>
+          <div className="chatroom-user-input">
+            <input 
+              className="input-field"
+              placeholder="내용을 입력하세요"
+              value={text}
+              onChange={e => setText(e.target.value)}
+              onKeyPress={sendMessage}
+            />
           </div>
         </div>
       </div>
       <div
         className="button-chatroom-exit"
-        onClick={() => {
-          window.location.href = "http://localhost:3000/";
-        }}
+        onClick={leaveChannel}
       >
         채팅방 나가기
       </div>

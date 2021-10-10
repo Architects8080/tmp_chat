@@ -1,12 +1,14 @@
+import axios from "axios";
 import React, { useState } from "react";
 import "./enterPasswordModal.scss";
 
 type enterPasswordModalProps = {
   open: boolean;
   close: any;
+  roomId: number;
 };
 
-function EnterPasswordModal(prop: enterPasswordModalProps) {
+const EnterPasswordModal = (prop: enterPasswordModalProps) => {
   const Title = "채팅방 접속";
   const Description = "비밀번호를 입력해주세요.";
 
@@ -26,18 +28,19 @@ function EnterPasswordModal(prop: enterPasswordModalProps) {
     prop.close();
   };
 
-  const handleSubmitEvent = () => {
-    console.log(`userInput : `, input);
-
-    //io.emit -> password send
-    //code
-
-    //io.on -> get result code & setErrorext
-    if (input === "4242") {
-      //io.emit(connect)
-      setErrorText("🎉🎉");
-      prop.close();
-    } else setErrorText("비밀번호가 틀렸습니다.");
+  const handleSubmitEvent = async () => {
+    try {
+      const response = await axios.post(`http://localhost:5000/channel/enter-pw`, {
+        roomId: prop.roomId,
+        password: input
+        }, { withCredentials: true });
+      if (response.data) {
+        prop.close();
+        window.location.href = `http://localhost:3000/chatroom/${prop.roomId}`
+      } else
+        setErrorText("비밀번호가 틀렸습니다.");
+    }
+    catch (e) { console.log(e); }
   };
   return (
     <div
