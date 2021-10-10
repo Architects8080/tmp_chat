@@ -78,7 +78,7 @@ export class GameRepository {
     const match: Match = this.matchRepository.create();
     const gameTime =
       (gameInfo.endAt.getTime() - gameInfo.startAt.getTime()) / 1000;
-    const isPlayer1Win = gameInfo.player1 > gameInfo.player2;
+    const isPlayer1Win = gameInfo.player1.score > gameInfo.player2.score;
     match.startAt = gameInfo.startAt;
     match.endAt = gameInfo.endAt;
     match.gameTime = Math.round(gameTime); // second

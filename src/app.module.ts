@@ -12,7 +12,9 @@ import { OTPModule } from './otp/otp.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { MatchModule } from './match/match.module';
 import { DmModule } from './dm/dm.module';
+import { CommunityModule } from './community/community.module';
 import { ChannelModule } from './channel/channel.module';
+
 
 @Module({
   imports: [
@@ -50,6 +52,7 @@ import { ChannelModule } from './channel/channel.module';
     OTPModule,
     MatchModule,
     DmModule,
+    CommunityModule,
     ChannelModule,
   ],
   controllers: [AppController],

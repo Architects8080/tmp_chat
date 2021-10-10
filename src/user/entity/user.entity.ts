@@ -1,6 +1,7 @@
 import { Exclude, Transform, TransformFnParams } from 'class-transformer';
 import { configuration } from 'config/configuration';
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Block, Friend } from 'src/community/entity/community.entity';
+import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 
 @Entity('user')
 export class User {
@@ -38,4 +39,10 @@ export class User {
 
   @Column({ default: 0 })
   ladderLevel: number;
+
+  @OneToMany(() => Friend, rel => rel.other)
+  friendList: Friend[];
+
+  @OneToMany(() => Block, rel => rel.other)
+  blockList: Block[];
 }
