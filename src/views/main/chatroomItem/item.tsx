@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
 import EnterPasswordModal from "../../../components/modal/chatroom/join/enterPasswordModal";
+import ModalHandler from "../../../components/modal/modalhandler";
 import { ioChannel } from "../../../socket/socket";
 import "./item.scss";
 
@@ -12,7 +13,7 @@ export type chatroomItemProps = {
 }
 
 const ChatroomItem = ({channel} : {channel:any}) => {
-  const [modalopen, setModalOpen] = useState(false);
+  const modalHandler = ModalHandler();
 
   const handleOnClick = async () => {
     if (channel.isProtected) {
@@ -21,7 +22,7 @@ const ChatroomItem = ({channel} : {channel:any}) => {
         if (response.data.find((mychannel: any) => mychannel.roomId === channel.roomId)) {
           window.location.href = `http://localhost:3000/chatroom/${channel.roomId}`
         } else
-          setModalOpen(true);
+          modalHandler.handleModalOpen("enterPassword");
       }
       catch (e) { console.log(e); }
     } else
@@ -29,7 +30,7 @@ const ChatroomItem = ({channel} : {channel:any}) => {
   };
 
   const handleModalClose = () => {
-    setModalOpen(false);
+    modalHandler.handleModalClose("enterPassword");
   };
 
   return (
@@ -41,7 +42,7 @@ const ChatroomItem = ({channel} : {channel:any}) => {
         </div>
         <div className="chatroom-member-count">{channel.memberCount}명 참여중</div>
       </div>
-      {modalopen ? <EnterPasswordModal open={modalopen} close={handleModalClose} roomId={channel.roomId}/> : ""}
+      <EnterPasswordModal open={modalHandler.isModalOpen.enterPassword} close={handleModalClose} roomId={channel.roomId}/>
     </>
   );
 }

@@ -47,6 +47,10 @@ const Chatroom = () => {
       setMessages([...messages, newMessage]);
     }
     ioChannel.emit("joinChannel", id);
+    ioChannel.on("joinRefused", () => {
+      window.location.href = "http://localhost:3000/main";
+      window.alert("비정상적인 접근입니다");
+    });
     ioChannel.on('msgToClient', (message: Payload) => {
       receivedMessage(message);
     });
