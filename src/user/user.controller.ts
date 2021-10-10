@@ -26,6 +26,9 @@ export class UserController {
 
   @Get('me')
   getMe(@Req() req) {
+    if (req.user) {
+      req.user.otp = req.user.otpSecret != null;
+    }
     return req.user;
   }
 
