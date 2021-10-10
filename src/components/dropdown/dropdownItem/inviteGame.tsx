@@ -28,15 +28,11 @@ function InviteGameItem(prop: props) {
 
   return (
     <>
-      {test ? (
-        <GameSettingModal
-          open={test}
-          close={handleModalClose}
-          targetId={prop.targetId}
-        />
-      ) : (
-        ""
-      )}
+      <GameSettingModal
+        open={test}
+        close={handleModalClose}
+        targetId={68874} //TODO
+      />
       <DefaultDropdownItem
         title="게임 초대하기"
         color="black"

@@ -10,6 +10,7 @@ import { sidebarProperty } from "../../components/sideBar/sideBarType";
 import ChatMessage from "./message/message";
 import { ioChannel } from "../../socket/socket";
 import "./chatroom.scss";
+import GameModalListener from "../../components/modal/gameModalListener";
 
 // 서버로부터 받아서 message state 에 넣을 때 들어가는 형태
 type Message = {
@@ -105,6 +106,7 @@ const Chatroom = () => {
       >
         채팅방 나가기
       </div>
+      <GameModalListener modalHandler={modalHandler}/>
     </>
   );
 }
