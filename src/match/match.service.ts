@@ -23,6 +23,9 @@ export class MatchService {
       return mp.matchId;
     });
     return this.matchRepository.find({
+      order: {
+        endAt: 'DESC',
+      },
       where: {
         id: In(matchIds),
       },
