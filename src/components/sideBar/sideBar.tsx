@@ -1,5 +1,6 @@
+import axios from "axios";
 import React, { useCallback, useEffect, useState } from "react";
-import { io } from "../../socket/socket";
+import { io, ioChannel } from "../../socket/socket";
 import ChatroomAdminDropdownList from "../dropdown/dropdownList/chatroomAdmin";
 import ChatroomDefaultDropdownList from "../dropdown/dropdownList/chatroomDefault";
 import ChatroomOwnerDropdownList from "../dropdown/dropdownList/chatroomOwner";
@@ -17,7 +18,6 @@ import {
   dropdownMenuInfo,
   sidebarProperty,
   sidebarProps,
-  status,
   userItemProps,
 } from "./sideBarType";
 
@@ -32,22 +32,41 @@ function SideBar(prop: sidebarProps) {
   var userId: number;
 
   // first render -> get userList according to sidebarType(prop.title)
-  var userList: any;
+  // var userList: any;
+  const [userList, setUserList] = useState<userItemProps[]>([]);
   useEffect(() => {
-    if (prop.title === sidebarProperty.chatMemberList)
-      io.emit("chatMemberList", prop.roomId);
+
+    const getChannelmember = async () => {
+      const data = await axios.get(
+        process.env.REACT_APP_SERVER_ADDRESS + `/channel/members/${prop.roomId}`,
+        { withCredentials: true }
+      );
+      setUserList(data.data);
+    }
+    if (prop.title === sidebarProperty.chatMemberList) {
+      getChannelmember();
+      ioChannel.on("channelMemberAdd", (newMember: userItemProps) => {
+        if (!userList.filter(user => user.id === newMember.id))
+          setUserList([...userList, newMember]);
+      });
+      ioChannel.on("channelMemberRemove", (userId) => {
+        setUserList(userList.filter(user => user.id !== userId));
+      });
+    }
     else if (prop.title === sidebarProperty.friendList)
       io.emit("friendList", userId);
     else if (prop.title === sidebarProperty.observerList)
       io.emit("observerList", prop.roomId);
 
-    io.on("sidebarItems", userList);
-  }, []);
+    // io.on("sidebarItems", userList);
+    
+  }, [userList]);
 
   // to test
   const tempInfo: userItemProps = {
+    id: 1,
     avatar: "https://cdn.intra.42.fr/users/yhan.jpg",
-    status: status.online,
+    status: 1,
     nickname: "yhan",
   };
 
@@ -116,47 +135,16 @@ function SideBar(prop: sidebarProps) {
         </div>
       </div>
       <div className="user-list">
-        {/* itemType: same as prop.title */}
-        <SidebarItem
-          itemType={prop.title}
-          itemInfo={tempInfo}
+        {userList ? 
+        userList.map(item => 
+          <SidebarItem itemType={prop.title}
+          key={item.id}
+          itemInfo={item}
           contextMenuHandler={contextMenuHandler}
-          roomId={1}
+          roomId={prop.roomId}
           userId={2}
-          targetId={3}
-        />
-        <SidebarItem
-          itemType={prop.title}
-          itemInfo={tempInfo}
-          contextMenuHandler={contextMenuHandler}
-          roomId={1}
-          userId={2}
-          targetId={3}
-        />
-        <SidebarItem
-          itemType={prop.title}
-          itemInfo={tempInfo}
-          contextMenuHandler={contextMenuHandler}
-          roomId={1}
-          userId={2}
-          targetId={3}
-        />
-        <SidebarItem
-          itemType={prop.title}
-          itemInfo={tempInfo}
-          contextMenuHandler={contextMenuHandler}
-          roomId={1}
-          userId={2}
-          targetId={3}
-        />
-        <SidebarItem
-          itemType={prop.title}
-          itemInfo={tempInfo}
-          contextMenuHandler={contextMenuHandler}
-          roomId={1}
-          userId={2}
-          targetId={3}
-        />
+          targetId={3} />
+        ) : null}
         <SidebarItem
           itemType={prop.title}
           itemInfo={tempInfo}

@@ -11,8 +11,9 @@ export enum sidebarProperty {
 }
 
 export type userItemProps = {
+  id: number;
   avatar: string;
-  status: status;
+  status: number;
   nickname: string;
 };
 
