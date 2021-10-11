@@ -50,15 +50,19 @@ const ChatroomSettingModal = (prop: chatroomSettingModalProps) => {
 
   const handleSubmitEvent = async () => {
     if (errorText === "" && title !== '') {
-      console.log(`emit password : `, password);
-      await axios.put(process.env.REACT_APP_SERVER_ADDRESS + "/channel/" + prop.roomId,
+      try {
+        await axios.put(process.env.REACT_APP_SERVER_ADDRESS + "/channel/" + prop.roomId,
         {
           title,
           type: selectedRoomType,
           password,
         }, { withCredentials: true }
       );
-        prop.close();
+      prop.close();
+      } catch (e) {
+        console.log(e);
+        setErrorText("권한이 없습니다");
+      }
     }
   };
 
@@ -75,6 +79,10 @@ const ChatroomSettingModal = (prop: chatroomSettingModalProps) => {
   const handleChange = (type: number) => {
     (type == roomType.publicRoom) ? setSelectedRoomType(roomType.publicRoom) :
       (type == roomType.privateRoom) ? setSelectedRoomType(roomType.privateRoom) : setSelectedRoomType(roomType.protectedRoom);
+    if (type != roomType.protectedRoom) {
+      setErrorText("");
+      setPassword("");
+    }     
   };
 
   return (
@@ -157,6 +165,8 @@ const ChatroomSettingModal = (prop: chatroomSettingModalProps) => {
           <div className="protected-description">{descriptionText}</div>
           <div className="protected-error">{errorText}</div>
         </div>
+        <div className={
+          selectedRoomType !== roomType.protectedRoom ? "role-error": "protected-close"}>{errorText}</div>
 
         <div className="submit-wrap">
           <div className="submit" onClick={handleSubmitEvent}>
