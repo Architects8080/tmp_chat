@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import { ioCommunity } from "../../../../socket/socket";
 import "./addFriendModal.scss";
 
 enum Result {
@@ -6,6 +7,7 @@ enum Result {
   Success,
   NotFoundUser,
   AlreadyFriend,
+  Myself,
 }
 
 type addFriendModalProps = {
@@ -20,14 +22,13 @@ function AddFriendModal(prop: addFriendModalProps) {
   const nickPlaceholder = "플레이어 닉네임";
   const buttonTitle = "친구 추가";
 
-  const [input, setInput] = useState("");
-  const [resultText, setResultText] = useState("");
-  const resultCode = useRef(Result.Default);
+  const [input, setInput] = useState<string>("");
+  const [resultText, setResultText] = useState<string>("");
+  const [resultCode, setresultCode] = useState<number>(0);
 
   const handleUserInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value === "") {
       setResultText("");
-      resultCode.current = 0;
     }
     setInput(e.target.value);
   };
@@ -35,6 +36,7 @@ function AddFriendModal(prop: addFriendModalProps) {
   const handleClose = () => {
     setInput("");
     setResultText("");
+    setresultCode(0);
     prop.close();
   };
 
@@ -42,18 +44,24 @@ function AddFriendModal(prop: addFriendModalProps) {
     console.log(`userInput : `, input);
 
     //io.emit -> nickname send
+    ioCommunity.emit("friendRequestToServer", 1);
     //io.on -> get result code
-    if (input == "ina") resultCode.current = 3;
-    else if (input == "yhan") resultCode.current = 1;
-    else resultCode.current = 2;
-
-    //set Result Text
-    if (resultCode.current == Result.AlreadyFriend)
-      setResultText(input + "님과는 이미 친구입니다.");
-    else if (resultCode.current == Result.Success)
-      setResultText("친구 신청을 보냈습니다!");
-    else if (resultCode.current == Result.NotFoundUser)
-      setResultText("존재하지 않는 플레이어입니다. 다시 시도해주세요.");
+    ioCommunity.on("friendResponseToClient", (code: number) => {
+      //set Result Text
+      setresultCode(code);
+      if (code == Result.AlreadyFriend)
+        setResultText(input + "님과는 이미 친구입니다.");
+      else if (code == Result.Success)
+        setResultText("친구 신청을 보냈습니다!");
+      else if (code == Result.NotFoundUser)
+        setResultText("존재하지 않는 플레이어입니다. 다시 시도해주세요.");
+      else if (code == Result.Myself)
+        setResultText("본인 외의 플레이어를 입력해주세요.");
+      console.log("code: "+code);
+    });
+    // if (input == "ina") resultCode.current = 3;
+    // else if (input == "yhan") resultCode.current = 1;
+    // else resultCode.current = 2;
   };
 
   return (
@@ -88,9 +96,9 @@ function AddFriendModal(prop: addFriendModalProps) {
         <div className="result">
           <div
             className={
-              resultCode.current == Result.Default
+              resultCode == Result.Default
                 ? ""
-                : resultCode.current == Result.Success
+                : resultCode == Result.Success
                 ? "success"
                 : "error"
             }

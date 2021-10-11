@@ -43,7 +43,7 @@ function SidebarItem(prop: sidebarItemProps) {
       var tempInfo = {
         roomId: 42,
         userId: 42,
-        targetId: 50, //same id test
+        targetId: prop.targetId,
 
         // permission: undefined,
         permission: chatroomPermission.owner,

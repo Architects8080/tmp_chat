@@ -1,5 +1,6 @@
+import axios from "axios";
 import React, { useCallback, useEffect, useState } from "react";
-import { io } from "../../socket/socket";
+import { ioChannel, ioCommunity } from "../../socket/socket";
 import ChatroomAdminDropdownList from "../dropdown/dropdownList/chatroomAdmin";
 import ChatroomDefaultDropdownList from "../dropdown/dropdownList/chatroomDefault";
 import ChatroomOwnerDropdownList from "../dropdown/dropdownList/chatroomOwner";
@@ -7,6 +8,7 @@ import FriendDropdownList from "../dropdown/dropdownList/friend";
 import ChatroomInviteModal from "../modal/chatroom/invite/chatroomInviteModal";
 import ChatroomSettingModal from "../modal/chatroom/setting/chatroomSettingModal";
 import AddFriendModal from "../modal/friend/add/addFriendModal";
+import { useNotiDispatch } from "../notification/notificationContext";
 import AddUserIcon from "./icon/addUser";
 import InviteUserIcon from "./icon/inviteUser";
 import SettingIcon from "./icon/setting";
@@ -22,6 +24,8 @@ import {
 } from "./sideBarType";
 
 function SideBar(prop: sidebarProps) {
+  const notiDispatch = useNotiDispatch();
+  const [userList, setUserList] = useState<userItemProps[]>([]);
   // use UserAPI to get userId;
 
   const modalHandler = prop.modalHandler;
@@ -29,27 +33,56 @@ function SideBar(prop: sidebarProps) {
   const handleModalOpen = modalHandler.handleModalOpen;
   const handleModalClose = modalHandler.handleModalClose;
 
-  var userId: number;
+  // var userId: number;
 
   // first render -> get userList according to sidebarType(prop.title)
-  var userList: any;
+  // var userList: any;
   useEffect(() => {
     if (prop.title === sidebarProperty.chatMemberList)
-      io.emit("chatMemberList", prop.roomId);
+      ioChannel.emit("chatMemberList", prop.roomId);
     else if (prop.title === sidebarProperty.friendList)
-      io.emit("friendList", userId);
+      fetchFriendList();
     else if (prop.title === sidebarProperty.observerList)
-      io.emit("observerList", prop.roomId);
+      ioChannel.emit("observerList", prop.roomId);
 
-    io.on("sidebarItems", userList);
+    // io.on("sidebarItems", userList);
+    //친구 요청 수신
+    ioCommunity.on("friendRequestToClient", async (friend: number) => {
+      const response = await axios.get(
+				`${process.env.REACT_APP_SERVER_ADDRESS}/user/${friend}`,
+				{
+					withCredentials: true,
+				}
+			);
+      notiDispatch({
+        type: "ADD",
+        Notification: {
+          title: "친구 요청",
+          description: `${response.data.nickname}님의 친구 신청입니다. 수락하시겠습니까?`,
+          acceptCallback: () => {
+            ioCommunity.emit("friendAcceptToServer", {friendID: friend});
+          },
+          rejectCallback: () => {}
+        }
+      })
+    });
+
+    //친구 수락 수신
+    ioCommunity.on("friendAcceptToClient", async (friend: number) => {
+      const response = await axios.get(
+				`${process.env.REACT_APP_SERVER_ADDRESS}/user/${friend}`,
+				{
+					withCredentials: true,
+				}
+			);
+      setUserList(userList => [...userList, {
+        id: friend,
+        avatar: response.data.avatar,
+        status: status.online,
+        nickname: response.data.nickname
+      }]);
+    });
   }, []);
-
-  // to test
-  const tempInfo: userItemProps = {
-    avatar: "https://cdn.intra.42.fr/users/yhan.jpg",
-    status: status.online,
-    nickname: "yhan",
-  };
 
   // to contextMenu
   const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
@@ -85,6 +118,28 @@ function SideBar(prop: sidebarProps) {
     setResult(dropdownMenuInfo);
   };
 
+  const fetchFriendList = async () => {
+		try {
+      let newUserList: userItemProps[] = [];
+			const response = await axios.get(
+				`${process.env.REACT_APP_SERVER_ADDRESS}/community/friend`,
+				{
+					withCredentials: true,
+				}
+			);
+			response.data.map((user: any) => newUserList.push({
+				id: user.otherID,
+				avatar: user.other.avatar,
+        status: status.online,
+        nickname: user.other.nickname
+			}));
+      console.log(newUserList);
+      setUserList(newUserList);
+		} catch (e) {
+			console.log(`[FriendListError] ${e}`);
+		}
+	};
+
   return (
     <aside>
       <div className="sidebar-header">
@@ -117,54 +172,16 @@ function SideBar(prop: sidebarProps) {
       </div>
       <div className="user-list">
         {/* itemType: same as prop.title */}
-        <SidebarItem
-          itemType={prop.title}
-          itemInfo={tempInfo}
-          contextMenuHandler={contextMenuHandler}
-          roomId={1}
-          userId={2}
-          targetId={3}
-        />
-        <SidebarItem
-          itemType={prop.title}
-          itemInfo={tempInfo}
-          contextMenuHandler={contextMenuHandler}
-          roomId={1}
-          userId={2}
-          targetId={3}
-        />
-        <SidebarItem
-          itemType={prop.title}
-          itemInfo={tempInfo}
-          contextMenuHandler={contextMenuHandler}
-          roomId={1}
-          userId={2}
-          targetId={3}
-        />
-        <SidebarItem
-          itemType={prop.title}
-          itemInfo={tempInfo}
-          contextMenuHandler={contextMenuHandler}
-          roomId={1}
-          userId={2}
-          targetId={3}
-        />
-        <SidebarItem
-          itemType={prop.title}
-          itemInfo={tempInfo}
-          contextMenuHandler={contextMenuHandler}
-          roomId={1}
-          userId={2}
-          targetId={3}
-        />
-        <SidebarItem
-          itemType={prop.title}
-          itemInfo={tempInfo}
-          contextMenuHandler={contextMenuHandler}
-          roomId={1}
-          userId={2}
-          targetId={3}
-        />
+        {userList.map(user => (
+          <SidebarItem
+            itemType={prop.title}
+            itemInfo={user}
+            contextMenuHandler={contextMenuHandler}
+            roomId={1}
+            userId={2}
+            targetId={user.id}
+          />
+        ))}
       </div>
 
       {/* anchorPoint, dropdownMenuInfo, userId, targetId */}
