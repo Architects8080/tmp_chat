@@ -5,6 +5,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Query,
   Req,
   UploadedFile,
   UseGuards,
@@ -46,5 +47,10 @@ export class UserController {
   @Delete(':id')
   async deleteUserById(@Param('id', ParseIntPipe) id: number) {
     return this.userService.deleteUserById(id);
+  }
+
+  @Get('search/:nickname')
+  async getUserByNickname(@Param('nickname') nickname: string) {
+    return await this.userService.getUserByNickname(nickname);
   }
 }
