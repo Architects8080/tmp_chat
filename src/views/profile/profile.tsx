@@ -21,7 +21,7 @@ type User = {
   status: number;
   ladderPoint: number;
   ladderLevel: number;
-}
+};
 
 type Match = {
   id: number;
@@ -31,7 +31,7 @@ type Match = {
   gameTime: number;
   players: MatchPlayer[];
   targetId: number;
-}
+};
 
 type MatchPlayer = {
   match: Match;
@@ -43,13 +43,13 @@ type MatchPlayer = {
   isWinner: boolean;
   ladderPoint: number;
   ladderIncrease: number;
-}
+};
 
 type MatchRatio = {
   win: number;
   lose: number;
   total: number;
-}
+};
 
 function Profile() {
   const modalHandler = ModalHandler();
@@ -69,13 +69,20 @@ function Profile() {
   const [search, setSearch] = useState("");
 
   const searchUser = (e: React.KeyboardEvent<HTMLInputElement>) => {
-		if (e.key !== 'Enter' || search === '')
-			return;
-    
+    if (e.key !== "Enter" || search === "") return;
+
     //TODO
-    //axios.get(server_address/user/{nickname_to_search}) => get id
-    //window.location.href = "http://localhost:3000/profile/" + id;
-	}
+    axios
+      .get(`http://localhost:5000/user/search/${search}`, {
+        withCredentials: true,
+      })
+      .then((res) => {
+        window.location.href = `http://localhost:3000/profile/${res.data.id}`;
+      })
+      .catch((err) => {
+        snackbar.error("유저가 존재하지 않습니다.");
+      });
+  };
 
   // var gameLog;
   useEffect(() => {
@@ -83,37 +90,48 @@ function Profile() {
     var total = 0;
 
     axios
-    .all([
-      axios.get("http://localhost:5000/user/", { withCredentials: true }),
-      axios.get("http://localhost:5000/user/" + id, { withCredentials: true }),
-      axios.get("http://localhost:5000/match/user/" + id, { withCredentials: true }),
-      //axios.get("http://localhost:5000/achievement/" + id, {withCredentials: true}),
-    ])
-    .then(
-      axios.spread((userList, userInfo, matchList) => { //achievementList
+      .all([
+        axios.get("http://localhost:5000/user/", { withCredentials: true }),
+        axios.get("http://localhost:5000/user/" + id, {
+          withCredentials: true,
+        }),
+        axios.get("http://localhost:5000/match/user/" + id, {
+          withCredentials: true,
+        }),
+        //axios.get("http://localhost:5000/achievement/" + id, {withCredentials: true}),
+      ])
+      .then(
+        axios.spread((userList, userInfo, matchList) => {
+          //achievementList
 
-        console.log(`userList : `, userList.data);
-        console.log(`userInfo : `, userInfo.data);
-        console.log(`matchList : `, matchList.data);
-        setUser(userInfo.data);
-        setTopRate(((userInfo.data.ladderLevel) / userList.data.length).toFixed(2).toString());
-        setMatchList(matchList.data);
+          console.log(`userList : `, userList.data);
+          console.log(`userInfo : `, userInfo.data);
+          console.log(`matchList : `, matchList.data);
+          setUser(userInfo.data);
+          setTopRate(
+            (userInfo.data.ladderLevel / userList.data.length)
+              .toFixed(2)
+              .toString()
+          );
+          setMatchList(matchList.data);
 
-        matchList.data.map((match: any) => {
-          if (match.players[0].userId == userInfo.data.id && match.players[0].isWinner == true ||
-              match.players[0].userId != userInfo.data.id && match.players[0].isWinner == false)
-            win++;
-          total++;
-        });
+          matchList.data.map((match: any) => {
+            if (
+              (match.players[0].userId == userInfo.data.id &&
+                match.players[0].isWinner == true) ||
+              (match.players[0].userId != userInfo.data.id &&
+                match.players[0].isWinner == false)
+            )
+              win++;
+            total++;
+          });
 
-        setWinRatio({win: win, total: total, lose: total - win});
-      })
-    )
-    .catch((err) => {
-      // console.log(err);
-      // window.location.href = "http://localhost:3000/main";
-    });
-
+          setWinRatio({ win: win, total: total, lose: total - win });
+        })
+      )
+      .catch((err) => {
+        window.location.href = "http://localhost:3000/main";
+      });
   }, []);
 
   return (
@@ -127,7 +145,7 @@ function Profile() {
         />
         <div className="profile-wrap">
           <div className="profile-header">
-            {user && winRatio ?
+            {user && winRatio ? (
               <div className="profile-info">
                 <img
                   className="user-avatar"
@@ -140,14 +158,23 @@ function Profile() {
                     <div className="ladder-rank">
                       Ladder Rank : #{user.ladderLevel} ({topRate}% of top)
                     </div>
-                    <div className="ladder-point">Ladder Point : {user.ladderPoint}</div>
-                    <div className="win-ratio-title">{winRatio.total}G {winRatio.win}W {winRatio.lose}L</div>
-                    <div className="win-ratio">Win ratio {(winRatio.win / winRatio.total * 100).toFixed(2)}%</div>
+                    <div className="ladder-point">
+                      Ladder Point : {user.ladderPoint}
+                    </div>
+                    <div className="win-ratio-title">
+                      {winRatio.total}G {winRatio.win}W {winRatio.lose}L
+                    </div>
+                    <div className="win-ratio">
+                      Win ratio{" "}
+                      {((winRatio.win / winRatio.total) * 100).toFixed(2)}%
+                    </div>
                   </div>
                 </div>
-              {/* show info from server */}
+                {/* show info from server */}
               </div>
-            : ""}
+            ) : (
+              ""
+            )}
 
             <div className="profile-side">
               <div className="profile-searchbar">
@@ -161,7 +188,7 @@ function Profile() {
                   className="search-nickname"
                   type="text"
                   placeholder={"search"}
-                  onChange={e => setSearch(e.target.value)}
+                  onChange={(e) => setSearch(e.target.value)}
                   onKeyPress={searchUser}
                 />
               </div>
@@ -176,21 +203,22 @@ function Profile() {
             </div>
           </div>
 
-          {!matchList || matchList.length == 0 ?
-              <EmptyPageInfo
-                description={`전적이 존재하지 않습니다.\n다른 플레이어와 게임을 진행해보세요!`}
-              />
-            :
-              <div className="gameLogList">
-                {user && matchList.map((match: any) => {
+          {!matchList || matchList.length == 0 ? (
+            <EmptyPageInfo
+              description={`전적이 존재하지 않습니다.\n다른 플레이어와 게임을 진행해보세요!`}
+            />
+          ) : (
+            <div className="gameLogList">
+              {user &&
+                matchList.map((match: any) => {
                   match.targetId = user.id;
-                  return (<GameLogItem {...match}/>);
+                  return <GameLogItem {...match} />;
                 })}
-              </div>
-          }
+            </div>
+          )}
         </div>
       </div>
-      <GameModalListener modalHandler={modalHandler}/>
+      <GameModalListener modalHandler={modalHandler} />
     </>
   );
 }
