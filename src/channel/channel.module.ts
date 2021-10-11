@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from 'src/auth/auth.module';
 import { UserModule } from 'src/user/user.module';
+import { ChannelRoleService } from './channel-role.service';
 import { ChannelController } from './channel.controller';
 import { ChannelGateway } from './channel.gateway';
 import { ChannelService } from './channel.service';
@@ -15,6 +16,11 @@ import { Channel, ChannelMember } from './entity/channel.entity';
     UserModule,
   ],
   controllers: [ChannelController],
-  providers: [ChannelService, ChannelGateway, ChannelSocketUserService],
+  providers: [
+    ChannelService,
+    ChannelGateway,
+    ChannelSocketUserService,
+    ChannelRoleService,
+  ],
 })
 export class ChannelModule {}

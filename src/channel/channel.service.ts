@@ -1,19 +1,15 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import { JwtStrategy } from 'src/auth/strategy/jwt.strategy';
-import { User } from 'src/user/entity/user.entity';
 import { Repository } from 'typeorm';
 import { ChannelListDto } from './dto/channel-list.dto';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { Channel, ChannelMember } from './entity/channel.entity';
 import * as bcrypt from 'bcrypt';
+import { UpdateChannelDto } from './dto/update-channel.dto';
 
 @Injectable()
 export class ChannelService {
   constructor(
-    private jwtService: JwtService,
-    private jwtStrategy: JwtStrategy,
     @InjectRepository(Channel)
     private readonly channelRepository: Repository<Channel>,
     @InjectRepository(ChannelMember)
@@ -157,17 +153,20 @@ export class ChannelService {
       userID: userId,
       channelID: roomId,
     });
-    const memCnt = await this.channelMemberRepository.findAndCount({
+    const memCnt = await this.channelMemberRepository.count({
       where: {
         channelID: roomId,
       },
-      join: {
-        alias: 'channel_member',
-        leftJoinAndSelect: {
-          channel: 'channel_member.channel',
-        },
-      },
     });
-    if (memCnt[1] === 0) await this.channelRepository.delete({ id: roomId });
+    if (memCnt === 0) await this.channelRepository.delete({ id: roomId });
+  }
+
+  async updateChannel(roomId: number, updateData: UpdateChannelDto) {
+    const updateChannel = await this.channelRepository.findOne(roomId);
+    console.log(updateChannel);
+    for (const key in updateData) {
+      updateChannel[key] = updateData[key];
+    }
+    await this.channelRepository.save(updateChannel);
   }
 }
