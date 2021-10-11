@@ -30,6 +30,16 @@ export class ChannelController {
     return this.channelService.getMyChannel(req.user.id);
   }
 
+  @Get(':id')
+  getOneChannel(@Param('id') roomId: number) {
+    return this.channelService.channelMap.get(+roomId);
+  }
+
+  @Get('/members/:id')
+  async getChannelMember(@Param('id') roomId: number) {
+    return this.channelService.getChannelMember(+roomId);
+  }
+
   @Post('enter-pw')
   async logIn(@Body() req) {
     return this.channelService.checkPassword(req.roomId, req.password);

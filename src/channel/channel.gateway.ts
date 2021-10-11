@@ -82,6 +82,13 @@ export class ChannelGateway
       }
     } else {
       client.join(data.toString());
+      const newMember = {
+        id: client.user.id,
+        nickname: client.user.nickname.toString(),
+        avatart: client.user.avatar.toString(),
+        status: client.user.status,
+      };
+      this.server.to(data.toString()).emit('channelMemberAdd', newMember);
       this.channelService.joinChannel(data, client.user.id);
       console.log(client.rooms);
     }
@@ -105,5 +112,6 @@ export class ChannelGateway
     @ConnectedSocket() client: SocketUser,
   ) {
     this.channelService.leaveChannel(data, client.user.id);
+    this.server.to(data).emit('channelMemberRemove', client.user.id);
   }
 }

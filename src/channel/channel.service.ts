@@ -169,4 +169,30 @@ export class ChannelService {
     }
     await this.channelRepository.save(updateChannel);
   }
+
+  async getChannelMember(roomId: number) {
+    const member = await this.channelMemberRepository.find({
+      select: ['user'],
+      where: {
+        channelID: roomId,
+      },
+      join: {
+        alias: 'channel_member',
+        leftJoinAndSelect: {
+          user: 'channel_member.user',
+        },
+      },
+    });
+    const obj = member.map(({ userID, ...keepAttrs }) => keepAttrs);
+    const result = [];
+    obj.map((item) => {
+      result.push({
+        id: item['user'].id,
+        avatar: item['user'].avatar,
+        status: item['user'].status,
+        nickname: item['user'].nickname,
+      });
+    });
+    return result;
+  }
 }
