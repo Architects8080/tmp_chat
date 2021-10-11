@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import RadioButton from "../../../button/radio/radio";
 import { roomType } from "../create/chatroomCreateModal";
 import "./chatroomSettingModal.scss";
