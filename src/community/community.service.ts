@@ -8,7 +8,7 @@ import { Block, Friend } from './entity/community.entity';
 export class CommunityService {
   constructor(
     @InjectRepository(Friend)
-    private readonly frinedRepository: Repository<Friend>,
+    private readonly friendRepository: Repository<Friend>,
     @InjectRepository(Block)
     private readonly blockRepository: Repository<Block>
   ) {}
@@ -16,11 +16,11 @@ export class CommunityService {
   async setRelationship(relationship: CommunityDto, isFriendly: boolean) {
     try {
       if (isFriendly) {
-        await this.frinedRepository.insert(
-          this.frinedRepository.create(relationship)
+        await this.friendRepository.insert(
+          this.friendRepository.create(relationship)
         );
-        return await this.frinedRepository.insert(
-          this.frinedRepository.create({
+        return await this.friendRepository.insert(
+          this.friendRepository.create({
             userID: relationship.otherID,
             otherID: relationship.userID
         }));
@@ -36,7 +36,7 @@ export class CommunityService {
 
   async getRelationships(userID: number, isFriendly: boolean) {
     if (isFriendly)
-      return await this.frinedRepository.find({
+      return await this.friendRepository.find({
         relations: ["other"],
         where: { userID: userID }
       });
@@ -48,7 +48,7 @@ export class CommunityService {
   }
 
   async getRelationshipByID(relationship: CommunityDto) {
-    const result = await this.frinedRepository.findOne({
+    const result = await this.friendRepository.findOne({
       where: { userID: relationship.userID, otherID: relationship.otherID }
     });
     if (!result) throw new NotFoundException();
@@ -57,8 +57,8 @@ export class CommunityService {
 
   async deleteRelationshipByID(relationship: CommunityDto, isFriendly: boolean) {
     if (isFriendly) {
-      await this.frinedRepository.delete(relationship);
-      return await this.frinedRepository.delete({
+      await this.friendRepository.delete(relationship);
+      return await this.friendRepository.delete({
         userID: relationship.otherID,
         otherID: relationship.userID
       });
