@@ -45,13 +45,6 @@ function SideBar(prop: sidebarProps) {
     }
     if (prop.title === sidebarProperty.chatMemberList) {
       getChannelmember();
-      ioChannel.on("channelMemberAdd", (newMember: userItemProps) => {
-        if (!userList.filter(user => user.id === newMember.id))
-          setUserList([...userList, newMember]);
-      });
-      ioChannel.on("channelMemberRemove", (userId) => {
-        setUserList(userList.filter(user => user.id !== userId));
-      });
     }
     else if (prop.title === sidebarProperty.friendList)
       io.emit("friendList", userId);
@@ -60,7 +53,31 @@ function SideBar(prop: sidebarProps) {
 
     // io.on("sidebarItems", userList);
     
-  }, [userList]);
+  }, []);
+
+  
+
+  useEffect(() => {
+    const addMember = (newMemArr: userItemProps[]) => {
+      setUserList(newMemArr)
+    }
+    const removeMember = (leavedArr: userItemProps[]) => {
+      setUserList(leavedArr);
+    }
+
+    if (prop.title === sidebarProperty.chatMemberList) {
+      ioChannel.on("channelMemberAdd", (newMember: userItemProps) => {
+        if (!userList.some(user => user.id === newMember.id)) {
+          const newMemArr = [...userList, newMember]
+          addMember(newMemArr);
+        } 
+      });
+      ioChannel.on("channelMemberRemove", (userId) => {
+        const leavedArr = userList.filter(user => user.id !== userId);
+        removeMember(leavedArr);
+      });
+    }
+  }, [userList, prop.title])
 
   // to test
   const tempInfo: userItemProps = {
