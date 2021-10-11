@@ -85,7 +85,7 @@ export class ChannelGateway
       const newMember = {
         id: client.user.id,
         nickname: client.user.nickname.toString(),
-        avatart: client.user.avatar.toString(),
+        avatar: client.user.avatar.toString(),
         status: client.user.status,
       };
       this.server.to(data.toString()).emit('channelMemberAdd', newMember);
