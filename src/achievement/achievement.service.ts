@@ -23,10 +23,10 @@ export class AchievementService {
     })
   }
 
-  async getAchievementByUser(user: User) {
+  async getAchievementByUser(userId: number) {
     const achievementList = await this.userAchievementRepository.find({
       where: {
-        userId: user.id,
+        userId: userId,
       },
       relations: ['achievement'],
     });
