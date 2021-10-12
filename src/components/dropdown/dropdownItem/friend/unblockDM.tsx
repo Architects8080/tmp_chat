@@ -1,5 +1,5 @@
 import React from "react";
-import { io } from "../../../../socket/socket";
+import { ioCommunity } from "../../../../socket/socket";
 import DefaultDropdownItem from "../../itemTemplate/default/item";
 
 type props = {
@@ -8,7 +8,10 @@ type props = {
 
 function UnblockDMItem(prop: props) {
   const handleUnblockDM = () => {
-    io.emit("dm/unblock", prop.targetId); //TODO
+    ioCommunity.emit("relationDeleteToServer", {
+      otherID: prop.targetId,
+      isFriendly: false
+    });
   };
 
   return (

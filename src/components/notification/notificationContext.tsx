@@ -1,26 +1,5 @@
 import React, { useReducer, createContext, useContext, Dispatch } from "react";
 
-const testNoti: Notification[] = [
-	{
-		title: "test1",
-		description: "polarbear 님의 친구 신청입니다. 수락하시겠습니까?",
-		acceptCallback: () => {},
-		rejectCallback: () => {}
-	},
-	{
-		title: "test2",
-		description: "polarbear 님의 친구 신청입니다. 수락하시겠습니까?",
-		acceptCallback: () => {},
-		rejectCallback: () => {}
-	},
-	{
-		title: "test3",
-		description: "polarbear 님의 채팅방 초대입니다. 수락하시겠습니까?",
-		acceptCallback: () => {},
-		rejectCallback: () => {}
-	}
-];
-
 export type Notification = {
 	title: string;
 	description: string;
@@ -48,7 +27,7 @@ const NotiStateContext = createContext<Notification[] | undefined>(undefined);
 const NotiDispatchContext = createContext<Dispatch<Action> | undefined>(undefined);
 
 export function NotificationProvider({children}: { children: React.ReactNode }) {
-  const [state, dispatch] = useReducer(NotificationReducer, testNoti);
+  const [state, dispatch] = useReducer(NotificationReducer, []);
   return (
     <NotiStateContext.Provider value={state}>
       <NotiDispatchContext.Provider value={dispatch}>

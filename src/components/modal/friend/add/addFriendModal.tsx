@@ -43,8 +43,9 @@ function AddFriendModal(prop: addFriendModalProps) {
   const handleSubmitEvent = () => {
     console.log(`userInput : `, input);
 
+    // !!TO DO - nickname(input)으로 id 찾기
     //io.emit -> nickname send
-    ioCommunity.emit("friendRequestToServer", 1);
+    ioCommunity.emit("requestToServer", {otherID: 1, isFriendly: true});
     //io.on -> get result code
     ioCommunity.on("friendResponseToClient", (code: number) => {
       //set Result Text

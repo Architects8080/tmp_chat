@@ -33,10 +33,7 @@ function SideBar(prop: sidebarProps) {
   const handleModalOpen = modalHandler.handleModalOpen;
   const handleModalClose = modalHandler.handleModalClose;
 
-  // var userId: number;
-
   // first render -> get userList according to sidebarType(prop.title)
-  // var userList: any;
   useEffect(() => {
     if (prop.title === sidebarProperty.chatMemberList)
       ioChannel.emit("chatMemberList", prop.roomId);
@@ -44,44 +41,6 @@ function SideBar(prop: sidebarProps) {
       fetchFriendList();
     else if (prop.title === sidebarProperty.observerList)
       ioChannel.emit("observerList", prop.roomId);
-
-    // io.on("sidebarItems", userList);
-    //친구 요청 수신
-    ioCommunity.on("friendRequestToClient", async (friend: number) => {
-      const response = await axios.get(
-				`${process.env.REACT_APP_SERVER_ADDRESS}/user/${friend}`,
-				{
-					withCredentials: true,
-				}
-			);
-      notiDispatch({
-        type: "ADD",
-        Notification: {
-          title: "친구 요청",
-          description: `${response.data.nickname}님의 친구 신청입니다. 수락하시겠습니까?`,
-          acceptCallback: () => {
-            ioCommunity.emit("friendAcceptToServer", {friendID: friend});
-          },
-          rejectCallback: () => {}
-        }
-      })
-    });
-
-    //친구 수락 수신
-    ioCommunity.on("friendAcceptToClient", async (friend: number) => {
-      const response = await axios.get(
-				`${process.env.REACT_APP_SERVER_ADDRESS}/user/${friend}`,
-				{
-					withCredentials: true,
-				}
-			);
-      setUserList(userList => [...userList, {
-        id: friend,
-        avatar: response.data.avatar,
-        status: status.online,
-        nickname: response.data.nickname
-      }]);
-    });
   }, []);
 
   // to contextMenu
@@ -118,6 +77,7 @@ function SideBar(prop: sidebarProps) {
     setResult(dropdownMenuInfo);
   };
 
+  // FriendList func
   const fetchFriendList = async () => {
 		try {
       let newUserList: userItemProps[] = [];
@@ -128,7 +88,7 @@ function SideBar(prop: sidebarProps) {
 				}
 			);
 			response.data.map((user: any) => newUserList.push({
-				id: user.otherID,
+				id: user.other.id,
 				avatar: user.other.avatar,
         status: status.online,
         nickname: user.other.nickname
@@ -139,6 +99,67 @@ function SideBar(prop: sidebarProps) {
 			console.log(`[FriendListError] ${e}`);
 		}
 	};
+
+  useEffect(() => {
+    //친구 요청 수신
+    ioCommunity.on("friendRequestToClient",
+    async (id: number, nickname: string) => {
+      notiDispatch({
+        type: "ADD",
+        Notification: {
+          title: "친구 요청",
+          description: `${nickname}님의 친구 신청입니다. 수락하시겠습니까?`,
+          acceptCallback: () => {
+            ioCommunity.emit("friendAcceptToServer", id);
+          },
+          rejectCallback: () => {}
+        }
+      })
+    });
+
+    //친구 수락 수신
+    ioCommunity.on("friendAcceptToClient", async (friendID: number) => {
+      const response = await axios.get(
+        `${process.env.REACT_APP_SERVER_ADDRESS}/user/${friendID}`,
+        { withCredentials: true, }
+      );
+      setUserList(userList => [...userList, {
+        id: friendID,
+        avatar: response.data.avatar,
+        status: status.online,
+        nickname: response.data.nickname
+      }]);
+    });
+
+    //친구 차단 수신
+    ioCommunity.on("blockResponseToClient", async (friendID: number) => {
+      setUserList(userList => userList.filter(user => user.id !== friendID));
+    });
+
+    //친구or차단 취소 수신
+    ioCommunity.on("relationDeleteToClient",
+    async (id: number, isFriendly: boolean) => {
+      if (isFriendly)
+        setUserList(userList => userList.filter(user => user.id !== id));
+      else {
+        try {
+          const response = await axios.get(
+            `${process.env.REACT_APP_SERVER_ADDRESS}/community/${id}`,
+            { withCredentials: true }
+          );
+          if (response)
+            setUserList(userList => [...userList, {
+              id: id,
+              avatar: response.data.avatar,
+              status: status.online,
+              nickname: response.data.nickname
+            }]);
+        } catch (e) {
+          console.log(`[relationDeleteToClient] ${e}`);
+        }
+      }
+    });
+  }, []);
 
   return (
     <aside>
