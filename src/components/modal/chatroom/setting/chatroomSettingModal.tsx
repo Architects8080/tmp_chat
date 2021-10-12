@@ -1,5 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import RadioButton from "../../../button/radio/radio";
+import { roomType } from "../create/chatroomCreateModal";
 import "./chatroomSettingModal.scss";
 
 type chatroomSettingModalProps = {
@@ -8,12 +10,16 @@ type chatroomSettingModalProps = {
   roomId: number;
 };
 
-function ChatroomSettingModal(prop: chatroomSettingModalProps) {
-  const Title = "채팅방 설정";
+const ChatroomSettingModal = (prop: chatroomSettingModalProps) => {
+  const modalTitle = "채팅방 설정";
   const Description = "채팅방 설정을 변경해보세요.";
 
   const roomPlaceholder = "방 제목";
   const buttonTitle = "변경하기";
+
+  const [title, setTitle] = useState("");
+  const [selectedRoomType, setSelectedRoomType] = useState(roomType.publicRoom);
+  const [password, setPassword] = useState("");
 
   const [descriptionText, setDescriptionText] = useState(
     "비밀번호는 숫자 4자리로 구성 가능합니다."
@@ -23,8 +29,7 @@ function ChatroomSettingModal(prop: chatroomSettingModalProps) {
   const handleUserInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
     setDescriptionText("비밀번호는 숫자 4자리로 구성 가능합니다.");
-    console.log(Number(e.target.value), e.target.value.length);
-    if (e.target.value.length != 4)
+    if (e.target.value.length !== 4)
       setErrorText("비밀번호를 숫자 4자리로 구성해주세요.");
     else if (
       isNaN(Number(e.target.value)) ||
@@ -36,7 +41,6 @@ function ChatroomSettingModal(prop: chatroomSettingModalProps) {
       setErrorText("");
       setDescriptionText("");
     }
-    console.log(`[DEBUG] user password : `, password);
   };
 
   const handleClose = () => {
@@ -44,15 +48,23 @@ function ChatroomSettingModal(prop: chatroomSettingModalProps) {
     prop.close();
   };
 
-  const handleSubmitEvent = () => {
-    if (errorText == "") {
-      console.log(`emit password : `, password);
-      //io.emit(password) to create gameroom
+  const handleSubmitEvent = async () => {
+    if (errorText === "" && title !== '') {
+      try {
+        await axios.put(process.env.REACT_APP_SERVER_ADDRESS + "/channel/" + prop.roomId,
+        {
+          title,
+          type: selectedRoomType,
+          password,
+        }, { withCredentials: true }
+      );
+      prop.close();
+      } catch (e) {
+        console.log(e);
+        setErrorText("권한이 없습니다");
+      }
     }
   };
-
-  const [selectedInput, setSelectedInput] = useState("");
-  const [password, setPassword] = useState("");
 
   useEffect(() => {
     //io.on(getChatroomSettings)
@@ -60,13 +72,17 @@ function ChatroomSettingModal(prop: chatroomSettingModalProps) {
     // 2. private
     // 3. protected, password
 
-    setSelectedInput("option-3");
-    setPassword("1243");
+    // setSelectedRoomType(roomType.publicRoom);
+    // setPassword("1243");
   }, []);
 
-  const handleChange = (inputValue: string) => {
-    console.log(inputValue);
-    setSelectedInput(inputValue);
+  const handleChange = (type: number) => {
+    (type == roomType.publicRoom) ? setSelectedRoomType(roomType.publicRoom) :
+      (type == roomType.privateRoom) ? setSelectedRoomType(roomType.privateRoom) : setSelectedRoomType(roomType.protectedRoom);
+    if (type != roomType.protectedRoom) {
+      setErrorText("");
+      setPassword("");
+    }     
   };
 
   return (
@@ -75,7 +91,7 @@ function ChatroomSettingModal(prop: chatroomSettingModalProps) {
     >
       <div className="chatroom-setting-modal-wrap">
         <div className="modal-header">
-          <div className="title">{Title}</div>
+          <div className="title">{modalTitle}</div>
           <img
             className="close"
             src="/icons/modal/close.svg"
@@ -90,6 +106,8 @@ function ChatroomSettingModal(prop: chatroomSettingModalProps) {
           <input
             className="roomTitle"
             type="text"
+            value={title}
+            onChange={e => setTitle(e.target.value)}
             placeholder={roomPlaceholder}
           ></input>
         </div>
@@ -99,28 +117,28 @@ function ChatroomSettingModal(prop: chatroomSettingModalProps) {
           <div className="select">
             <RadioButton
               name="option"
-              value="option-1"
+              value={0}
               label="Public"
-              isChecked={selectedInput === "option-1"}
+              isChecked={selectedRoomType === roomType.publicRoom}
               handleChange={handleChange}
             />
             <RadioButton
               name="option"
-              value="option-2"
+              value={1}
               label="Private"
-              isChecked={selectedInput === "option-2"}
+              isChecked={selectedRoomType === roomType.privateRoom}
               handleChange={handleChange}
             />
             <RadioButton
               name="option"
-              value="option-3"
+              value={2}
               label="Protected"
-              isChecked={selectedInput === "option-3"}
+              isChecked={selectedRoomType === roomType.protectedRoom}
               handleChange={handleChange}
             />
             <div
               className={
-                selectedInput === "option-3"
+                selectedRoomType === roomType.protectedRoom
                   ? "password-open"
                   : "password-close"
               }
@@ -141,12 +159,14 @@ function ChatroomSettingModal(prop: chatroomSettingModalProps) {
         {/* show or not */}
         <div
           className={
-            selectedInput === "option-3" ? "protected-open" : "protected-close"
+            selectedRoomType === roomType.protectedRoom ? "protected-open" : "protected-close"
           }
         >
           <div className="protected-description">{descriptionText}</div>
           <div className="protected-error">{errorText}</div>
         </div>
+        <div className={
+          selectedRoomType !== roomType.protectedRoom ? "role-error": "protected-close"}>{errorText}</div>
 
         <div className="submit-wrap">
           <div className="submit" onClick={handleSubmitEvent}>

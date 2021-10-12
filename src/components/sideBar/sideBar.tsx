@@ -19,7 +19,6 @@ import {
   dropdownMenuInfo,
   sidebarProperty,
   sidebarProps,
-  status,
   userItemProps,
 } from "./sideBarType";
 
@@ -34,14 +33,56 @@ function SideBar(prop: sidebarProps) {
   const handleModalClose = modalHandler.handleModalClose;
 
   // first render -> get userList according to sidebarType(prop.title)
+  // var userList: any;
+  const [userList, setUserList] = useState<userItemProps[]>([]);
   useEffect(() => {
-    if (prop.title === sidebarProperty.chatMemberList)
-      ioChannel.emit("chatMemberList", prop.roomId);
+
+    const getChannelmember = async () => {
+      const data = await axios.get(
+        process.env.REACT_APP_SERVER_ADDRESS + `/channel/members/${prop.roomId}`,
+        { withCredentials: true }
+      );
+      setUserList(data.data);
+    }
+    if (prop.title === sidebarProperty.chatMemberList) {
+      getChannelmember();
+    }
     else if (prop.title === sidebarProperty.friendList)
       fetchFriendList();
     else if (prop.title === sidebarProperty.observerList)
       ioChannel.emit("observerList", prop.roomId);
   }, []);
+  
+
+  useEffect(() => {
+    const addMember = (newMemArr: userItemProps[]) => {
+      setUserList(newMemArr)
+    }
+    const removeMember = (leavedArr: userItemProps[]) => {
+      setUserList(leavedArr);
+    }
+
+    if (prop.title === sidebarProperty.chatMemberList) {
+      ioChannel.on("channelMemberAdd", (newMember: userItemProps) => {
+        if (!userList.some(user => user.id === newMember.id)) {
+          const newMemArr = [...userList, newMember]
+          addMember(newMemArr);
+        } 
+      });
+      ioChannel.on("channelMemberRemove", (userId) => {
+        const leavedArr = userList.filter(user => user.id !== userId);
+        removeMember(leavedArr);
+      });
+    }
+  }, [userList, prop.title])
+
+  // to test
+  const tempInfo: userItemProps = {
+    id: 1,
+    avatar: "https://cdn.intra.42.fr/users/yhan.jpg",
+    status: 1,
+    nickname: "yhan",
+  };
 
   // to contextMenu
   const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
@@ -192,17 +233,24 @@ function SideBar(prop: sidebarProps) {
         </div>
       </div>
       <div className="user-list">
-        {/* itemType: same as prop.title */}
-        {userList.map(user => (
-          <SidebarItem
-            itemType={prop.title}
-            itemInfo={user}
-            contextMenuHandler={contextMenuHandler}
-            roomId={1}
-            userId={2}
-            targetId={user.id}
-          />
-        ))}
+        {userList ? 
+        userList.map(item => 
+          <SidebarItem itemType={prop.title}
+          key={item.id}
+          itemInfo={item}
+          contextMenuHandler={contextMenuHandler}
+          roomId={prop.roomId}
+          userId={2}
+          targetId={3} />
+        ) : null}
+        <SidebarItem
+          itemType={prop.title}
+          itemInfo={tempInfo}
+          contextMenuHandler={contextMenuHandler}
+          roomId={1}
+          userId={2}
+          targetId={3}
+        />
       </div>
 
       {/* anchorPoint, dropdownMenuInfo, userId, targetId */}
