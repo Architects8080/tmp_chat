@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { OffsetWithoutLimitNotSupportedError, Repository } from 'typeorm';
 import { CommunityDto } from './dto/community';
 import { Block, Friend } from './entity/community.entity';
 
@@ -35,19 +35,27 @@ export class CommunityService {
   }
 
   async getRelationships(userID: number, isFriendly: boolean) {
-    if (isFriendly)
-      return await this.friendRepository.find({
-        relations: ["other"],
-        where: { userID: userID }
-      });
+    if (isFriendly) {
+      const blockList = await this.blockRepository.createQueryBuilder('block')
+      .select("block.otherID")
+      .where("block.userID = :userID", { userID: userID });
+
+      return await this.friendRepository.createQueryBuilder('friend')
+      .where("friend.userID = :userID", { userID: userID })
+      .andWhere(`friend.otherID NOT IN (${blockList.getSql()})`)
+      .leftJoinAndSelect("friend.other", "other")
+      .orderBy("other.nickname", "ASC")
+      .getMany();
+    }
     else
       return await this.blockRepository.find({
         relations: ["other"],
+        select: ["other"],
         where: { userID: userID }
       });
   }
 
-  async getRelationshipByID(relationship: CommunityDto) {
+  async getFriendByID(relationship: CommunityDto) {
     const result = await this.friendRepository.findOne({
       where: { userID: relationship.userID, otherID: relationship.otherID }
     });

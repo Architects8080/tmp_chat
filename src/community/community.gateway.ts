@@ -18,6 +18,7 @@ import { CommunityService } from './community.service';
 import { SendDMDto } from 'src/dm/dto/sendDM';
 import { DmService } from 'src/dm/dm.service';
 import { UserService } from 'src/user/user.service';
+import { CommunityDto } from './dto/community';
 
 enum Result {
   Default = 0,
@@ -88,44 +89,69 @@ export class CommunityGateway implements OnGatewayConnection, OnGatewayDisconnec
     if (friend) friend.emit('dmToClient', newDM);
   }
 
-  @SubscribeMessage('friendRequestToServer')
+  @SubscribeMessage('requestToServer')
   async requestMessage(
+    @MessageBody() body: { otherID: number, isFriendly: boolean },
+  	@ConnectedSocket() client: SocketUser
+  ) {
+    const friend = await this.socketUserService.getSocketById(body.otherID);
+    const relationship: CommunityDto = {
+      userID: client.user.id,
+      otherID: body.otherID
+    };
+
+    if (body.isFriendly) {
+      let responseCode = Result.Success;
+
+      try {
+        await this.userService.getUserById(body.otherID);
+      }
+      catch (e) { responseCode = Result.NotFoundUser; }
+      try {
+        const result = await this.communityService.getFriendByID(relationship);
+        if (result) responseCode = Result.AlreadyFriend;
+      }
+      catch (e) {}
+      if (client.user.id == body.otherID) responseCode = Result.Myself;
+
+      if (friend) friend.emit('friendRequestToClient', client.user.id, client.user.nickname);
+      client.emit('friendResponseToClient', responseCode);
+    }
+    else {
+      this.communityService.setRelationship(relationship, false);
+      if (client) client.emit('blockResponseToClient', body.otherID);
+    }
+  }
+
+  @SubscribeMessage('friendAcceptToServer')
+  async acceptFriend(
     @MessageBody() friendID: number,
   	@ConnectedSocket() client: SocketUser
   ) {
     const friend = await this.socketUserService.getSocketById(friendID);
-    let responseCode = Result.Success;
-
-    if (friend) friend.emit('friendRequestToClient', client.user.id);
-
-    try {
-      await this.userService.getUserById(friendID);
-    }
-    catch (e) { responseCode = Result.NotFoundUser; }
-    try {
-      const result = await this.communityService.getRelationshipByID({
-        userID: client.user.id,
-        otherID: friendID
-      });
-      if (result) responseCode = Result.AlreadyFriend;
-    }
-    catch (e) {}
-    if (client.user.id == friendID) responseCode = Result.Myself;
-
-    client.emit('friendResponseToClient', responseCode);
-  }
-
-  @SubscribeMessage('friendAcceptToServer')
-  async replyMessage(
-    @MessageBody() reply: {friendID: number},
-  	@ConnectedSocket() client: SocketUser
-  ) {
-    const friend = await this.socketUserService.getSocketById(reply.friendID);
     this.communityService.setRelationship({
       userID: client.user.id,
-      otherID: reply.friendID
+      otherID: friendID
     }, true);
-    if (client) client.emit('friendAcceptToClient', reply.friendID);
+    if (client) client.emit('friendAcceptToClient', friendID);
     if (friend) friend.emit('friendAcceptToClient', client.user.id);
+  }
+
+  @SubscribeMessage('relationDeleteToServer')
+  async deleteRelationship(
+    @MessageBody() body: { otherID: number, isFriendly: boolean },
+  	@ConnectedSocket() client: SocketUser
+  ) {
+    const friend = await this.socketUserService.getSocketById(body.otherID);
+    const relationship: CommunityDto = {
+      userID: client.user.id,
+      otherID: body.otherID
+    };
+
+    this.communityService.deleteRelationshipByID(relationship, body.isFriendly);
+    if (client)
+      client.emit('relationDeleteToClient', body.otherID, body.isFriendly);
+    if (friend && body.isFriendly)
+      friend.emit('relationDeleteToClient', client.user.id, body.isFriendly);
   }
 }
