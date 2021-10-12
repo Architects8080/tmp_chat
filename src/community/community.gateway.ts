@@ -118,7 +118,7 @@ export class CommunityGateway implements OnGatewayConnection, OnGatewayDisconnec
       client.emit('friendResponseToClient', responseCode);
     }
     else {
-      this.communityService.setRelationship(relationship, false);
+      await this.communityService.setRelationship(relationship, false);
       if (client) client.emit('blockResponseToClient', body.otherID);
     }
   }
