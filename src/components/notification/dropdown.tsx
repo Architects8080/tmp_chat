@@ -7,11 +7,12 @@ import "./dropdown.scss";
 
 type DropdownProps = {
   isActive: boolean;
+  nicknameLength: number;
 };
 
 function NotificationOverlay(prop: DropdownProps) {
   return (
-    <div className="notification-wrap">
+    <div className="notification-wrap" style={{right: (40 + 48 + 50 + prop.nicknameLength * 10.9)}}>
       <div className={`dropdown ${prop.isActive ? "active" : "inactive"}`}>
         <NotificationItem
           title="test"
