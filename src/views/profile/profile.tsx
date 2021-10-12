@@ -1,3 +1,4 @@
+import { Match } from "@testing-library/dom";
 import axios from "axios";
 import { userInfo } from "os";
 import React, { useEffect, useState } from "react";
@@ -12,66 +13,24 @@ import { sidebarProperty } from "../../components/sideBar/sideBarType";
 import snackbar from "../../components/snackbar/snackbar";
 import GameLogItem from "./gamelog/item";
 import "./profile.scss";
-
-type User = {
-  id: number;
-  nickname: string;
-  intraLogin: string;
-  avatar: string;
-  status: number;
-  ladderPoint: number;
-  ladderLevel: number;
-};
-
-type Match = {
-  id: number;
-  gameType: number;
-  startAt: Date;
-  endAt: Date;
-  gameTime: number;
-  players: MatchPlayer[];
-  targetId: number;
-};
-
-type MatchPlayer = {
-  match: Match;
-  matchId: number;
-  user: User;
-  userId: number;
-  score: number;
-  isLeft: boolean;
-  isWinner: boolean;
-  ladderPoint: number;
-  ladderIncrease: number;
-};
-
-type MatchRatio = {
-  win: number;
-  lose: number;
-  total: number;
-};
+import { Achievement, MatchRatio, User } from "./profileType";
 
 function Profile() {
   const modalHandler = ModalHandler();
-  const [isEmpty, setIsEmpty] = useState(false);
-
   const { id } = useParams<{ id: string }>();
 
   const [user, setUser] = useState<User | null>(null);
-  const [matchList, setMatchList] = useState<Match[] | null>(null);
-  const [achievementInfo, setAchievementInfo] = useState(null);
   const [topRate, setTopRate] = useState<string>("100");
+  const [matchList, setMatchList] = useState<Match[] | null>(null);
+  const [achievedList, setAchievedList] = useState<Achievement[] | null>(null);
+  const achievementTitle = ['10회 승리', '5연속 승리', '5연속 퍼펙트 게임', '50전 이상 플레이', 'OTP 등록'];
 
   const [winRatio, setWinRatio] = useState<MatchRatio | null>(null);
-  // const matchInfo;
-  // const achievementInfo;
-
   const [search, setSearch] = useState("");
 
   const searchUser = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key !== "Enter" || search === "") return;
 
-    //TODO
     axios
       .get(`http://localhost:5000/user/search/${search}`, {
         withCredentials: true,
@@ -90,48 +49,32 @@ function Profile() {
     var total = 0;
 
     axios
-      .all([
-        axios.get("http://localhost:5000/user/", { withCredentials: true }),
-        axios.get("http://localhost:5000/user/" + id, {
-          withCredentials: true,
-        }),
-        axios.get("http://localhost:5000/match/user/" + id, {
-          withCredentials: true,
-        }),
-        //axios.get("http://localhost:5000/achievement/" + id, {withCredentials: true}),
-      ])
-      .then(
-        axios.spread((userList, userInfo, matchList) => {
-          //achievementList
+    .all([
+      axios.get("http://localhost:5000/user/", { withCredentials: true }),
+      axios.get("http://localhost:5000/user/" + id, { withCredentials: true }),
+      axios.get("http://localhost:5000/match/user/" + id, { withCredentials: true }),
+      axios.get("http://localhost:5000/achievement/" + id, {withCredentials: true}),
+    ])
+    .then(
+      axios.spread((userList, userInfo, matchList, achievementList) => { //achievementList
+        setUser(userInfo.data);
+        setTopRate(((userInfo.data.ladderLevel) / userList.data.length).toFixed(2).toString());
+        setMatchList(matchList.data);
+        setAchievedList(achievementList.data);
+        matchList.data.map((match: any) => {
+          if (match.players[0].userId == userInfo.data.id && match.players[0].isWinner == true ||
+              match.players[0].userId != userInfo.data.id && match.players[0].isWinner == false)
+            win++;
+          total++;
+        });
 
-          console.log(`userList : `, userList.data);
-          console.log(`userInfo : `, userInfo.data);
-          console.log(`matchList : `, matchList.data);
-          setUser(userInfo.data);
-          setTopRate(
-            (userInfo.data.ladderLevel / userList.data.length)
-              .toFixed(2)
-              .toString()
-          );
-          setMatchList(matchList.data);
+        setWinRatio({win: win, total: total, lose: total - win});
+      })
+    )
+    .catch((err) => {
+      window.location.href = "http://localhost:3000/main";
+    });
 
-          matchList.data.map((match: any) => {
-            if (
-              (match.players[0].userId == userInfo.data.id &&
-                match.players[0].isWinner == true) ||
-              (match.players[0].userId != userInfo.data.id &&
-                match.players[0].isWinner == false)
-            )
-              win++;
-            total++;
-          });
-
-          setWinRatio({ win: win, total: total, lose: total - win });
-        })
-      )
-      .catch((err) => {
-        window.location.href = "http://localhost:3000/main";
-      });
   }, []);
 
   return (
@@ -170,7 +113,6 @@ function Profile() {
                     </div>
                   </div>
                 </div>
-                {/* show info from server */}
               </div>
             ) : (
               ""
@@ -178,7 +120,6 @@ function Profile() {
 
             <div className="profile-side">
               <div className="profile-searchbar">
-                {/* keyevent */}
                 <img
                   className="search-icon"
                   alt="search-icon"
@@ -193,12 +134,13 @@ function Profile() {
                 />
               </div>
               <div className="achievement-list">
-                {/* TODO : get API & setting*/}
-                <AchievementItem title={"승리 10회"} isAchieve={false} />
-                <AchievementItem title={"패배 10회"} isAchieve={false} />
-                <AchievementItem title={"OTP 등록"} isAchieve={false} />
-                <AchievementItem title={"채팅방 첫 접속"} isAchieve={false} />
-                <AchievementItem title={"친구 100명 달성"} isAchieve={false} />
+                { achievementTitle.map((title, index) => {
+                    if (achievedList && achievedList.length != 0 && achievedList.find(achievement => achievement.id == index + 1))
+                      return <AchievementItem title={title} isAchieve={true} />
+                    else
+                      return <AchievementItem title={title} isAchieve={false} />
+                  })
+                }
               </div>
             </div>
           </div>
