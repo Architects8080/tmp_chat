@@ -19,6 +19,14 @@ import { SendDMDto } from 'src/dm/dto/sendDM';
 import { DmService } from 'src/dm/dm.service';
 import { UserService } from 'src/user/user.service';
 
+enum Result {
+  Default = 0,
+  Success,
+  NotFoundUser,
+  AlreadyFriend,
+  Myself,
+}
+
 @UseGuards(JwtAuthGuard)
 @WebSocketGateway(4500, { namespace: 'community' })
 export class CommunityGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -86,26 +94,25 @@ export class CommunityGateway implements OnGatewayConnection, OnGatewayDisconnec
   	@ConnectedSocket() client: SocketUser
   ) {
     const friend = await this.socketUserService.getSocketById(friendID);
+    let responseCode = Result.Success;
+
     if (friend) friend.emit('friendRequestToClient', client.user.id);
-    // // [NotFoundUser]
-    // try {
-    //   this.userService.getUserById(friendID);
-    // }
-    // catch (e) {
-    //   client.emit('friendReplyToClient', client.user.id, 2);
-    // }
-    // // [AlreadyFriend]
-    // try {
-    //   this.communityService.getRelationshipByID({
-    //     userID: client.user.id,
-    //     otherID: friendID
-    //   });
-    // }
-    // catch (e) {
-    //   client.emit('friendReplyToClient', client.user.id, 3);
-    // }
-    // [Success]
-    client.emit('friendReplyToClient', client.user.id, 1);
+
+    try {
+      await this.userService.getUserById(friendID);
+    }
+    catch (e) { responseCode = Result.NotFoundUser; }
+    try {
+      const result = await this.communityService.getRelationshipByID({
+        userID: client.user.id,
+        otherID: friendID
+      });
+      if (result) responseCode = Result.AlreadyFriend;
+    }
+    catch (e) {}
+    if (client.user.id == friendID) responseCode = Result.Myself;
+
+    client.emit('friendResponseToClient', responseCode);
   }
 
   @SubscribeMessage('friendAcceptToServer')
