@@ -14,6 +14,7 @@ import { MatchModule } from './match/match.module';
 import { DmModule } from './dm/dm.module';
 import { CommunityModule } from './community/community.module';
 import { ChannelModule } from './channel/channel.module';
+import { AchievementModule } from './achievement/achievement.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { ChannelModule } from './channel/channel.module';
     DmModule,
     CommunityModule,
     ChannelModule,
+    AchievementModule,
   ],
   controllers: [AppController],
   providers: [AppService],
