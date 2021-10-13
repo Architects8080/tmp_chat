@@ -1,37 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { Match, MatchPlayer } from "../profileType";
 import "./item.scss";
-
-type User = {
-  id: number;
-  nickname: string;
-  intraLogin: string;
-  avatar: string;
-  status: number;
-  ladderPoint: number;
-  ladderLevel: number;
-}
-
-type Match = {
-  id: number;
-  gameType: number;
-  startAt: Date;
-  endAt: Date;
-  gameTime: number;
-  players: MatchPlayer[];
-  targetId: number;
-}
-
-type MatchPlayer = {
-  match: Match;
-  matchId: number;
-  user: User;
-  userId: number;
-  score: number;
-  isLeft: boolean;
-  isWinner: boolean;
-  ladderPoint: number;
-  ladderIncrease: number;
-}
 
 function GameLogItem(match: Match) {
 
@@ -64,6 +33,10 @@ function GameLogItem(match: Match) {
     if (match.targetId === leftPlayer.userId && leftPlayer.isWinner ||
         match.targetId === rightPlayer.userId && rightPlayer.isWinner)
       setIsVictory(true);
+    if (!match.players[0].isLeft) {
+      setLeftPlayer(match.players[1]);
+      setRightPlayer(match.players[0]);
+    }
   }, []);
 
   return (
@@ -71,9 +44,9 @@ function GameLogItem(match: Match) {
       <div className="gamelog-item">
         <div className={"gamelog " + (isVictory ? "win" : "lose")}>
           <div className="gamestats">
-            <div className="gameinfo">{match.gameType}</div> {/* TODO */}
+            <div className="gameinfo">{match.gameType}</div>
             <div className="timestamp">{timestamp}</div>
-            <div className={"gameresult " + (isVictory ? "win" : "lose")}>{isVictory ? "Victory" : "Defeat"}</div> {/* gameResult lose*/}
+            <div className={"gameresult " + (isVictory ? "win" : "lose")}>{isVictory ? "Victory" : "Defeat"}</div>
             <div className="gamelength">{gamelength}</div>
           </div>
         </div>
