@@ -114,7 +114,8 @@ export class CommunityGateway implements OnGatewayConnection, OnGatewayDisconnec
       catch (e) {}
       if (client.user.id == body.otherID) responseCode = Result.Myself;
 
-      if (friend) friend.emit('friendRequestToClient', client.user.id, client.user.nickname);
+      if (friend && responseCode == Result.Success)
+        friend.emit('friendRequestToClient', client.user.id, client.user.nickname);
       client.emit('friendResponseToClient', responseCode);
     }
     else {
