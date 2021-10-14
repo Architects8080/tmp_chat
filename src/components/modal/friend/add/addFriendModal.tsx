@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { useRef, useState } from "react";
 import { ioCommunity } from "../../../../socket/socket";
 import "./addFriendModal.scss";
@@ -40,29 +41,43 @@ function AddFriendModal(prop: addFriendModalProps) {
     prop.close();
   };
 
-  const handleSubmitEvent = () => {
-    console.log(`userInput : `, input);
+  const handleSubmitEvent = async () => {
+    if (input == "") {
+      setResultText("");
+      return;
+    }
 
-    // !!TO DO - nickname(input)으로 id 찾기
-    //io.emit -> nickname send
-    ioCommunity.emit("requestToServer", {otherID: 1, isFriendly: true});
-    //io.on -> get result code
-    ioCommunity.on("friendResponseToClient", (code: number) => {
-      //set Result Text
-      setresultCode(code);
-      if (code == Result.AlreadyFriend)
-        setResultText(input + "님과는 이미 친구입니다.");
-      else if (code == Result.Success)
-        setResultText("친구 신청을 보냈습니다!");
-      else if (code == Result.NotFoundUser)
-        setResultText("존재하지 않는 플레이어입니다. 다시 시도해주세요.");
-      else if (code == Result.Myself)
-        setResultText("본인 외의 플레이어를 입력해주세요.");
-      console.log("code: "+code);
-    });
-    // if (input == "ina") resultCode.current = 3;
-    // else if (input == "yhan") resultCode.current = 1;
-    // else resultCode.current = 2;
+    try {
+      await axios.get(
+        `${process.env.REACT_APP_SERVER_ADDRESS}/user/search/${input}`,
+        { withCredentials: true }
+      )
+      .then((response) => {
+        //io.emit -> nickname send
+        ioCommunity.emit("requestToServer", {otherID: response.data.id, isFriendly: true});
+        //io.on -> get result code
+        ioCommunity.on("friendResponseToClient", (code: number) => {
+          //set Result Text
+          setresultCode(code);
+          if (code == Result.AlreadyFriend)
+            setResultText(input + "님과는 이미 친구입니다.");
+          else if (code == Result.Success)
+            setResultText("친구 신청을 보냈습니다!");
+          else if (code == Result.NotFoundUser)
+            setResultText("존재하지 않는 플레이어입니다. 다시 시도해주세요.");
+          else if (code == Result.Myself)
+            setResultText("본인 외의 플레이어를 입력해주세요.");
+        });
+      })
+      .catch (e => {
+        if (e.response.data.statusCode === 404)
+          setResultText("존재하지 않는 플레이어입니다. 다시 시도해주세요.");
+      });
+    } catch (e) {
+      console.log(`[addFriendModal] ${e}`);
+    }
+
+    setInput("");
   };
 
   return (
