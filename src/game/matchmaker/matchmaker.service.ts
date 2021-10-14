@@ -36,30 +36,36 @@ export class MatchmakerService {
 
   loop() {
     return () => {
-      const user = this.waitingQueue.pop();
-      if (!user) return;
-      for (const target of this.waitingQueue.heap) {
-        if (Math.abs(user.ladderPoint - target.ladderPoint) < 100) {
-          user.hasRoom = true;
-          target.hasRoom = true;
-          const room = this.gameRepository.createGameRoom();
-          room.player1 = { id: user.userId, isAccept: false };
-          room.player2 = { id: target.userId, isAccept: false };
-          room.isObstacle = false;
-          room.mapType = 1;
-          room.gameType = GameType.LADDER;
-          if (
-            this.sendInviteRoom(user.userId, target.userId, room.socketRoomId)
-          ) {
-            this.waitingQueue.remove(target);
-            break;
+      const failedUserList = [];
+      while (this.waitingQueue.heap.length > 0) {
+        const user = this.waitingQueue.pop();
+        if (!user) return;
+        for (const target of this.waitingQueue.heap) {
+          if (Math.abs(user.ladderPoint - target.ladderPoint) < 100) {
+            user.hasRoom = true;
+            target.hasRoom = true;
+            const room = this.gameRepository.createGameRoom();
+            room.player1 = { id: user.userId, isAccept: false };
+            room.player2 = { id: target.userId, isAccept: false };
+            room.isObstacle = false;
+            room.mapType = 1;
+            room.gameType = GameType.LADDER;
+            if (
+              this.sendInviteRoom(user.userId, target.userId, room.socketRoomId)
+            ) {
+              this.waitingQueue.remove(target);
+              break;
+            }
+            target.hasRoom = false;
+            this.gameRepository.deleteGameRoom(room.socketRoomId);
           }
-          target.hasRoom = false;
-          this.gameRepository.deleteGameRoom(room.socketRoomId);
         }
+        // 매칭에 실패한 경우
+        if (!user.hasRoom) failedUserList.push(user);
       }
-      // 매칭에 실패한 경우
-      if (!user.hasRoom) this.waitingQueue.push(user);
+      failedUserList.forEach((user) => {
+        this.waitingQueue.push(user);
+      });
     };
   }
 
