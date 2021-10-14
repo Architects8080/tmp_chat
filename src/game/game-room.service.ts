@@ -1,11 +1,26 @@
 import { Injectable } from '@nestjs/common';
 import { GameStatus } from './data/game-status.data';
-import { GameRoom } from './data/gameroom.data';
+import { GameType } from './data/game-type.data';
 import { GameRepository } from './game.repository';
 
 @Injectable()
 export class GameRoomService {
   constructor(private gameRepository: GameRepository) {}
+
+  getReadyRoomListByUser(userId: number): number[] {
+    const result = [];
+    for (const iter of this.gameRepository.gameRoomMap) {
+      const roomId = iter[0];
+      const room = iter[1];
+      if (
+        (room.player1.id == userId || room.player2.id == userId) &&
+        room.gameStatus == GameStatus.READY
+      ) {
+        result.push(roomId);
+      }
+    }
+    return result;
+  }
 
   getJoinedRoom(id: number): string {
     let result: string;
@@ -37,6 +52,7 @@ export class GameRoomService {
     gameRoom.player2 = { id: targetUserId, isAccept: false };
     gameRoom.isObstacle = mapSetting.isObstacle;
     gameRoom.mapType = mapSetting.mapId;
+    gameRoom.gameType = GameType.CUSTOM;
     if (gameRoom.mapType == 0) gameRoom.mapType = 1;
     return gameRoom.socketRoomId;
   }

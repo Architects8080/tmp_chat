@@ -10,6 +10,7 @@ import { GameGateway } from './game.gateway';
 import { GameRepository } from './game.repository';
 import { GameService } from './game.service';
 import { GameSocketUserService } from './game.socket-user.service';
+import { MatchmakerService } from './matchmaker/matchmaker.service';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { GameSocketUserService } from './game.socket-user.service';
     GameRoomService,
     GameRepository,
     GameSocketUserService,
+    MatchmakerService,
   ],
   controllers: [GameController],
   exports: [GameService, GameSocketUserService, GameRepository],

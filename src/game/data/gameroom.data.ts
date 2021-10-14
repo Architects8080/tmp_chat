@@ -1,4 +1,5 @@
 import { GameStatus } from './game-status.data';
+import { GameType } from './game-type.data';
 import { GameInfo } from './gameinfo.data';
 import { RoomPlayer } from './room-player.data';
 
@@ -13,7 +14,7 @@ export class GameRoom {
   player1: RoomPlayer;
   player2: RoomPlayer;
 
-  gameType: number; // need change to enum
+  gameType: GameType;
   mapType: number; // map index(id)
 
   isObstacle: boolean;
