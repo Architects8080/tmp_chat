@@ -15,7 +15,7 @@ type channelCreateDto = {
   password?: string;
 }
 
-enum roomType {
+export enum roomType {
   publicRoom,
   privateRoom,
   protectedRoom
@@ -78,7 +78,7 @@ const ChatroomCreateModal = (prop: chatroomCreateModalProps) => {
 
   const [selectedRoomType, setSelectedRoomType] = useState(roomType.publicRoom);
 
-  const handleChange = (type: roomType) => {
+  const handleChange = (type: number) => {
     (type == roomType.publicRoom) ? setSelectedRoomType(roomType.publicRoom) :
       (type == roomType.privateRoom) ? setSelectedRoomType(roomType.privateRoom) : setSelectedRoomType(roomType.protectedRoom);
   };
