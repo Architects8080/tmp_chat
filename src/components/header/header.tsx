@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 import NotificationOverlay from "../notification/dropdown";
 import ProfileMenu from "../profile/dropdown";
@@ -5,6 +6,16 @@ import "./header.scss";
 
 type headerProps = {
   isLoggedIn: boolean;
+};
+
+type User = {
+  id: number;
+  nickname: string;
+  intraLogin: string;
+  avatar: string;
+  status: number;
+  ladderPoint: number;
+  ladderLevel: number;
 };
 
 function Header(prop: headerProps) {
@@ -15,25 +26,36 @@ function Header(prop: headerProps) {
     off: "/icons/notification/off.svg",
   });
 
+  const [user, setUser] = useState<User | null>(null);
+
   const handleNotifyDropdown = () => {
     console.log(`click!!`);
     setIsNotiOverlayActive(!isNotiOverlayActive);
   };
 
-  const handleProfileDropdown = () => {
+  const handleProfileDropdown = () => {  
     console.log(`test click!!`);
     setIsProfileMenuActive(!isProfileMenuActive);
   };
 
   useEffect(() => {
     //list check and url setting
-    //if (~) setNotifyIconURL('/icons/notification/true.png');
+    axios
+      .all([
+        axios.get("http://localhost:5000/user/me", { withCredentials: true }),
+        // axios.get("http://localhost:5000/notification/", { withCredentials: true }),
+      ])
+      .then(
+        axios.spread((userInfo) => {
+          setUser(userInfo.data);
+        })
+      )
   }, []);
 
   return (
     <div>
-      <NotificationOverlay isActive={isNotiOverlayActive} />
-      <ProfileMenu isActive={isProfileMenuActive} />
+      <NotificationOverlay isActive={isNotiOverlayActive} nicknameLength={user ? user.nickname.length : 0} />
+      <ProfileMenu isActive={isProfileMenuActive}/>
       <header>
         <div
           className="title"
@@ -42,10 +64,9 @@ function Header(prop: headerProps) {
               window.location.href = "http://localhost:3000/main";
           }}
         >
-          {" "}
-          42 Pong Pong{" "}
+          {" 42 Pong Pong "}
         </div>
-        {prop.isLoggedIn ? (
+        {prop.isLoggedIn && user ? (
           <>
             <div className="notification-icon">
               <img
@@ -56,11 +77,11 @@ function Header(prop: headerProps) {
               />
             </div>
             <div className="profile-icon" onClick={handleProfileDropdown}>
-              <div className="user-nickname">chlee</div>
+              <div className="user-nickname">{user.nickname}</div>
               <img
                 className="user-avatar"
                 alt="user-avatar"
-                src="https://cdn.intra.42.fr/users/chlee.png"
+                src={user.avatar}
               />
             </div>
           </>
