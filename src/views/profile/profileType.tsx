@@ -1,3 +1,8 @@
+export enum GameType {
+  CUSTOM = 0,
+  LADDER,
+}
+
 export type User = {
   id: number;
   nickname: string;
@@ -13,7 +18,7 @@ export type Match = {
   gameType: number;
   startAt: Date;
   endAt: Date;
-  gameTime: number;
+  gameTime: GameType;
   players: MatchPlayer[];
   targetId: number;
 }
