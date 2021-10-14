@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useCallback, useEffect, useState } from "react";
-import { io, ioChannel } from "../../socket/socket";
+import { ioChannel, ioCommunity } from "../../socket/socket";
 import ChatroomAdminDropdownList from "../dropdown/dropdownList/chatroomAdmin";
 import ChatroomDefaultDropdownList from "../dropdown/dropdownList/chatroomDefault";
 import ChatroomOwnerDropdownList from "../dropdown/dropdownList/chatroomOwner";
@@ -8,6 +8,7 @@ import FriendDropdownList from "../dropdown/dropdownList/friend";
 import ChatroomInviteModal from "../modal/chatroom/invite/chatroomInviteModal";
 import ChatroomSettingModal from "../modal/chatroom/setting/chatroomSettingModal";
 import AddFriendModal from "../modal/friend/add/addFriendModal";
+import { useNotiDispatch } from "../notification/notificationContext";
 import AddUserIcon from "./icon/addUser";
 import InviteUserIcon from "./icon/inviteUser";
 import SettingIcon from "./icon/setting";
@@ -22,6 +23,8 @@ import {
 } from "./sideBarType";
 
 function SideBar(prop: sidebarProps) {
+  const notiDispatch = useNotiDispatch();
+  const [userList, setUserList] = useState<userItemProps[]>([]);
   // use UserAPI to get userId;
 
   const modalHandler = prop.modalHandler;
@@ -29,11 +32,7 @@ function SideBar(prop: sidebarProps) {
   const handleModalOpen = modalHandler.handleModalOpen;
   const handleModalClose = modalHandler.handleModalClose;
 
-  var userId: number;
-
   // first render -> get userList according to sidebarType(prop.title)
-  // var userList: any;
-  const [userList, setUserList] = useState<userItemProps[]>([]);
   useEffect(() => {
 
     const getChannelmember = async () => {
@@ -47,15 +46,11 @@ function SideBar(prop: sidebarProps) {
       getChannelmember();
     }
     else if (prop.title === sidebarProperty.friendList)
-      io.emit("friendList", userId);
+      fetchFriendList();
     else if (prop.title === sidebarProperty.observerList)
-      io.emit("observerList", prop.roomId);
-
-    // io.on("sidebarItems", userList);
-    
+      ioChannel.emit("observerList", prop.roomId);
   }, []);
 
-  
 
   useEffect(() => {
     const addMember = (newMemArr: userItemProps[]) => {
@@ -70,7 +65,7 @@ function SideBar(prop: sidebarProps) {
         if (!userList.some(user => user.id === newMember.id)) {
           const newMemArr = [...userList, newMember]
           addMember(newMemArr);
-        } 
+        }
       });
       ioChannel.on("channelMemberRemove", (userId) => {
         const leavedArr = userList.filter(user => user.id !== userId);
@@ -121,6 +116,90 @@ function SideBar(prop: sidebarProps) {
     setResult(dropdownMenuInfo);
   };
 
+  // FriendList func
+  const fetchFriendList = async () => {
+		try {
+      let newUserList: userItemProps[] = [];
+			const response = await axios.get(
+				`${process.env.REACT_APP_SERVER_ADDRESS}/community/friend`,
+				{
+					withCredentials: true,
+				}
+			);
+			response.data.map((user: any) => newUserList.push({
+				id: user.other.id,
+				avatar: user.other.avatar,
+        status: 1,
+        nickname: user.other.nickname
+			}));
+      console.log(newUserList);
+      setUserList(newUserList);
+		} catch (e) {
+			console.log(`[FriendListError] ${e}`);
+		}
+	};
+
+  useEffect(() => {
+    //친구 요청 수신
+    ioCommunity.on("friendRequestToClient",
+    async (id: number, nickname: string) => {
+      notiDispatch({
+        type: "ADD",
+        Notification: {
+          title: "친구 요청",
+          description: `${nickname}님의 친구 신청입니다. 수락하시겠습니까?`,
+          acceptCallback: () => {
+            ioCommunity.emit("friendAcceptToServer", id);
+          },
+          rejectCallback: () => {}
+        }
+      })
+    });
+
+    //친구 수락 수신
+    ioCommunity.on("friendAcceptToClient", async (friendID: number) => {
+      const response = await axios.get(
+        `${process.env.REACT_APP_SERVER_ADDRESS}/user/${friendID}`,
+        { withCredentials: true, }
+      );
+      setUserList(userList => [...userList, {
+        id: friendID,
+        avatar: response.data.avatar,
+        status: 1,
+        nickname: response.data.nickname
+      }]);
+    });
+
+    //친구 차단 수신
+    ioCommunity.on("blockResponseToClient", async (friendID: number) => {
+      setUserList(userList => userList.filter(user => user.id !== friendID));
+    });
+
+    //친구or차단 취소 수신
+    ioCommunity.on("relationDeleteToClient",
+    async (id: number, isFriendly: boolean) => {
+      if (isFriendly)
+        setUserList(userList => userList.filter(user => user.id !== id));
+      else {
+        try {
+          const response = await axios.get(
+            `${process.env.REACT_APP_SERVER_ADDRESS}/community/${id}`,
+            { withCredentials: true }
+          );
+          if (response)
+            setUserList(userList => [...userList, {
+              id: id,
+              avatar: response.data.avatar,
+              status: 1,
+              nickname: response.data.nickname
+            }]);
+        } catch (e) {
+          console.log(`[relationDeleteToClient] ${e}`);
+        }
+      }
+    });
+  }, []);
+
   return (
     <aside>
       <div className="sidebar-header">
@@ -152,24 +231,16 @@ function SideBar(prop: sidebarProps) {
         </div>
       </div>
       <div className="user-list">
-        {userList ? 
-        userList.map(item => 
+        {userList ?
+        userList.map(item =>
           <SidebarItem itemType={prop.title}
           key={item.id}
           itemInfo={item}
           contextMenuHandler={contextMenuHandler}
           roomId={prop.roomId}
           userId={2}
-          targetId={3} />
+          targetId={item.id} />
         ) : null}
-        <SidebarItem
-          itemType={prop.title}
-          itemInfo={tempInfo}
-          contextMenuHandler={contextMenuHandler}
-          roomId={1}
-          userId={2}
-          targetId={3}
-        />
       </div>
 
       {/* anchorPoint, dropdownMenuInfo, userId, targetId */}

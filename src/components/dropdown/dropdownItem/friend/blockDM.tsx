@@ -1,5 +1,6 @@
+import axios from "axios";
 import React from "react";
-import { io } from "../../../../socket/socket";
+import { ioCommunity } from "../../../../socket/socket";
 import DefaultDropdownItem from "../../itemTemplate/default/item";
 
 type props = {
@@ -8,7 +9,10 @@ type props = {
 
 function BlockDMItem(prop: props) {
   const handleBlockDM = () => {
-    io.emit("dm/block", prop.targetId); //TODO
+    ioCommunity.emit("requestToServer", {
+      otherID: prop.targetId,
+      isFriendly: false
+    });
   };
 
   return (
