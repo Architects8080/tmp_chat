@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useState } from "react";
 import { Redirect } from "react-router-dom";
 import Header from "../../../components/header/header";
+import snackbar from "../../../components/snackbar/snackbar";
 import "./register.scss";
 
 function Register() {
@@ -40,14 +41,19 @@ function Register() {
           }
         )
         .then((response) => {
-          console.log("registered!");
           setRegisted(true);
+        })
+        .catch(error => {
+          if (error.response.data.statusCode === 403) {
+            setForbiddenError(true);
+            snackbar.error("잘못된 접근입니다.");
+          }
+          else if (error.response.data.statusCode === 400) {
+            snackbar.error("닉네임이 중복되었습니다. 다시 시도해주세요.");
+          }
         });
-    } catch (error) {
-      //forbidden (already existed user)
-      console.log("error! redirect to main.");
-      setForbiddenError(true);
-    }
+    } catch (error) {};
+
     setForm({
       nickname: "",
     });
