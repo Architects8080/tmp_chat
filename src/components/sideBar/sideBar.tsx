@@ -33,8 +33,6 @@ function SideBar(prop: sidebarProps) {
   const handleModalClose = modalHandler.handleModalClose;
 
   // first render -> get userList according to sidebarType(prop.title)
-  // var userList: any;
-  const [userList, setUserList] = useState<userItemProps[]>([]);
   useEffect(() => {
 
     const getChannelmember = async () => {
@@ -52,7 +50,7 @@ function SideBar(prop: sidebarProps) {
     else if (prop.title === sidebarProperty.observerList)
       ioChannel.emit("observerList", prop.roomId);
   }, []);
-  
+
 
   useEffect(() => {
     const addMember = (newMemArr: userItemProps[]) => {
@@ -67,7 +65,7 @@ function SideBar(prop: sidebarProps) {
         if (!userList.some(user => user.id === newMember.id)) {
           const newMemArr = [...userList, newMember]
           addMember(newMemArr);
-        } 
+        }
       });
       ioChannel.on("channelMemberRemove", (userId) => {
         const leavedArr = userList.filter(user => user.id !== userId);
@@ -131,7 +129,7 @@ function SideBar(prop: sidebarProps) {
 			response.data.map((user: any) => newUserList.push({
 				id: user.other.id,
 				avatar: user.other.avatar,
-        status: status.online,
+        status: 1,
         nickname: user.other.nickname
 			}));
       console.log(newUserList);
@@ -167,7 +165,7 @@ function SideBar(prop: sidebarProps) {
       setUserList(userList => [...userList, {
         id: friendID,
         avatar: response.data.avatar,
-        status: status.online,
+        status: 1,
         nickname: response.data.nickname
       }]);
     });
@@ -192,7 +190,7 @@ function SideBar(prop: sidebarProps) {
             setUserList(userList => [...userList, {
               id: id,
               avatar: response.data.avatar,
-              status: status.online,
+              status: 1,
               nickname: response.data.nickname
             }]);
         } catch (e) {
@@ -233,24 +231,16 @@ function SideBar(prop: sidebarProps) {
         </div>
       </div>
       <div className="user-list">
-        {userList ? 
-        userList.map(item => 
+        {userList ?
+        userList.map(item =>
           <SidebarItem itemType={prop.title}
           key={item.id}
           itemInfo={item}
           contextMenuHandler={contextMenuHandler}
           roomId={prop.roomId}
           userId={2}
-          targetId={3} />
+          targetId={item.id} />
         ) : null}
-        <SidebarItem
-          itemType={prop.title}
-          itemInfo={tempInfo}
-          contextMenuHandler={contextMenuHandler}
-          roomId={1}
-          userId={2}
-          targetId={3}
-        />
       </div>
 
       {/* anchorPoint, dropdownMenuInfo, userId, targetId */}
