@@ -76,8 +76,10 @@ function AddFriendModal(prop: addFriendModalProps) {
         });
       })
       .catch (e => {
-        if (e.response.data.statusCode === 404)
+        if (e.response.data.statusCode === 404) {
+          setresultCode(Result.NotFoundUser);
           setResultText("존재하지 않는 플레이어입니다. 다시 시도해주세요.");
+        }
       });
     } catch (e) {
       console.log(`[addFriendModal] ${e}`);
