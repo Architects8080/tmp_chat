@@ -223,7 +223,6 @@ export class GameService {
     }
 
     gameRoom.gameInfo = gameInfo;
-    gameRoom.gameType = 0;
     gameRoom.gameStatus = GameStatus.STARTED;
     gameRoom.interval = setInterval(
       this.gameLoop(gameRoom, onUpdate, onFinish),
