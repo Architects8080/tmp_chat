@@ -26,6 +26,8 @@ enum Result {
   NotFoundUser,
   AlreadyFriend,
   Myself,
+  InProgress,
+  Block
 }
 
 @UseGuards(JwtAuthGuard)
@@ -103,6 +105,7 @@ export class CommunityGateway implements OnGatewayConnection, OnGatewayDisconnec
     if (body.isFriendly) {
       let responseCode = Result.Success;
 
+      // 오류 체크
       try {
         await this.userService.getUserById(body.otherID);
       }
@@ -112,10 +115,37 @@ export class CommunityGateway implements OnGatewayConnection, OnGatewayDisconnec
         if (result) responseCode = Result.AlreadyFriend;
       }
       catch (e) {}
+      try {
+        const result = await this.communityService.getBlockByID(relationship);
+        if (result) responseCode = Result.Block;
+      }
+      catch (e) {}
       if (client.user.id == body.otherID) responseCode = Result.Myself;
 
-      if (friend && responseCode == Result.Success)
-        friend.emit('friendRequestToClient', client.user.id, client.user.nickname);
+      // 응답 전송
+      if (friend && responseCode === Result.Success) {
+        try { // 상대방의 차단 여부 체크
+          await this.communityService.getBlockByID({
+            userID: body.otherID,
+            otherID: client.user.id
+          });
+        }
+        catch (e) {
+          try { // 중복 요청인지 체크
+            const result = await this.communityService.setNotification({
+              senderID: client.user.id,
+              receiverID: body.otherID,
+              targetID: client.user.id,
+              type: 0
+            });
+            if (result)
+              friend.emit('friendRequestToClient', client.user.id, client.user.nickname);
+            else
+              responseCode = Result.InProgress;
+          }
+          catch(e) {}
+        }
+      }
       client.emit('friendResponseToClient', responseCode);
     }
     else {
@@ -130,12 +160,31 @@ export class CommunityGateway implements OnGatewayConnection, OnGatewayDisconnec
   	@ConnectedSocket() client: SocketUser
   ) {
     const friend = await this.socketUserService.getSocketById(friendID);
-    this.communityService.setRelationship({
+    await this.communityService.setRelationship({
       userID: client.user.id,
       otherID: friendID
     }, true);
+    await this.communityService.deleteNotification({
+      senderID: friendID,
+      receiverID: client.user.id,
+      targetID: friendID,
+      type: 0
+    });
     if (client) client.emit('friendAcceptToClient', friendID);
     if (friend) friend.emit('friendAcceptToClient', client.user.id);
+  }
+
+  @SubscribeMessage('friendRejectToServer')
+  async rejectFriend(
+    @MessageBody() friendID: number,
+  	@ConnectedSocket() client: SocketUser
+  ) {
+    await this.communityService.deleteNotification({
+      senderID: friendID,
+      receiverID: client.user.id,
+      targetID: friendID,
+      type: 0
+    });
   }
 
   @SubscribeMessage('relationDeleteToServer')
@@ -149,7 +198,7 @@ export class CommunityGateway implements OnGatewayConnection, OnGatewayDisconnec
       otherID: body.otherID
     };
 
-    this.communityService.deleteRelationshipByID(relationship, body.isFriendly);
+    await this.communityService.deleteRelationshipByID(relationship, body.isFriendly);
     if (client)
       client.emit('relationDeleteToClient', body.otherID, body.isFriendly);
     if (friend && body.isFriendly)

@@ -8,13 +8,18 @@ export class CommunityController {
   constructor(private readonly communityService: CommunityService) {}
 
   @Get('friend')
-  async getFriendList(@Req() req) {
+  getFriendList(@Req() req) {
     return this.communityService.getRelationships(req.user.id, true);
   }
 
   @Get('block')
-  async getBlockList(@Req() req) {
+  getBlockList(@Req() req) {
     return this.communityService.getRelationships(req.user.id, false);
+  }
+
+  @Get('notification')
+  getNotificationList(@Req() req) {
+    return this.communityService.getNotifications(req.user.id);
   }
 
   @Get(':friendID')
