@@ -40,9 +40,9 @@ export class User {
   @Column({ default: 0 })
   ladderLevel: number;
 
-  @OneToMany(() => Friend, rel => rel.other)
+  @OneToMany(() => Friend, (rel) => rel.other)
   friendList: Friend[];
 
-  @OneToMany(() => Block, rel => rel.other)
+  @OneToMany(() => Block, (rel) => rel.other)
   blockList: Block[];
 }
