@@ -73,13 +73,13 @@ function NotificationOverlay(prop: DropdownProps) {
             acceptCallback: () => {
               setNotiList(notiList => notiList.filter(item => item.key !== nowKey));
               if (noti.type === NotiType.Friend)
-                ioCommunity.emit("friendAcceptToServer", 69097);  //TODO 유저 아이디
+                ioCommunity.emit("friendAcceptToServer", noti.senderID);  //TODO 유저 아이디
               //TODO else if (noti.type === NotiType.Channel) 채팅 초대 수락
             },
             rejectCallback: () => {
               setNotiList(notiList => notiList.filter(item => item.key !== nowKey));
               if (noti.type === NotiType.Friend)
-                ioCommunity.emit("friendRejectToServer", 69097); //TODO 유저 아이디
+                ioCommunity.emit("friendRejectToServer", noti.senderID); //TODO 유저 아이디
               //TODO else if (noti.type === NotiType.Channel) 채팅 초대 수락
             }
           }])
