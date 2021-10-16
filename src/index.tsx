@@ -6,6 +6,9 @@ import { BrowserRouter } from "react-router-dom";
 import reportWebVitals from "./reportWebVitals";
 import { SnackbarProvider } from "notistack";
 import { SnackbarUtilsConfigurator } from "./components/snackbar/snackbar";
+import axios from "axios";
+
+axios.defaults.withCredentials = true;
 
 ReactDOM.render(
   <React.StrictMode>
