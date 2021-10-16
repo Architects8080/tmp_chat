@@ -150,7 +150,6 @@ function Pong({ roomID, gameInfo }: PongProps) {
         <GameResultModal
           open={isGameOver}
           close={closeGameInviteModal}
-          header="게임 결과"
           score={gameoverInfo.score}
           winnerProfile={gameoverInfo.winnerProfile}
         ></GameResultModal>
