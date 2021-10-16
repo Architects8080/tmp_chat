@@ -15,6 +15,7 @@ export type userItemProps = {
   avatar: string;
   status: number;
   nickname: string;
+  alert: boolean;
 };
 
 export type modalHandler = {
@@ -49,4 +50,9 @@ export type dropdownMenuInfo = {
   isBannable: boolean; //chat: admin
   isMuted: boolean; //chat: admin
   isAdmin: boolean; //chat: owner
+};
+
+export type DM = {
+	id: number;
+	message: string;
 };

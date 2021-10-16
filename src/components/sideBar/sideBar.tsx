@@ -1,6 +1,7 @@
 import axios from "axios";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { HTMLAttributes, useCallback, useEffect, useRef, useState } from "react";
 import { ioChannel, ioCommunity } from "../../socket/socket";
+import DirectMessage from "../directMessage/directMessage";
 import ChatroomAdminDropdownList from "../dropdown/dropdownList/chatroomAdmin";
 import ChatroomDefaultDropdownList from "../dropdown/dropdownList/chatroomDefault";
 import ChatroomOwnerDropdownList from "../dropdown/dropdownList/chatroomOwner";
@@ -15,6 +16,7 @@ import "./sideBar.scss";
 import SidebarItem from "./sideBarItem";
 import {
   chatroomPermission,
+  DM,
   dropdownMenuInfo,
   sidebarProperty,
   sidebarProps,
@@ -22,7 +24,7 @@ import {
 } from "./sideBarType";
 
 function SideBar(prop: sidebarProps) {
-  const [userList, setUserList] = useState<userItemProps[]>([]);
+  const [userList, setUserList] = useState<userItemProps[] | null>(null);
   // use UserAPI to get userId;
 
   const modalHandler = prop.modalHandler;
@@ -32,7 +34,6 @@ function SideBar(prop: sidebarProps) {
 
   // first render -> get userList according to sidebarType(prop.title)
   useEffect(() => {
-
     const getChannelmember = async () => {
       const data = await axios.get(
         process.env.REACT_APP_SERVER_ADDRESS + `/channel/members/${prop.roomId}`,
@@ -47,6 +48,8 @@ function SideBar(prop: sidebarProps) {
       fetchFriendList();
     else if (prop.title === sidebarProperty.observerList)
       ioChannel.emit("observerList", prop.roomId);
+
+    getNewDM();
   }, []);
 
 
@@ -60,25 +63,19 @@ function SideBar(prop: sidebarProps) {
 
     if (prop.title === sidebarProperty.chatMemberList) {
       ioChannel.on("channelMemberAdd", (newMember: userItemProps) => {
-        if (!userList.some(user => user.id === newMember.id)) {
+        if (userList && !userList.some(user => user.id === newMember.id)) {
           const newMemArr = [...userList, newMember]
           addMember(newMemArr);
         }
       });
       ioChannel.on("channelMemberRemove", (userId) => {
-        const leavedArr = userList.filter(user => user.id !== userId);
-        removeMember(leavedArr);
+        if (userList) {
+          const leavedArr = userList.filter(user => user.id !== userId);
+          removeMember(leavedArr);
+        }
       });
     }
   }, [userList, prop.title])
-
-  // to test
-  const tempInfo: userItemProps = {
-    id: 1,
-    avatar: "https://cdn.intra.42.fr/users/yhan.jpg",
-    status: 1,
-    nickname: "yhan",
-  };
 
   // to contextMenu
   const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
@@ -128,9 +125,9 @@ function SideBar(prop: sidebarProps) {
 				id: user.other.id,
 				avatar: user.other.avatar,
         status: 1,
-        nickname: user.other.nickname
+        nickname: user.other.nickname,
+        alert: false
 			}));
-      console.log(newUserList);
       setUserList(newUserList);
 		} catch (e) {
 			console.log(`[FriendListError] ${e}`);
@@ -144,43 +141,96 @@ function SideBar(prop: sidebarProps) {
         `${process.env.REACT_APP_SERVER_ADDRESS}/user/${friendID}`,
         { withCredentials: true, }
       );
-      setUserList(userList => [...userList, {
+      const newUser: userItemProps = {
         id: friendID,
         avatar: response.data.avatar,
         status: 1,
-        nickname: response.data.nickname
-      }]);
+        nickname: response.data.nickname,
+        alert: false
+      };
+      setUserList(userList => userList? [...userList, ] : [newUser]);
     });
 
     //친구 차단 수신
     ioCommunity.on("blockResponseToClient", async (friendID: number) => {
-      setUserList(userList => userList.filter(user => user.id !== friendID));
+      setUserList(userList => userList? userList.filter(user => user.id !== friendID) : null);
     });
 
     //친구or차단 취소 수신
     ioCommunity.on("relationDeleteToClient",
     async (id: number, isFriendly: boolean) => {
       if (isFriendly)
-        setUserList(userList => userList.filter(user => user.id !== id));
+        setUserList(userList => userList? userList.filter(user => user.id !== id) : null);
       else {
         try {
           const response = await axios.get(
             `${process.env.REACT_APP_SERVER_ADDRESS}/community/${id}`,
             { withCredentials: true }
           );
-          if (response)
-            setUserList(userList => [...userList, {
+          if (response) {
+            const newUser: userItemProps = {
               id: id,
               avatar: response.data.avatar,
               status: 1,
-              nickname: response.data.nickname
-            }]);
+              nickname: response.data.nickname,
+              alert: false
+            };
+            setUserList(userList => userList? [...userList, ] : [newUser]);
+          }
         } catch (e) {
           console.log(`[relationDeleteToClient] ${e}`);
         }
       }
     });
   }, []);
+
+  // direct message
+  const [DMopen, setDMOpen] = useState<boolean>(false);
+  const [friend, setFriend] = useState<userItemProps>({
+    id: 0,
+    avatar: '',
+    status: 1,
+    nickname: '',
+    alert: false
+  });
+	const friendRef = useRef<userItemProps>(friend);
+	const timerRef = useRef<NodeJS.Timeout>();
+
+  const getNewDM = () => {
+    ioCommunity.on('dmToClient', (newDM: DM) => { if (!DMopen) alertNewDM(newDM.id); });
+  }
+
+  const alertNewDM = (senderID: number) => {
+    setUserList((userList) =>
+        userList?
+        userList.map(user =>
+          user.id === senderID ? { ...user, alert: true } : user
+        ) : userList
+    );
+    timerRef.current = setTimeout(() => {
+      setUserList((userList) =>
+      userList?
+        userList.map(user =>
+          user.id === senderID ? { ...user, alert: false } : user
+        ) : userList
+      );
+    }, 1200);
+  }
+
+  const openDM = (e: React.MouseEvent<HTMLLIElement>) => {
+    if (userList)
+		  friendRef.current = userList.filter(user => user.id === e.currentTarget.value)[0];
+		setFriend(friendRef.current);
+		if (timerRef.current) {
+      if (userList)
+        userList.map(user =>
+          user.id === e.currentTarget.value ? { ...user, alert: true } : user
+        );
+			clearTimeout(timerRef.current);
+		}
+		if (!DMopen) setDMOpen(true);
+	}
+	const closeDM = () => setDMOpen(false);
 
   return (
     <aside>
@@ -212,18 +262,31 @@ function SideBar(prop: sidebarProps) {
           ) : null}
         </div>
       </div>
-      <div className="user-list">
+      <ul className="user-list">
         {userList ?
-        userList.map(item =>
-          <SidebarItem itemType={prop.title}
-          key={item.id}
-          itemInfo={item}
-          contextMenuHandler={contextMenuHandler}
-          roomId={prop.roomId}
-          userId={2}
-          targetId={item.id} />
+        userList.map(user =>
+          <li onClick={openDM} value={user.id}>
+            {user.alert && (<span className="alert-overlay"></span>)}
+            <SidebarItem
+              itemType={prop.title}
+              key={user.id}
+              itemInfo={user}
+              contextMenuHandler={contextMenuHandler}
+              roomId={prop.roomId}
+              userId={2}
+              targetId={user.id}
+            />
+          </li>
         ) : null}
-      </div>
+      </ul>
+      {DMopen && (
+				<DirectMessage
+					friend={friend}
+          friendRef={friendRef}
+					closeDM={closeDM}
+          alertNewDM={alertNewDM}
+				/>
+			)}
 
       {/* anchorPoint, dropdownMenuInfo, userId, targetId */}
       {show && prop.title === sidebarProperty.friendList && result ? (

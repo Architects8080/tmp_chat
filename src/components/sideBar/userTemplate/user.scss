@@ -16,12 +16,13 @@
     position: relative;
     width: 64px;
     height: 64px;
+    border-radius: 50%;
+    border: 0.5px solid rgba(0, 0, 0, 0.2);
+    overflow: hidden;
 
     .avatar {
       width: 64px;
       height: 64px;
-      border: 0.5px solid rgba(0, 0, 0, 0.2);
-      border-radius: 100%;
       object-fit: cover;
     }
 
