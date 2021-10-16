@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Match, MatchPlayer } from "../profileType";
+import { GameType, Match, MatchPlayer } from "../profileType";
 import "./item.scss";
 
 function GameLogItem(match: Match) {
@@ -44,7 +44,7 @@ function GameLogItem(match: Match) {
       <div className="gamelog-item">
         <div className={"gamelog " + (isVictory ? "win" : "lose")}>
           <div className="gamestats">
-            <div className="gameinfo">{match.gameType}</div>
+            <div className="gameinfo">{match.gameType === GameType.CUSTOM ? "Custom" : "Ladder"}</div>
             <div className="timestamp">{timestamp}</div>
             <div className={"gameresult " + (isVictory ? "win" : "lose")}>{isVictory ? "Victory" : "Defeat"}</div>
             <div className="gamelength">{gamelength}</div>
