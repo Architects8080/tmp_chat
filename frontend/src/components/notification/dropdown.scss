@@ -1,19 +1,19 @@
 .notification-wrap {
-	z-index: 1;
-	position: fixed;
-	top: calc(86px - 8px + 20px);
-	right: calc(20px + 126px + 24px + 10px + 10px);
+  z-index: 1;
+  position: fixed;
+  top: calc(92px + 4px);
+  // right: calc(40px + 122px + 24px + 8px);
 
-	.dropdown {
-		max-height: calc(91px * 3);
-		overflow-y: scroll;
-		background: #fff;
-		box-shadow: 2px 2px 3px rgba(0,0,0,0.125);
-		position: relative;
-		display: none;
-	}
-  
-	.dropdown.active {
-		display: block;
-	}
+  .dropdown {
+    max-height: calc(91px * 3);
+    overflow-y: scroll;
+    background: #fff;
+    box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.125);
+    position: relative;
+    display: none;
+  }
+
+  .dropdown.active {
+    display: block;
+  }
 }

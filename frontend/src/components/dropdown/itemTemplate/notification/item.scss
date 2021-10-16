@@ -1,0 +1,65 @@
+.notification-item {
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.notification-item-box {
+  word-break: keep-all;
+  min-width: 176px;
+  max-width: 176px;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.title {
+  font-family: Spoqa Han Sans Neo;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 12px;
+  line-height: 15px;
+  color: #000000;
+}
+
+.description {
+  font-family: Spoqa Han Sans Neo;
+  font-style: normal;
+  font-weight: 300;
+  font-size: 12px;
+  line-height: 15px;
+  margin-top: 4px;
+  color: #000000;
+}
+
+.notification-item-button {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 8px;
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.checkbutton {
+  filter: invert(100%) sepia(1%) saturate(2532%) hue-rotate(332deg)
+    brightness(113%) contrast(101%);
+}
+
+.accept {
+  background: #3561ff;
+}
+
+.reject {
+  background: #f04949;
+}

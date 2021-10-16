@@ -13,11 +13,11 @@ function useDetectOutsideClick(el: any, initialState: any) {
 
     // If the item is active (ie open) then listen for clicks
     if (isActive) {
-      window.addEventListener("click", pageClickEvent);
+      // window.addEventListener("click", pageClickEvent);
     }
 
     return () => {
-      window.removeEventListener("click", pageClickEvent);
+      // window.removeEventListener("click", pageClickEvent);
     };
   }, [isActive, el]);
 

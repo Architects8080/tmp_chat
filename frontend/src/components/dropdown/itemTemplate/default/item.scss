@@ -1,0 +1,32 @@
+.dropdownItem-wrap {
+  display: flex;
+  flex-shrink: none;
+  align-items: center;
+  width: 100%;
+  // width: 260px; //나중에 지울거
+  height: 36px;
+  // border: 1px solid ;
+  background-color: #ffffff;
+
+  .dropdownItem-title {
+    margin: 8px;
+    font-family: Spoqa Han Sans Neo;
+    font-style: normal;
+    font-weight: 900;
+    font-size: 16px;
+    line-height: 20px;
+  }
+
+  .red {
+    color: #ff5c5c;
+  }
+
+  .black {
+    color: #000000;
+  }
+
+  &:hover {
+    cursor: pointer;
+    background-color: #f2f2f2;
+  }
+}

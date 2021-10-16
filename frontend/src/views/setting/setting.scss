@@ -20,7 +20,8 @@
   display: flex;
   justify-content: space-around;
 
-  .menu-avater, .menu-otp {
+  .menu-avatar,
+  .menu-otp {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -35,7 +36,7 @@
   }
 }
 
-.menu-avater {
+.menu-avatar {
   > input {
     display: none;
   }

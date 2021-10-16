@@ -1,19 +1,16 @@
 import React from "react";
 import "./gameModal.scss";
 import { io } from "../../../socket/socket";
-import { useState } from "react";
-import { useEffect } from "react";
 
 type inviteInfo = {
   nickname: string;
-  avater: string;
+  avatar: string;
   roomID: number;
 };
 
 type ModalProps = {
   open: any;
   close: any;
-  header: any;
   inviteInfo: inviteInfo;
 };
 
@@ -35,7 +32,7 @@ function GameInviteModal(prop: ModalProps) {
       {prop.open ? (
         <section>
           <div className="modal-title">
-            {prop.header}
+            게임 참가
             <button className="modal-close" onClick={handleReject}>
               {" "}
               X{" "}
@@ -46,7 +43,7 @@ function GameInviteModal(prop: ModalProps) {
           {/* from Server get ImageURL*/}
           <div className="modal-content center">
             <div className="image-cropper">
-              <img src={prop.inviteInfo.avater} className="rounded" />
+              <img src={prop.inviteInfo.avatar} className="rounded" />
             </div>
           </div>
 

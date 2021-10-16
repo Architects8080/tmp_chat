@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
-import './enterPasswordModal.scss';
+import axios from "axios";
+import React, { useState } from "react";
+import "./enterPasswordModal.scss";
 
 type enterPasswordModalProps = {
   open: boolean;
   close: any;
-}
+  roomId: number;
+};
 
-function EnterPasswordModal(prop: enterPasswordModalProps) {
+const EnterPasswordModal = (prop: enterPasswordModalProps) => {
   const Title = "채팅방 접속";
-  const Explain = "비밀번호를 입력해주세요.";
+  const Description = "비밀번호를 입력해주세요.";
 
   const nickPlaceholder = "password";
   const buttonTitle = "접속";
@@ -17,44 +19,59 @@ function EnterPasswordModal(prop: enterPasswordModalProps) {
   const [errorText, setErrorText] = useState("");
 
   const handleUserInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.value === "")
-      setErrorText("");
+    if (e.target.value === "") setErrorText("");
     setInput(e.target.value);
-  }
+  };
 
   const handleClose = () => {
     setInput("");
     prop.close();
-  }
+  };
 
-  const handleSubmitEvent = () => {
-    console.log(`userInput : `, input);
-
-    //io.emit -> password send
-    //code
-
-    //io.on -> get result code & setErrorext
-    if (input === "4242") {
-      //io.emit(connect)
-      setErrorText("🎉🎉");
-      prop.close();
+  const handleSubmitEvent = async () => {
+    try {
+      const response = await axios.post(`http://localhost:5000/channel/enter-pw`, {
+        roomId: prop.roomId,
+        password: input
+        }, { withCredentials: true });
+      if (response.data) {
+        prop.close();
+        window.location.href = `http://localhost:3000/chatroom/${prop.roomId}`
+      } else
+        setErrorText("비밀번호가 틀렸습니다.");
     }
-    else
-      setErrorText("비밀번호가 틀렸습니다.");
-
-  }
+    catch (e) { console.log(e); }
+  };
   return (
-    <div className={prop.open ? "modal-open modal-background" : "modal-background"}>
+    <div
+      className={prop.open ? "modal-open modal-background" : "modal-background"}
+    >
       <div className="modal-wrap">
         <div className="modal-header">
           <div className="title">{Title}</div>
-          <img className="close" alt="close" src="/icons/modal/close.svg" onClick={handleClose}/>
+          <img
+            className="close"
+            alt="close"
+            src="/icons/modal/close.svg"
+            onClick={handleClose}
+          />
         </div>
-        <div className="explain">{Explain}</div>
+        <div className="description">{Description}</div>
         <div className="search">
           <div className="search-bar">
-            <img className="search-icon" alt="search-icon" src="/icons/modal/password.svg"/>
-            <input className="search-nickname" type="password" maxLength={4} value={input} onChange={handleUserInputChange} placeholder={nickPlaceholder}/>
+            <img
+              className="search-icon"
+              alt="search-icon"
+              src="/icons/modal/password.svg"
+            />
+            <input
+              className="search-nickname"
+              type="password"
+              maxLength={4}
+              value={input}
+              onChange={handleUserInputChange}
+              placeholder={nickPlaceholder}
+            />
           </div>
           <div className="submit" onClick={handleSubmitEvent}>
             <div className="submit-title">{buttonTitle}</div>

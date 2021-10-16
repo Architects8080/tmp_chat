@@ -1,9 +1,9 @@
 .other-message-wrap {
   margin-bottom: 24px;
-
   display: flex;
   flex-direction: row;
-
+  align-items: left;
+ 
   .other-message-avater {
     width: 64px;
     height: 64px;
@@ -17,7 +17,7 @@
   .other-message-content {
     word-break: break-all;
     max-width: calc(100vw - 360px - 48px - 48px - 64px - 24px - 150px);
-  
+
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -54,7 +54,6 @@
     margin-left: auto;
 
     .message-username {
-
       font-family: Spoqa Han Sans Neo;
       font-style: normal;
       font-weight: bold;
@@ -66,7 +65,6 @@
     }
 
     .message-content {
-
       font-family: Spoqa Han Sans Neo;
       font-style: normal;
       font-weight: 300;

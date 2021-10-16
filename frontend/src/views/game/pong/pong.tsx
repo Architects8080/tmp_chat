@@ -4,7 +4,10 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { useRef } from "react";
 import GameResultModal from "../../../components/modal/game/gameResultModal";
-import { score, winnerProfile } from "../../../components/modal/game/gameResultModalType";
+import {
+  score,
+  winnerProfile,
+} from "../../../components/modal/game/gameResultModalType";
 import { io } from "../../../socket/socket";
 import { GameInfo } from "../gameType";
 import "./pong.css";
@@ -119,13 +122,13 @@ function Pong({ roomID, gameInfo }: PongProps) {
           element.position.x,
           element.position.y,
           obstacleWidth,
-          obstacleHeight,
+          obstacleHeight
         );
-      })
+      });
       ctx.fillStyle = "#FF5C5C";
       ctx.fill();
       ctx.closePath();
-    }
+    };
     window.addEventListener("keydown", keyDownEvent);
 
     return () => {

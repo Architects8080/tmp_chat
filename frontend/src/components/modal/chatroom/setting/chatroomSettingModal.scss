@@ -1,217 +1,231 @@
 @keyframes modal-show {
-	from {
-		opacity: 0;
-		margin-top: -50px;
-	}
-	to {
-		opacity: 1;
-		margin-top: 0;
-	}
+  from {
+    opacity: 0;
+    margin-top: -50px;
+  }
+  to {
+    opacity: 1;
+    margin-top: 0;
+  }
 }
 
 @keyframes modal-bg-show {
-	from {
-		opacity: 0;
-	}
-	to {
-		opacity: 1;
-	}
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .chatroom-setting-modal-wrap {
-	width: 544px;
-	background: #FFFFFF;
-	box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.05);
-	border-radius: 16px;
-	padding: 32px 24px;
-	animation: modal-show .3s;
-	overflow: hidden;
+  // width: 544px;
+  background: #ffffff;
+  box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.05);
+  border-radius: 16px;
+  padding: 32px 24px;
+  animation: modal-show 0.3s;
+  overflow: hidden;
 }
 
 .modal-header {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
 .modal-header {
-	.title {
-		font-family: Spoqa Han Sans Neo;
-		font-style: normal;
-		font-weight: bold;
-		font-size: 20px;
-		line-height: 20px;
-		display: flex;
-		align-items: center;
-		color: #1F1F1F;
-	}
-	.close {
-		height: 24px;
-		width: 24px;
-		&:hover {
-			cursor: pointer;
-		}
-	}
+  .title {
+    font-family: Spoqa Han Sans Neo;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 20px;
+    line-height: 20px;
+    display: flex;
+    align-items: center;
+    color: #1f1f1f;
+  }
+  .close {
+    height: 24px;
+    width: 24px;
+    &:hover {
+      cursor: pointer;
+    }
+  }
 }
 
 .chatroom-setting-modal-wrap {
-	.explain {
-		margin-top: 12px;
-		font-family: Spoqa Han Sans Neo;
-		font-style: normal;
-		font-weight: normal;
-		font-size: 16px;
-		line-height: 20px;
-		color: #9C9C9C;
-	}
-	.content {
-		margin-top: 24px;
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-	}
+  .description {
+    margin-top: 12px;
+    font-family: Spoqa Han Sans Neo;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 16px;
+    line-height: 20px;
+    color: #9c9c9c;
+  }
+  .content {
+    margin-top: 24px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
 }
 
 .content {
-	.subtitle {
-		font-family: Spoqa Han Sans Neo;
-		font-style: normal;
-		font-weight: bold;
-		font-size: 20px;
-		line-height: 25px;
-		width: 70px;
-	}
+  .subtitle {
+    flex-shrink: 0;
+    font-family: Spoqa Han Sans Neo;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 20px;
+    line-height: 25px;
+    width: 70px;
+  }
 }
 
 .roomTitle {
-	flex-grow: 1;
-	margin-left: 28px;
-	height: 40px;
-	background: #FFFFFF;
-	font-family: Spoqa Han Sans Neo;
-	font-style: normal;
-	font-weight: 300;
-	font-size: 18px;
-	line-height: 23px;
-	border: 1px solid rgba(0, 0, 0, 0.5);
-	box-sizing: border-box;
-	padding: 8px;
+  flex-grow: 1;
+  margin-left: 28px;
+  height: 40px;
+  background: #ffffff;
+  font-family: Spoqa Han Sans Neo;
+  font-style: normal;
+  font-weight: 300;
+  font-size: 18px;
+  line-height: 23px;
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  box-sizing: border-box;
+  padding: 8px;
 }
 
 .select {
-	flex-grow: 1;
-	margin-left: 28px;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	>div.radio {
-		margin-right: 16px;
-	}
-	.password-close {
-		display: none;
-	}
-	.password-open {
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-	}
+  flex-grow: 1;
+  margin-left: 28px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  > div.radio {
+    margin-right: 16px;
+  }
+  .password-close {
+    display: none;
+  }
+  .password-open {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
 }
 
 .result {
-	font-family: Spoqa Han Sans Neo;
-	font-style: normal;
-	font-weight: normal;
-	font-size: 17px;
-	line-height: 21px;
-	text-align: center;
-	.success {
-		margin-top: 24px;
-		color: #1B1A1A;
-	}
-	.error {
-		margin-top: 24px;
-		color: #FF5C5C;
-	}
+  font-family: Spoqa Han Sans Neo;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 17px;
+  line-height: 21px;
+  text-align: center;
+  .success {
+    margin-top: 24px;
+    color: #1b1a1a;
+  }
+  .error {
+    margin-top: 24px;
+    color: #ff5c5c;
+  }
 }
 
 .password-open {
-	.password-input {
-		margin-left: 8px;
-		padding: 4px 8px;
-		width: 118px;
-		font-family: Spoqa Han Sans Neo;
-		font-style: normal;
-		font-weight: 300;
-		font-size: 18px;
-		line-height: 23px;
-		background: #FFFFFF;
-		border: 1px solid rgba(0, 0, 0, 0.5);
-		box-sizing: border-box;
-	}
+  .password-input {
+    margin-left: 8px;
+    padding: 4px 8px;
+    width: 118px;
+    font-family: Spoqa Han Sans Neo;
+    font-style: normal;
+    font-weight: 300;
+    font-size: 18px;
+    line-height: 23px;
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.5);
+    box-sizing: border-box;
+
+    &:focus {
+      outline: none;
+    }
+  }
 }
 
 .protected-close {
-	display: none;
+  display: none;
 }
 
 .protected-open {
-	margin-left: calc(70px + 28px);
-	margin-top: 12px;
-	font-family: Spoqa Han Sans Neo;
-	font-style: normal;
-	font-weight: normal;
-	font-size: 18px;
-	line-height: 23px;
-	.protected-explain {
-		color: #000000;
-	}
-	.protected-error {
-		color: #FF5C5C;
-	}
+  margin-left: calc(70px + 28px);
+  margin-top: 12px;
+  font-family: Spoqa Han Sans Neo;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 18px;
+  line-height: 23px;
+  .protected-description {
+    color: #000000;
+  }
+  .protected-error {
+    color: #ff5c5c;
+  }
+}
+
+.role-error {
+  margin-left: calc(70px + 28px);
+  margin-top: 12px;
+  font-size: 18px;
+  line-height: 23px;
+  color: #ff5c5c;
 }
 
 .submit-wrap {
-	margin-top: 24px;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	.submit {
-		padding: 10px 0px;
-		width: 200px;
-		height: 40px;
-		border: 1px solid rgba(0, 0, 0, 0.5);
-		box-sizing: border-box;
-	}
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  .submit {
+    padding: 10px 0px;
+    width: 200px;
+    height: 40px;
+    border: 1px solid rgba(0, 0, 0, 0.5);
+    box-sizing: border-box;
+  }
 }
 
 .submit {
-	.submit-title {
-		font-family: Spoqa Han Sans Neo;
-		font-style: normal;
-		font-weight: bold;
-		font-size: 16px;
-		line-height: 20px;
-		display: block;
-		text-align: center;
-	}
-	&:hover {
-		cursor: pointer;
-	}
+  .submit-title {
+    font-family: Spoqa Han Sans Neo;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 16px;
+    line-height: 20px;
+    display: block;
+    text-align: center;
+  }
+  &:hover {
+    cursor: pointer;
+  }
 }
 
 .modal-background {
-	display: none;
-	position: fixed;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	background-color: rgba(0, 0, 0, 0.5);
+  z-index: 10;
+  display: none;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
 .modal-open {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	animation: modal-bg-show .3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: modal-bg-show 0.3s;
 }

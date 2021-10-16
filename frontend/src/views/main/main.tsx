@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import Button from '../../components/button/button';
@@ -7,58 +8,79 @@ import ChatroomCreateModal from '../../components/modal/chatroom/create/chatroom
 import SideBar from '../../components/sideBar/sideBar';
 import ChatroomItem, { chatroomItemProps } from './chatroomItem/item';
 import './main.scss';
+=======
+import React, { useState, useEffect } from "react";
+import Button from "../../components/button/button";
+import EmptyPageInfo from "../../components/emptyPage/empty";
+import Header from "../../components/header/header";
+import ChatroomCreateModal from "../../components/modal/chatroom/create/chatroomCreateModal";
+import SideBar from "../../components/sideBar/sideBar";
+import ChatroomItem, { chatroomItemProps } from "./chatroomItem/item";
+import "./main.scss";
+import { sidebarProperty } from "../../components/sideBar/sideBarType";
+import ModalHandler from "../../components/modal/modalhandler";
+import ChatroomDefaultDropdownList from "../../components/dropdown/dropdownList/chatroomDefault";
+import ChatroomAdminDropdownList from "../../components/dropdown/dropdownList/chatroomAdmin";
+import ChatroomOwnerDropdownList from "../../components/dropdown/dropdownList/chatroomOwner";
+import FriendDropdownList from "../../components/dropdown/dropdownList/friend";
+import HeaderDropdownList from "../../components/dropdown/dropdownList/header";
+import OTPModal from "../../components/modal/otp/otpModal";
+import axios from "axios";
+import GameSettingModal from "../../components/modal/game/gameSettingModal";
+import GameModalListener from "../../components/modal/gameModalListener";
+>>>>>>> 7ea3303af2888e238a68985385c8fe3e26348f77
 
 enum ChatroomCategory {
   AllChatroomList,
   JoinedChatroomList,
 }
 
-function Main() {
+const Main = () => {
+  const modalHandler = ModalHandler();
 
-  const [isModalOpen, setIsModalOpen] = useState({
-    'addFriend' : false,
-    'chatroomInvite': false,
-    'chatroomCreate': false,
-    'chatroomSetting': false,
-    'enterPassword': false,
-  });
+  const [chatroomCategory, setChatroomCategory] = useState(
+    ChatroomCategory.AllChatroomList
+  );
 
-  const handleModalOpen = (key: string) => {
-    setIsModalOpen({
-      ...isModalOpen,
-      [key]: true,
-    });
-  }
-
-  const handleModalClose = (key: string) => {
-    setIsModalOpen({
-      ...isModalOpen,
-      [key]: false,
-    });
-  }
-
-  const [chatroomCategory, setChatroomCategory] = useState(ChatroomCategory.AllChatroomList);
   const changeChatroomList = (category: ChatroomCategory) => {
     //io.emit : by category
     //io.on   : get Chatrooms object
     return () => {
       setChatroomCategory(category);
+<<<<<<< HEAD
     }
   }
   const [channels, setChannels] = useState<chatroomItemProps[] | null>(null);
   const [myChannels, setMyChannels] = useState<chatroomItemProps[] | null>(null);
 
+=======
+    };
+  };
+
+  const [channels, setChannels] = useState<chatroomItemProps[] | null>(null);
+  const [myChannels, setMyChannels] = useState<chatroomItemProps[] | null>(null);
+
+>>>>>>> 7ea3303af2888e238a68985385c8fe3e26348f77
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
 				let response = await axios.get(`http://localhost:5000/channel`, { withCredentials: true });
+<<<<<<< HEAD
 				setChannels(response.data);
         response = await axios.get(`http://localhost:5000/channel/me`, { withCredentials: true });
         setMyChannels(response.data);
+=======
+        if (response.data.length != 0)
+          setChannels(response.data);
+        response = await axios.get(`http://localhost:5000/channel/me`, { withCredentials: true });
+        if (response.data.length != 0)
+          setMyChannels(response.data);
+>>>>>>> 7ea3303af2888e238a68985385c8fe3e26348f77
 			}
 			catch (e) { console.log(e); }
 		};
 		fetchData();
+<<<<<<< HEAD
 	}, [channels]);
 
 	if (!channels) {
@@ -101,41 +123,81 @@ function Main() {
                             { roomId: 42, title: "테트리스 잘하는 사람들의 모임", memberCount: 42, isProtected: false },
                             { roomId: 42, title: "슈퍼 겁쟁이들의 모임", memberCount: 42, isProtected: false }, ];
   */
+=======
+	}, []);
+/*
+  if (!channels) {
+		return (
+			<div>Loading..</div>
+		)
+	}*/
+>>>>>>> 7ea3303af2888e238a68985385c8fe3e26348f77
   // to test empty info
   // tempAllChatroomList = [];
   // tempJoinedChatroomList = [];
 
   return (
     <>
-      <Header isLoggedIn={true}/>
+      <Header isLoggedIn={true} />
       <div className="page">
-        <SideBar/>
-        <div className="content">
+        <SideBar
+          title={sidebarProperty.friendList}
+          roomId={1}
+          modalHandler={modalHandler}
+        />
+        <div className="main-wrap">
           <div className="button-list">
             <div className="button-left-side">
-                <Button title="전체 채팅방" onClick={changeChatroomList(ChatroomCategory.AllChatroomList)}></Button>
-                <Button title="참여중인 채팅방" onClick={changeChatroomList(ChatroomCategory.JoinedChatroomList)}></Button>
+              {/* to make a non-focusable element focusable */}
+              <div className="focusable-button" tabIndex={1}>
+                <Button
+                  title="전체 채팅방"
+                  onClick={changeChatroomList(ChatroomCategory.AllChatroomList)}
+                />
+              </div>
+              <div className="focusable-button" tabIndex={1}>
+                <Button
+                  title="참여중인 채팅방"
+                  onClick={changeChatroomList(
+                    ChatroomCategory.JoinedChatroomList
+                  )}
+                />
+              </div>
             </div>
             <div className="button-right-side">
-              <Button title="게임 찾기" onClick={()=>{}}></Button>
-              <Button title="채팅방 만들기" onClick={() => handleModalOpen('chatroomCreate')}></Button>
+              <Button title="게임 찾기" onClick={() => {}} />
+              <Button
+                title="채팅방 만들기"
+                onClick={() => modalHandler.handleModalOpen("chatroomCreate")}
+              />
             </div>
           </div>
 
+<<<<<<< HEAD
           {(chatroomCategory === ChatroomCategory.AllChatroomList && !channels) 
+=======
+          {(chatroomCategory === ChatroomCategory.AllChatroomList && !channels)
+>>>>>>> 7ea3303af2888e238a68985385c8fe3e26348f77
             ? <EmptyPageInfo description={`공개 채팅방이 존재하지 않습니다.\n'채팅방 만들기' 버튼으로 채팅방을 생성해보세요!`}/>
             : (chatroomCategory === ChatroomCategory.JoinedChatroomList && !myChannels)
               ? <EmptyPageInfo description={`현재 참여중인 채팅방이 없습니다.\n전체 채팅방 목록에서 참가해보세요!`}/> 
               : <div className="chatroom-list">
+<<<<<<< HEAD
                   {chatroomCategory === ChatroomCategory.AllChatroomList 
+=======
+                  {chatroomCategory === ChatroomCategory.AllChatroomList && channels
+>>>>>>> 7ea3303af2888e238a68985385c8fe3e26348f77
                     ? channels.map(item => (
                         <ChatroomItem 
                         channel = {item} 
                         key = {item.roomId}/>
                       ))
+<<<<<<< HEAD
                     // : myChannels.map(item => (
                     //     <ChatroomItem roomId={item.roomId} title={item.title} memberCount={item.memberCount} isProtected={item.isProtected}/>
                     //   ))
+=======
+>>>>>>> 7ea3303af2888e238a68985385c8fe3e26348f77
                        : myChannels ? myChannels.map(item => (
                           <ChatroomItem 
                           channel = {item} 
@@ -146,7 +208,11 @@ function Main() {
           }
         </div>
       </div>
-      {isModalOpen.chatroomCreate ? <ChatroomCreateModal open={isModalOpen.chatroomCreate} close={() => handleModalClose('chatroomCreate')}></ChatroomCreateModal> : ""}
+      <ChatroomCreateModal
+        open={modalHandler.isModalOpen.chatroomCreate}
+        close={() => modalHandler.handleModalClose("chatroomCreate")}
+      />
+      <GameModalListener modalHandler={modalHandler}/>
     </>
   );
 }

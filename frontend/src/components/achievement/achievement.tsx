@@ -1,11 +1,11 @@
-import React from 'react';
-import './achievement.scss';
-import Tooltip from '@mui/material/Tooltip';
+import React from "react";
+import "./achievement.scss";
+import Tooltip from "@mui/material/Tooltip";
 
 type achievementItemProps = {
-  title: string,
-  isAchieve: boolean,
-}
+  title: string;
+  isAchieve: boolean;
+};
 
 //db achievementId -> achievementTitle X
 //isfront?
@@ -13,7 +13,13 @@ type achievementItemProps = {
 function AchievementItem(prop: achievementItemProps) {
   return (
     <Tooltip title={prop.title} placement="top">
-      <img className="achievement-item" alt="achievement-item" src={"/icons/achievement/" + (prop.isAchieve ? "true.svg" : "false.svg")}/>
+      <img
+        className="achievement-item"
+        alt="achievement-item"
+        src={
+          "/icons/achievement/" + (prop.isAchieve ? "true.svg" : "false.svg")
+        }
+      />
     </Tooltip>
   );
 }

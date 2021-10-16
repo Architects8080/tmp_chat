@@ -1,4 +1,5 @@
 .modal {
+  z-index: 10;
   display: none;
   position: fixed;
   top: 0;
@@ -58,7 +59,7 @@
   background-color: transparent;
 }
 
-.modal > section > div.explain {
+.modal > section > div.description {
   margin-top: 22px;
   font-family: Spoqa Han Sans Neo;
   font-style: normal;
