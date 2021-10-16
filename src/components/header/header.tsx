@@ -4,6 +4,11 @@ import NotificationOverlay from "../notification/dropdown";
 import ProfileMenu from "../profile/dropdown";
 import "./header.scss";
 
+enum NotifyIconURL {
+  on = "/icons/notification/on.svg",
+  off = "/icons/notification/off.svg",
+};
+
 type headerProps = {
   isLoggedIn: boolean;
 };
@@ -21,12 +26,10 @@ type User = {
 function Header(prop: headerProps) {
   const [isNotiOverlayActive, setIsNotiOverlayActive] = useState(false);
   const [isProfileMenuActive, setIsProfileMenuActive] = useState(false);
-  const [notifyIconURL, setNotifyIconURL] = useState({
-    on: "/icons/notification/on.svg",
-    off: "/icons/notification/off.svg",
-  });
+  const [notifyIconURL, setNotifyIconURL] = useState(NotifyIconURL.off);
 
   const [user, setUser] = useState<User | null>(null);
+  const [notiCount, setNotiCount] = useState<number>(0);
 
   const handleNotifyDropdown = () => {
     console.log(`click!!`);
@@ -42,19 +45,30 @@ function Header(prop: headerProps) {
     //list check and url setting
     axios
       .all([
-        axios.get("http://localhost:5000/user/me", { withCredentials: true }),
-        // axios.get("http://localhost:5000/notification/", { withCredentials: true }),
+        axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/user/me`, { withCredentials: true }),
+        axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/community/notification`, { withCredentials: true }),
       ])
       .then(
-        axios.spread((userInfo) => {
+        axios.spread((userInfo, notiList) => {
           setUser(userInfo.data);
+          setNotiCount(notiList.data.length);
+
+          if (notiList.data.length > 0)
+            setNotifyIconURL(NotifyIconURL.on);
         })
       )
   }, []);
 
+  const updateNotiCount = () => {
+    setNotiCount(notiCount - 1);
+    setNotifyIconURL(NotifyIconURL.off);
+    if (notiCount > 0)
+      setNotifyIconURL(NotifyIconURL.on);
+  }
+
   return (
     <div>
-      <NotificationOverlay isActive={isNotiOverlayActive} nicknameLength={user ? user.nickname.length : 0} />
+      <NotificationOverlay isActive={isNotiOverlayActive} nicknameLength={user ? user.nickname.length : 0} updateIcon={updateNotiCount}/>
       <ProfileMenu isActive={isProfileMenuActive}/>
       <header>
         <div
@@ -72,7 +86,7 @@ function Header(prop: headerProps) {
               <img
                 className="notification-trigger"
                 alt="notification-trigger"
-                src={notifyIconURL.on}
+                src={notifyIconURL}
                 onClick={handleNotifyDropdown}
               />
             </div>

@@ -10,6 +10,7 @@ import "./dropdown.scss";
 type DropdownProps = {
   isActive: boolean;
   nicknameLength: number;
+  updateIcon: () => void;
 };
 
 type Notification = {
@@ -41,10 +42,12 @@ function NotificationOverlay(prop: DropdownProps) {
         title: "친구 요청",
         description: `${nickname}님의 친구 요청입니다. 수락하시겠습니까?`,
         acceptCallback: () => {
+          prop.updateIcon();
           setNotiList(notiList => notiList.filter(item => item.key !== nowKey));
           ioCommunity.emit("friendAcceptToServer", id);
         },
         rejectCallback: () => {
+          prop.updateIcon();
           setNotiList(notiList => notiList.filter(item => item.key !== nowKey));
           ioCommunity.emit("friendRejectToServer", id);
         }
@@ -72,12 +75,14 @@ function NotificationOverlay(prop: DropdownProps) {
             title: title,
             description: `${user.data.nickname}님의 ${title}입니다. 수락하시겠습니까?`,
             acceptCallback: () => {
+              prop.updateIcon();
               setNotiList(notiList => notiList.filter(item => item.key !== nowKey));
               if (noti.type === NotiType.Friend)
                 ioCommunity.emit("friendAcceptToServer", noti.senderID);  //TODO 유저 아이디
               //TODO else if (noti.type === NotiType.Channel) 채팅 초대 수락
             },
             rejectCallback: () => {
+              prop.updateIcon();
               setNotiList(notiList => notiList.filter(item => item.key !== nowKey));
               if (noti.type === NotiType.Friend)
                 ioCommunity.emit("friendRejectToServer", noti.senderID); //TODO 유저 아이디
