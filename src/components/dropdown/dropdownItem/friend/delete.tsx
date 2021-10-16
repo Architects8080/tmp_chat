@@ -1,5 +1,3 @@
-import axios from "axios";
-import React from "react";
 import { ioCommunity } from "../../../../socket/socket";
 import DefaultDropdownItem from "../../itemTemplate/default/item";
 

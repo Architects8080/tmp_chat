@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { ioCommunity } from "../../../../socket/socket";
 import "./addFriendModal.scss";
 
@@ -9,6 +9,8 @@ enum Result {
   NotFoundUser,
   AlreadyFriend,
   Myself,
+  InProgress,
+  Block
 }
 
 type addFriendModalProps = {
@@ -67,11 +69,17 @@ function AddFriendModal(prop: addFriendModalProps) {
             setResultText("존재하지 않는 플레이어입니다. 다시 시도해주세요.");
           else if (code == Result.Myself)
             setResultText("본인 외의 플레이어를 입력해주세요.");
+          else if (code == Result.InProgress)
+            setResultText("이미 친구 요청을 보냈습니다.");
+          else if (code == Result.Block)
+            setResultText("차단한 플레이어입니다. 차단을 해제한 후 다시 시도해주세요.");
         });
       })
       .catch (e => {
-        if (e.response.data.statusCode === 404)
+        if (e.response.data.statusCode === 404) {
+          setresultCode(Result.NotFoundUser);
           setResultText("존재하지 않는 플레이어입니다. 다시 시도해주세요.");
+        }
       });
     } catch (e) {
       console.log(`[addFriendModal] ${e}`);
