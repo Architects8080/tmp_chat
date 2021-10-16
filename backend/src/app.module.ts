@@ -8,16 +8,21 @@ import { AuthModule } from './auth/auth.module';
 import { JwtMiddleware } from './auth/middleware/jwt.middleware';
 import { UserModule } from './user/user.module';
 import { GameModule } from './game/game.module';
+import { OTPModule } from './otp/otp.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { MatchModule } from './match/match.module';
+import { DmModule } from './dm/dm.module';
+import { CommunityModule } from './community/community.module';
 import { ChannelModule } from './channel/channel.module';
-import { ChannelGateway } from './channel/channel.gateway';
+import { AchievementModule } from './achievement/achievement.module';
 
 @Module({
   imports: [
-    AuthModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
     }),
+    AuthModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -32,9 +37,24 @@ import { ChannelGateway } from './channel/channel.gateway';
         synchronize: true,
       }),
     }),
+    ServeStaticModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => [
+        {
+          rootPath: configService.get<string>('public.path'),
+          serveRoot: configService.get<string>('public.route'),
+        },
+      ],
+    }),
     UserModule,
     GameModule,
+    OTPModule,
+    MatchModule,
+    DmModule,
+    CommunityModule,
     ChannelModule,
+    AchievementModule,
   ],
   controllers: [AppController],
   providers: [AppService],

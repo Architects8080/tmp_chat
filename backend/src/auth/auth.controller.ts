@@ -27,13 +27,18 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('test')
   async test(@Req() req, @Res({ passthrough: true }) res: Response) {
-    const token = await this.authService.sign(req.user);
-    if (token) {
-      res.cookie('access_token', token);
-      return res.redirect(
-        `${this.configService.get<string>('client_address')}/main`,
+    try {
+      const token = await this.authService.sign(
+        req.user,
+        req.user.otpSecret == null,
       );
-    }
+      if (token) {
+        res.cookie('access_token', token);
+        return res.redirect(
+          `${this.configService.get<string>('client_address')}/main`,
+        );
+      }
+    } catch (error) {}
   }
 
   @UseGuards(FTAuthGuard)
@@ -43,16 +48,15 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
     @Session() session: Record<string, User>,
   ) {
-    const token = await this.authService.login(req.user, session);
-    if (token) {
-      res.cookie('access_token', token);
-      return res.redirect(
-        `${this.configService.get<string>('client_address')}/main`,
-      );
-    }
-    return res.redirect(
-      `${this.configService.get<string>('client_address')}/register`,
-    );
+    const loginResult = await this.authService.login(req.user, session);
+    let redirectUrl = `${this.configService.get<string>('client_address')}/`;
+    if (loginResult) {
+      res.cookie('access_token', loginResult.token);
+      if (loginResult.user.otpSecret == null) redirectUrl += 'main';
+      else redirectUrl += 'otp';
+    } else redirectUrl += 'register';
+    console.log(redirectUrl);
+    return res.redirect(redirectUrl);
   }
 
   @Post('register')

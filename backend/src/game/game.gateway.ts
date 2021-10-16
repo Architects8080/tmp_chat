@@ -18,7 +18,9 @@ import { GameService } from './game.service';
 import { SocketUserService } from '../socket/socket-user.service';
 import { GameRoomService } from './game-room.service';
 import { GamePlayer } from './data/game-player.data';
+import { MatchmakerService } from './matchmaker/matchmaker.service';
 import { GameRoom } from './data/gameroom.data';
+import { User } from 'src/user/entity/user.entity';
 
 @UseGuards(JwtAuthGuard)
 @WebSocketGateway(4000, { namespace: 'game' })
@@ -30,6 +32,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private gameRoomService: GameRoomService,
     @Inject('GAME_SOCKET_USER_SERVICE')
     private socketUserService: SocketUserService,
+    private matchmakerService: MatchmakerService,
   ) {}
 
   @WebSocketServer()
@@ -66,8 +69,21 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const userPayload = this.jwtService.verify(token);
       const user = await this.jwtStrategy.validate(userPayload);
       client.user = user;
+      this.matchmakerService.removeWaiting(user);
+      this.clearReadyRoom(user);
       this.socketUserService.removeSocket(client);
     } catch (error) {}
+  }
+
+  clearReadyRoom(user: User) {
+    this.gameRoomService
+      .getReadyRoomListByUser(user.id)
+      .forEach((roomId: number) => {
+        const targetId = this.gameRoomService.cancel(user.id, roomId);
+        const target = this.socketUserService.getSocketById(targetId);
+        this.matchmakerService.rejectedMatch(target.user);
+        if (target) target.emit('cancel', roomId);
+      });
   }
 
   @SubscribeMessage('invite')
@@ -75,18 +91,24 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: any[],
     @ConnectedSocket() client: SocketUser,
   ) {
-    console.log(data);
     const targetUserId = data[0];
     const mapSetting = data[1];
     const targetUser = this.socketUserService.getSocketById(targetUserId);
 
+    // queue에서 대기중인 경우 초대를 못 보내게 합니다.
+    if (this.matchmakerService.isWaiting(client.user)) return;
     if (targetUser) {
       const roomId: number = this.gameRoomService.invite(
         client.user.id,
         targetUser.user.id,
         mapSetting,
       );
-
+      // 보낸 대상이 queue에서 대기중인 경우 바로 거절되도록 합니다.
+      if (this.matchmakerService.isWaiting(targetUser.user)) {
+        this.gameRoomService.cancel(targetUser.user.id, roomId);
+        client.emit('cancel', roomId);
+        return;
+      }
       targetUser.emit(
         'invite',
         client.user.nickname,
@@ -128,12 +150,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (!player1 || !player2) {
         // exception
       }
+
       player1.emit('ready', roomId);
       player2.emit('ready', roomId);
 
       player1.join('gameroom:' + roomId.toString());
       player2.join('gameroom:' + roomId.toString());
-
       this.gameService.start(
         roomId,
         (gameInfo: GameInfo) => {
@@ -166,6 +188,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             });
         },
       );
+      this.matchmakerService.removeWaiting(player1.user);
+      this.matchmakerService.removeWaiting(player2.user);
+      this.clearReadyRoom(player1.user);
+      this.clearReadyRoom(player2.user);
     }
   }
 
@@ -181,8 +207,27 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     );
     const canceledPlayer =
       this.socketUserService.getSocketById(canceledPlayerId);
-
+    if (this.matchmakerService.isWaiting(client.user)) {
+      this.matchmakerService.removeWaiting(client.user);
+      if (canceledPlayer)
+        this.matchmakerService.rejectedMatch(canceledPlayer.user);
+    }
     if (canceledPlayer) canceledPlayer.emit('cancel', roomId);
+  }
+
+  @SubscribeMessage('joinQueue')
+  joinQueue(@MessageBody() data: any[], @ConnectedSocket() client: SocketUser) {
+    if (!this.matchmakerService.isWaiting(client.user))
+      this.clearReadyRoom(client.user);
+    this.matchmakerService.addWaiting(client.user);
+  }
+
+  @SubscribeMessage('leaveQueue')
+  leaveQueue(
+    @MessageBody() data: any[],
+    @ConnectedSocket() client: SocketUser,
+  ) {
+    this.matchmakerService.removeWaiting(client.user);
   }
 
   @SubscribeMessage('move')
@@ -193,14 +238,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const roomId = +data[0];
     const moveInfo = data[1];
 
-    console.log(
-      `roomId : `,
-      roomId,
-      `client.user.id : `,
-      client.user.id,
-      `moveInfo : `,
-      moveInfo,
-    );
     this.gameService.move(roomId, client.user.id, moveInfo);
   }
 }

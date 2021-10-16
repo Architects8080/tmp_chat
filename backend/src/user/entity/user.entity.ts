@@ -1,5 +1,12 @@
+<<<<<<< HEAD
 import { Column, Entity, PrimaryColumn, OneToMany } from 'typeorm';
 import { ChannelMember } from 'src/channel/entity/channel.entity';
+=======
+import { Exclude, Transform, TransformFnParams } from 'class-transformer';
+import { configuration } from 'config/configuration';
+import { Block, Friend } from 'src/community/entity/community.entity';
+import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
+>>>>>>> a864136ce98e1c940db1ee791c31ad90ab99a749
 
 @Entity('user')
 export class User {
@@ -13,17 +20,34 @@ export class User {
   intraLogin: string;
 
   @Column()
+  @Transform((avatar: TransformFnParams) => {
+    if (avatar.value == null) return '';
+    if (!avatar.value.match('^https?://')) {
+      const route = configuration.public.route;
+      const avatarRoute = configuration.public.avatar.route;
+      const serverAddress = configuration.server_address;
+      return `${serverAddress}${route}${avatarRoute}/${avatar.value}`;
+    }
+    return avatar.value;
+  })
   avatar: string;
 
   @Column({ default: 0 })
   status: number;
 
-  @Column({ default: false })
-  useTwoFactor: boolean;
+  @Exclude()
+  @Column({ nullable: true, default: null })
+  otpSecret: string;
 
   @Column({ default: 0 })
   ladderPoint: number;
 
   @Column({ default: 0 })
   ladderLevel: number;
+
+  @OneToMany(() => Friend, (rel) => rel.other)
+  friendList: Friend[];
+
+  @OneToMany(() => Block, (rel) => rel.other)
+  blockList: Block[];
 }

@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import * as cookie from 'cookie';
@@ -27,9 +27,10 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
   async validate(payload: JwtDto) {
     try {
+      if (!payload.valid) throw new UnauthorizedException();
       return this.authService.validate(payload);
     } catch (error) {
-      throw new ForbiddenException();
+      throw new UnauthorizedException();
     }
   }
 }

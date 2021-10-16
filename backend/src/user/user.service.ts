@@ -25,16 +25,32 @@ export class UserService {
   }
 
   async getUsers() {
-    return this.userRepository.find();
+    return await this.userRepository.find();
   }
 
   async getUserById(id: number) {
-    const user: User = await this.userRepository.findOne({ where: { id: id } });
+    const user = await this.userRepository.findOne({ where: { id: id } });
+    if (!user) throw new NotFoundException();
+    return user;
+  }
+
+  async getUserByNickname(nickname: string) {
+    const user = await this.userRepository.findOne({
+      where: { nickname: nickname },
+    });
     if (!user) throw new NotFoundException();
     return user;
   }
 
   async deleteUserById(id: number) {
     await this.userRepository.delete({ id: id });
+  }
+
+  async updateAvatar(user: User, file: Express.Multer.File) {
+    await this.userRepository.update(user.id, { avatar: file.filename });
+  }
+
+  async updateUser(user: User) {
+    await this.userRepository.update(user.id, user);
   }
 }

@@ -72,11 +72,34 @@ export class ChannelGateway
     @MessageBody() data: any,
     @ConnectedSocket() client: SocketUser,
   ) {
+<<<<<<< HEAD
     client.join(data.toString());
     const myChannel = await this.channelService.getMyChannel(client);
     if (!myChannel.some((channel) => channel.roomId == data))
       this.channelService.joinChannel(data, client.user.id);
     console.log(client.rooms);
+=======
+    if (this.channelService.channelMap.get(+data).isProtected > 0) {
+      const myChannel = await this.channelService.getMyChannel(client.user.id);
+      if (myChannel.find((myChannel) => myChannel.roomId == data)) {
+        client.join(data.toString());
+        this.channelService.joinChannel(data, client.user.id);
+      } else {
+        this.server.emit('joinRefused', false);
+      }
+    } else {
+      client.join(data.toString());
+      const newMember = {
+        id: client.user.id,
+        nickname: client.user.nickname.toString(),
+        avatar: client.user.avatar.toString(),
+        status: client.user.status,
+      };
+      this.server.to(data.toString()).emit('channelMemberAdd', newMember);
+      this.channelService.joinChannel(data, client.user.id);
+      console.log(client.rooms);
+    }
+>>>>>>> a864136ce98e1c940db1ee791c31ad90ab99a749
   }
 
   @SubscribeMessage('msgToChannel')
@@ -86,8 +109,24 @@ export class ChannelGateway
   ) {
     const payload = {
       text: data.text,
+<<<<<<< HEAD
       name: client.user.intraLogin,
     };
     this.server.to(data.roomId).emit('msgToClient', payload);
   }
+=======
+      name: client.user.nickname,
+    };
+    this.server.to(data.roomId).emit('msgToClient', payload);
+  }
+
+  @SubscribeMessage('leaveChannel')
+  leaveChannel(
+    @MessageBody() data: any,
+    @ConnectedSocket() client: SocketUser,
+  ) {
+    this.channelService.leaveChannel(data, client.user.id);
+    this.server.to(data).emit('channelMemberRemove', client.user.id);
+  }
+>>>>>>> a864136ce98e1c940db1ee791c31ad90ab99a749
 }
