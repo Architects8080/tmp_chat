@@ -10,6 +10,8 @@ import OTP from "./views/auth/otp/otp";
 import Chatroom from "./views/chatroom/chatroom";
 import Login from "./views/auth/login";
 import TestLogin from "./views/auth/test";
+import BlockList from "./views/blocklist/blocklist";
+
 
 function App() {
   return (
@@ -25,6 +27,7 @@ function App() {
       <Route path="/otp" component={OTP} />
       <Route path="/register" component={Register} />
       <Route path="/chatroom/:id" component={Chatroom} />
+      <Route path="/blocklist" component={BlockList} />
     </div>
   );
 }
