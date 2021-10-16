@@ -15,10 +15,10 @@ export type User = {
 
 export type Match = {
   id: number;
-  gameType: number;
+  gameType: GameType;
   startAt: Date;
   endAt: Date;
-  gameTime: GameType;
+  gameTime: number;
   players: MatchPlayer[];
   targetId: number;
 }
