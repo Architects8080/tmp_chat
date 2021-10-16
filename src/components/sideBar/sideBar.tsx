@@ -8,7 +8,6 @@ import FriendDropdownList from "../dropdown/dropdownList/friend";
 import ChatroomInviteModal from "../modal/chatroom/invite/chatroomInviteModal";
 import ChatroomSettingModal from "../modal/chatroom/setting/chatroomSettingModal";
 import AddFriendModal from "../modal/friend/add/addFriendModal";
-import { useNotiDispatch } from "../notification/notificationContext";
 import AddUserIcon from "./icon/addUser";
 import InviteUserIcon from "./icon/inviteUser";
 import SettingIcon from "./icon/setting";
@@ -23,7 +22,6 @@ import {
 } from "./sideBarType";
 
 function SideBar(prop: sidebarProps) {
-  const notiDispatch = useNotiDispatch();
   const [userList, setUserList] = useState<userItemProps[]>([]);
   // use UserAPI to get userId;
 
@@ -140,22 +138,6 @@ function SideBar(prop: sidebarProps) {
 	};
 
   useEffect(() => {
-    //친구 요청 수신
-    ioCommunity.on("friendRequestToClient",
-    async (id: number, nickname: string) => {
-      notiDispatch({
-        type: "ADD",
-        Notification: {
-          title: "친구 요청",
-          description: `${nickname}님의 친구 신청입니다. 수락하시겠습니까?`,
-          acceptCallback: () => {
-            ioCommunity.emit("friendAcceptToServer", id);
-          },
-          rejectCallback: () => {}
-        }
-      })
-    });
-
     //친구 수락 수신
     ioCommunity.on("friendAcceptToClient", async (friendID: number) => {
       const response = await axios.get(
