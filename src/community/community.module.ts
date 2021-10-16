@@ -9,6 +9,7 @@ import { CommunityController } from './community.controller';
 import { CommunityGateway } from './community.gateway';
 import { CommunityService } from './community.service';
 import { Block, Friend } from './entity/community.entity';
+import { Notification } from './entity/notification.entity';
 import { SocketUserService } from './socket-user.service';
 
 @Module({
@@ -16,7 +17,8 @@ import { SocketUserService } from './socket-user.service';
     Friend,
     Block,
     User,
-    DirectMessageInfo
+    DirectMessageInfo,
+    Notification
   ]), AuthModule],
   controllers: [CommunityController],
   providers: [
