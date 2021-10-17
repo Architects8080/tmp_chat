@@ -5,29 +5,17 @@ import { DM, userItemProps } from '../sideBar/sideBarType';
 import { ioCommunity } from '../../socket/socket';
 
 type DMProps = {
+	myProfile: {id: number, nickname: string},
 	friend: userItemProps,
-	friendRef: MutableRefObject<userItemProps>,
+	friendRef: MutableRefObject<userItemProps | null>,
 	closeDM: () => void,
 	alertNewDM: (senderID: number) => void
 };
 
-function DirectMessage({friend, friendRef, closeDM, alertNewDM}: DMProps) {
+function DirectMessage({myProfile, friend, friendRef, closeDM, alertNewDM}: DMProps) {
 	const [message, setMessage] = useState<string>('');
 	const [DMList, setDMList] = useState<DM[]>([]);
 	const DMRef = useRef<HTMLLIElement | null>(null);
-	const myProfile = useRef<{id: number, nickname: string} | null>(null);
-
-	const getMyProfile = async () => {
-		try {
-			const response = await axios.get(
-				`${process.env.REACT_APP_SERVER_ADDRESS}/user/me`, {withCredentials: true}
-			);
-			myProfile.current = {id: response.data.id, nickname: response.data.nickname};
-		} catch (e) {
-			console.log(`[DMUserInfo] ${e}`);
-		}
-	}
-	useEffect(() => { getMyProfile() }, []);
 
 	const fetchDMList = async (friendID: number) => {
 		try {
@@ -51,7 +39,7 @@ function DirectMessage({friend, friendRef, closeDM, alertNewDM}: DMProps) {
 	useEffect(() => { fetchDMList(friend.id) }, [friend]);
 
 	const receiveDM = (newDM: DM) => {
-		if (newDM.id === friendRef.current.id || newDM.id === myProfile.current?.id) {
+		if (newDM.id === friendRef?.current?.id || newDM.id === myProfile.id) {
 			setDMList(DMList => [...DMList, newDM]);
 			DMRef.current?.scrollIntoView({ behavior: 'smooth' });
 		}
@@ -65,7 +53,7 @@ function DirectMessage({friend, friendRef, closeDM, alertNewDM}: DMProps) {
 		if (e.key !== 'Enter' || message === '')
 			return;
 		const newDM = {
-			userID: myProfile.current?.id,
+			userID: myProfile.id,
 			friendID: friend.id,
 			message: message,
 		};
@@ -88,9 +76,9 @@ function DirectMessage({friend, friendRef, closeDM, alertNewDM}: DMProps) {
 			</div>
 			<ul>
 				{DMList.map(DM => (
-					DM.id === myProfile.current?.id ? (
+					DM.id === myProfile.id ? (
 						<li className="dm-message my-dm" ref={DMRef}>
-							<div className="dm-user">{myProfile.current?.nickname}</div>
+							<div className="dm-user">{myProfile.nickname}</div>
 							<div className="dm-text">{DM.message}</div>
 						</li>
 					):(
