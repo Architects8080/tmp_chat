@@ -88,6 +88,7 @@ const Chatroom = () => {
             {messages.map(message => (
               <ChatMessage key={message.id} isSelfMessage={true} nickname={message.name} content={message.text}/>
             ))}
+            <AlwaysScrollToBottom/>
           </div>
           <div className="chatroom-user-input">
             <input 

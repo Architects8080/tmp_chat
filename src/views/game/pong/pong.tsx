@@ -34,6 +34,9 @@ function Pong({ roomID, gameInfo }: PongProps) {
 
   const keyDownEvent = useCallback((e) => {
     //usememo 그대로 써서 cost
+
+    e.preventDefault();
+    e.target.focus({preventScroll: true});
     if (e.key === "ArrowUp" || e.key === "w") {
       io.emit("move", [roomID, moveUpSpeed]);
     }
