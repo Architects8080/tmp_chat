@@ -11,7 +11,6 @@ type ModalProps = {
   open: boolean;
   close: any;
   targetId: number;
-  // children: React.ReactNode;
 };
 
 function GameSettingModal(prop: ModalProps) {
@@ -74,15 +73,16 @@ function GameSettingModal(prop: ModalProps) {
   };
 
   return (
-    <div className={prop.open ? "openModal modal" : "modal"}>
+    <div className={prop.open ? "open-modal modal" : "modal"}>
       {prop.open ? (
         <section>
           <div className="modal-title">
             게임 설정
-            <button className="modal-close" onClick={prop.close}>
-              {" "}
-              X{" "}
-            </button>
+            <img
+              className="close"
+              alt="close"
+              src="/icons/modal/close.svg"
+              onClick={prop.close} />
           </div>
           <div className="description">
             커스텀 게임을 진행하기 전에 맵, 장애물 여부를 선택해주세요.
@@ -90,7 +90,7 @@ function GameSettingModal(prop: ModalProps) {
           {/* 1번째 subtitle */}
           <div className="modal-content">
             <div className="title">맵 선택 & 미리보기</div>
-            <img src={mapList[currentImageIdx]} />
+            <img src={mapList[currentImageIdx]} className="preview-map"/>
           </div>
 
           {/* 2번째 subtitle */}
@@ -145,7 +145,7 @@ function GameSettingModal(prop: ModalProps) {
             <div className="title">장애물 여부</div>
             <input type="checkbox" id="obstacle" onChange={handleChangeEvent} />
           </div>
-          <div className="gameSettingmodal-submit">
+          <div className="game-setting-submit">
             <button className="close" onClick={handleSubmit}>
               {" "}
               submit

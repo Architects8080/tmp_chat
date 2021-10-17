@@ -8,40 +8,33 @@ import { score, winnerProfile } from "./gameResultModalType";
 type ModalProps = {
   open: any;
   close: any;
-  header: any;
   score: score;
   winnerProfile: winnerProfile;
 };
 
 function GameResultModal(prop: ModalProps) {
   const handleClose = () => {
-    //redirect to main
     prop.close();
   };
 
   return (
-    <div className={prop.open ? "openModal modal" : "modal"}>
+    <div className={prop.open ? "open-modal modal" : "modal"}>
       {prop.open ? (
         <section>
           <div className="modal-title">
-            {prop.header}
-            <button className="modal-close" onClick={handleClose}>
-              {" "}
-              X{" "}
-            </button>
+            게임 결과
+            <img
+              className="close"
+              alt="close"
+              src="/icons/modal/close.svg"
+              onClick={handleClose} />
           </div>
 
-          {/* 1번째 subtitle */}
-          {/* from Server get ImageURL*/}
           <div className="modal-content center">
             <h3>👑Winner👑</h3>
-            <div className="image-cropper">
-              <img src={prop.winnerProfile.avatar} className="rounded" />
-            </div>
+            <img src={prop.winnerProfile.avatar} className="rounded-avatar" />
           </div>
 
-          {/* 2번째 subtitle */}
-          {/* from Server get nick */}
           <div className="modal-content center">
             {prop.winnerProfile.nickname}
           </div>
@@ -53,9 +46,8 @@ function GameResultModal(prop: ModalProps) {
             <br />
             <br />
           </div>
-          <div className="gameResult-submit">
+          <div className="game-result-submit">
             <button className="accept" onClick={handleClose}>
-              {" "}
               메인으로 돌아가기
             </button>
           </div>

@@ -1,3 +1,23 @@
+@keyframes modal-show {
+  from {
+    opacity: 0;
+    margin-top: -50px;
+  }
+  to {
+    opacity: 1;
+    margin-top: 0;
+  }
+}
+
+@keyframes modal-bg-show {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .modal {
   z-index: 10;
   display: none;
@@ -7,6 +27,13 @@
   bottom: 0;
   left: 0;
   background-color: rgba(0, 0, 0, 0.5);
+
+  &.open-modal {
+    display: flex;
+    align-items: center;
+    /* 팝업이 열릴때 스르륵 열리는 효과 */
+    animation: modal-bg-show 0.3s;
+  }
 }
 
 /* modal all button */
@@ -22,8 +49,7 @@
   display: table;
   width: auto;
 
-  margin: 0 auto; /* to animation */
-  /* width: 526px; */
+  margin: 0 auto;
   padding: 32px 24px;
 
   background: #ffffff;
@@ -33,268 +59,253 @@
   font-family: Spoqa Han Sans Neo;
 
   align-items: center;
-  /* 팝업이 열릴때 스르륵 열리는 효과 */
   animation: modal-show 0.3s;
   overflow: hidden;
-}
 
-/* Title */
-.modal > section > div.modal-title {
-  font-style: normal;
-  font-weight: bold;
-  font-size: 24px;
-  position: relative;
+  .modal-title {
+    font-style: normal;
+    font-weight: bold;
+    font-size: 24px;
+    position: relative;
+    font-weight: 700;
+  
+    .close {
+      float: right;
+  
+      &:hover {
+        cursor: pointer;
+      }
+    }
+  }
 
-  /* background-color: #f1f1f1; */
-  font-weight: 700;
-}
+  .description {
+    margin-top: 22px;
+    font-family: Spoqa Han Sans Neo;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 14px;
+    line-height: 18px;
+  
+    color: #9c9c9c;
+  
+    background-color: transparent;
+  }
 
-.modal > section > div.modal-title > button.modal-close {
-  float: right;
-  font-size: 21px;
-  font-weight: 700;
-  text-align: center;
-  color: #000;
+  // gameInviteModal
+  .game-invite {
+    margin-top: 78px;
+    font-family: Spoqa Han Sans Neo;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 18px;
+    line-height: 23px;
+    text-align: center;
+  
+    color: #9c9c9c;
+  
+    background-color: transparent;
+  }
 
-  background-color: transparent;
-}
+  .modal-content {
+    margin-top: 24px;
 
-.modal > section > div.description {
-  margin-top: 22px;
-  font-family: Spoqa Han Sans Neo;
-  font-style: normal;
-  font-weight: normal;
-  font-size: 14px;
-  line-height: 18px;
+    &.center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-top: 28px;
+    
+      font-family: Spoqa Han Sans Neo;
+      font-style: normal;
+      font-weight: bold;
+      font-size: 24px;
+    }
 
-  color: #9c9c9c;
+    .title {
+      display: block;
+      margin-bottom: 16px;
+      font-style: normal;
+      font-weight: bold;
+      font-size: 16px;
+      align-items: center;
+    }
 
-  background-color: transparent;
-}
+    .preview-map {
+      height: 320px;
+      width: 512px;
+      object-fit: cover;
+      border-radius: 5px;
+    }
 
-.modal > section > div.game-invite {
-  margin-top: 78px;
-  font-family: Spoqa Han Sans Neo;
-  font-style: normal;
-  font-weight: normal;
-  font-size: 18px;
-  line-height: 23px;
-  text-align: center;
+    & input {
+        margin: 0;
+    }
 
-  color: #9c9c9c;
+    .rounded-avatar {
+      display: flex;
+      justify-content: center;
+      width: 152px;
+      height: 152px;
+      object-fit: cover;
+      filter: drop-shadow(0px 8px 16px rgba(0, 0, 0, 0.25));
+      border-radius: 100%;
+    }
+  }
 
-  background-color: transparent;
-}
 
-/* Content */
-div.modal-content {
-  margin-top: 24px;
-}
+  .game-invite-submit {
+    width: 531px;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 48px;
+  
+    .accept {
+      width: 252px;
+      margin-top: 30px;
+      padding: 16px 0;
+      background: rgba(53, 97, 255, 0.1);
+      border-radius: 8px;
+  
+      font-family: Spoqa Han Sans Neo;
+      font-weight: bold;
+      font-size: 16px;
+      line-height: 20px;
+  
+      color: #3562ff;
+      &:hover {
+        background: #3562ff;
+        color: #ffffff;
+        transition: 0.3s;
+      }
+    }
+  
+    .reject {
+      width: 252px;
+      margin-top: 30px;
+      padding: 16px 0;
+      background: rgba(255, 92, 92, 0.1);
+    
+      font-family: Spoqa Han Sans Neo;
+      font-weight: bold;
+      font-size: 16px;
+      line-height: 20px;
+    
+      color: #ff5c5c;
+      border-radius: 8px;
 
-div.modal-content.center {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-top: 28px;
+      &:hover {
+        background: #ff5c5c;
+        color: #ffffff;
+        transition: 0.3s;
+      }
+    }
+  }
 
-  font-family: Spoqa Han Sans Neo;
-  font-style: normal;
-  font-weight: bold;
-  font-size: 24px;
-}
+  .game-setting-submit {
+    .close {
+      width: 100%;
+      margin-top: 30px;
+      padding: 16px 0;
+      background: rgba(53, 97, 255, 0.1);
+    
+      font-family: Spoqa Han Sans Neo;
+      font-weight: bold;
+      font-size: 16px;
+      line-height: 20px;
+    
+      color: #3562ff;
+      border-radius: 8px;
 
-div.modal-content > div.title {
-  display: block;
-  margin-bottom: 16px;
-  font-style: normal;
-  font-weight: bold;
-  font-size: 16px;
-  align-items: center;
-}
+      &:hover {
+        background: #3562ff;
+        color: #ffffff;
+        transition: 0.3s;
+      }
+    }
+  }
 
-/* Preview */
-div.modal-content > img {
-  /* background: url(https://www.imaginarycloud.com/blog/content/images/2019/02/Pong.jpg); */
-  height: 320px;
-  width: 512px;
-  object-fit: cover;
-  border-radius: 5px;
+  .game-result-submit {
+    .accept {
+      width: 528px;
+      margin-top: 30px;
+      padding: 16px 0;
+      background: rgba(53, 97, 255, 0.1);
+      border-radius: 8px;
+    
+      font-family: Spoqa Han Sans Neo;
+      font-weight: bold;
+      font-size: 16px;
+      line-height: 20px;
+    
+      color: #3562ff;
+      &:hover {
+        background: #3562ff;
+        color: #ffffff;
+        transition: 0.3s;
+      }
+    }
+  }
 }
 
 /* Custom Dropdown Menu */
-div.menu-container button {
-  background: #ffffff;
-  border: 1px solid #d5d5d5;
-  box-sizing: border-box;
-  border-radius: 5px;
+.menu-container {
+  .menu-trigger {
+    background: #ffffff;
+    border: 1px solid #d5d5d5;
+    box-sizing: border-box;
+    border-radius: 5px;
 
-  padding: 16px;
+    padding: 16px;
 
-  font-family: Spoqa Han Sans Neo;
-  font-style: normal;
-  font-weight: normal;
-  font-size: 14px;
-  line-height: 18px;
+    font-family: Spoqa Han Sans Neo;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 14px;
+    line-height: 18px;
 
-  text-align: left;
-  width: 100%;
-  color: #000000;
-}
+    text-align: left;
+    width: 100%;
+    color: #000000;
 
-div.menu-container > .menu {
-  background: #ffffff;
-  border-radius: 8px;
-  width: 100%;
-  box-shadow: 0 5px 8px rgba(0, 0, 0, 0.3);
-  opacity: 0;
-  display: none;
-  /* visibility: hidden; */
-  transform: translateY(-20px);
-  transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s;
-}
+    &:hover {
+      box-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
+    }
+  }
 
-div.menu-container > .menu-trigger:hover {
-  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
-}
-
-div.menu-container > .menu.active {
-  opacity: 1;
-  display: block;
-  /* visibility: visible; */
-  transform: translateY(0);
-}
-
-div.menu-container > .menu ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-div.menu-container > .menu li {
-  border-bottom: 1px solid #dddddd;
-}
-
-div.menu-container > .menu li a {
-  text-decoration: none;
-  color: #333333;
-  padding: 15px 20px;
-  display: block;
-}
-
-div.modal-content > input {
-  margin: 0;
-}
-
-/* ***************** */
-/* Invite Game Modal */
-
-div.modal-content > div.image-cropper {
-  display: flex;
-  justify-content: center;
-  width: 152px;
-  height: 152px;
-  overflow: hidden;
-  border-radius: 102px;
-  filter: drop-shadow(0px 8px 16px rgba(0, 0, 0, 0.25));
-}
-
-/* div.modal-content > div.image-cropper img {
-	margin: 0 auto;
-	height: 100%;
-	width: auto;
-} */
-
-/* Submit */
-.modal > section > div.gameInvite-submit {
-  width: 531px;
-  display: flex;
-  justify-content: space-between;
-  margin-top: 48px;
-}
-
-.modal > section > div.gameSettingmodal-submit > button.close {
-  width: 100%;
-  margin-top: 30px;
-  padding: 16px 0;
-  background: rgba(53, 97, 255, 0.1);
-
-  font-family: Spoqa Han Sans Neo;
-  font-weight: bold;
-  font-size: 16px;
-  line-height: 20px;
-
-  color: #3562ff;
-  border-radius: 8px;
-}
-
-.modal > section > div.gameInvite-submit > button.accept {
-  width: 252px;
-  margin-top: 30px;
-  padding: 16px 0;
-  background: rgba(53, 97, 255, 0.1);
-  border-radius: 8px;
-
-  font-family: Spoqa Han Sans Neo;
-  font-weight: bold;
-  font-size: 16px;
-  line-height: 20px;
-
-  color: #3562ff;
-}
-
-.modal > section > div.gameInvite-submit > button.reject {
-  width: 252px;
-  margin-top: 30px;
-  padding: 16px 0;
-  background: rgba(255, 92, 92, 0.1);
-
-  font-family: Spoqa Han Sans Neo;
-  font-weight: bold;
-  font-size: 16px;
-  line-height: 20px;
-
-  color: #ff5c5c;
-  border-radius: 8px;
-}
-
-.modal > section > div.gameResult-submit > button.accept {
-  width: 528px;
-  margin-top: 30px;
-  padding: 16px 0;
-  background: rgba(53, 97, 255, 0.1);
-  border-radius: 8px;
-
-  font-family: Spoqa Han Sans Neo;
-  font-weight: bold;
-  font-size: 16px;
-  line-height: 20px;
-
-  color: #3562ff;
-}
-
-.modal.openModal {
-  display: flex;
-  align-items: center;
-  /* 팝업이 열릴때 스르륵 열리는 효과 */
-  animation: modal-bg-show 0.3s;
-}
-
-@keyframes modal-show {
-  from {
+  .menu {
+    background: #ffffff;
+    border-radius: 8px;
+    width: 100%;
+    box-shadow: 0 5px 8px rgba(0, 0, 0, 0.3);
     opacity: 0;
-    margin-top: -50px;
-  }
-  to {
-    opacity: 1;
-    margin-top: 0;
-  }
-}
-@keyframes modal-bg-show {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
+    display: none;
+    /* visibility: hidden; */
+    transform: translateY(-20px);
+    transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s;
+
+    &.active {
+      opacity: 1;
+      display: block;
+      /* visibility: visible; */
+      transform: translateY(0);
+    }
+
+    & ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      & li {
+        border-bottom: 1px solid #dddddd;
+
+        & a {
+          text-decoration: none;
+          color: #333333;
+          padding: 8px 0;
+          display: block;
+        }
+      }
+    }
   }
 }

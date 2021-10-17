@@ -32,6 +32,7 @@ function AddFriendModal(prop: addFriendModalProps) {
   const handleUserInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value === "") {
       setResultText("");
+      setresultCode(Result.Default);
     }
     setInput(e.target.value);
   };
