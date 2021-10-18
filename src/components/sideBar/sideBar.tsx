@@ -159,7 +159,7 @@ function SideBar(prop: sidebarProps) {
         nickname: response.data.nickname,
         alert: false
       };
-      setUserList(userList => userList? [...userList, ] : [newUser]);
+      setUserList(userList => userList? [...userList, newUser] : [newUser]);
     });
 
     //친구 차단 수신
