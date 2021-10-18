@@ -1,10 +1,14 @@
 import {
   BadRequestException,
   ConflictException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CommunityGateway } from 'src/community/community.gateway';
+import { FriendService } from 'src/friend/friend.service';
 import { Repository } from 'typeorm';
 import { BlockRelationshipDto } from './dto/block-relationship.dto';
 import { Block } from './entity/block.entity';
@@ -14,15 +18,23 @@ export class BlockService {
   constructor(
     @InjectRepository(Block)
     private blockRepository: Repository<Block>,
+    @Inject(forwardRef(() => CommunityGateway))
+    private communityGateway: CommunityGateway,
+    @Inject(forwardRef(() => FriendService))
+    private friendService: FriendService,
   ) {}
+
   async deleteBlock(dto: BlockRelationshipDto) {
     await this.blockRepository.delete(dto);
+    const friend = this.friendService.getFriendById(dto);
+    if (friend) this.communityGateway.addFriendUser(dto.userId, dto.otherId);
   }
 
   async setBlock(dto: BlockRelationshipDto) {
     if (dto.otherId == dto.userId) throw new BadRequestException();
     try {
       await this.blockRepository.insert(this.blockRepository.create(dto));
+      this.communityGateway.removeFriendUser(dto.userId, dto.otherId);
     } catch (error) {
       switch (error.code) {
         case '23505':

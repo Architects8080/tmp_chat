@@ -7,6 +7,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CommunityGateway } from 'src/community/community.gateway';
 import { FriendService } from 'src/friend/friend.service';
 import { Repository } from 'typeorm';
 import { NotificationDto } from './dto/notification';
@@ -19,6 +20,8 @@ export class NotificationService {
     private readonly notificationRepository: Repository<Notification>,
     @Inject(forwardRef(() => FriendService))
     private readonly friendService: FriendService,
+    @Inject(forwardRef(() => CommunityGateway))
+    private readonly communityGateway: CommunityGateway,
   ) {}
 
   async getNotifications(userId: number) {
@@ -34,17 +37,19 @@ export class NotificationService {
   }
 
   async setNotification(userId: number, dto: NotificationDto) {
-    const notification = {
+    const notification = this.notificationRepository.create({
       senderId: userId,
       ...dto,
-    };
+    });
     const result = await this.notificationRepository.findOne(notification);
 
     if (result) return null;
     try {
-      return await this.notificationRepository.insert(
-        this.notificationRepository.create(notification),
+      const insertResult = await this.notificationRepository.insert(
+        notification,
       );
+      this.communityGateway.notify(dto.receiverId, notification);
+      return insertResult;
     } catch (error) {
       throw new BadRequestException();
     }

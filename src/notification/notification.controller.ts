@@ -10,7 +10,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
-import { NotificationDto } from './dto/notification';
 import { NotificationService } from './notification.service';
 
 @UseGuards(JwtAuthGuard)

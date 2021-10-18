@@ -10,6 +10,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { BlockService } from 'src/block/block.service';
 import { Block } from 'src/block/entity/block.entity';
+import { CommunityGateway } from 'src/community/community.gateway';
 import { Friend } from 'src/friend/entity/friend.entity';
 import { NotificationType } from 'src/notification/entity/notification.entity';
 import { NotificationService } from 'src/notification/notification.service';
@@ -26,10 +27,13 @@ export class FriendService {
     private friendRepository: Repository<Friend>,
     @InjectRepository(Block)
     private blockRepository: Repository<Block>,
+    @Inject(forwardRef(() => BlockService))
     private blockService: BlockService,
     @Inject(forwardRef(() => NotificationService))
     private notificationService: NotificationService,
     private userService: UserService,
+    @Inject(forwardRef(() => CommunityGateway))
+    private communityGateway: CommunityGateway,
   ) {}
 
   async deleteFriend(dto: FriendRelationshipDto) {
@@ -50,6 +54,8 @@ export class FriendService {
           otherId: dto.userId,
         }),
       );
+      this.communityGateway.addFriendUser(dto.userId, dto.otherId);
+      this.communityGateway.addFriendUser(dto.otherId, dto.userId);
     } catch (error) {
       switch (error.code) {
         case '23505':

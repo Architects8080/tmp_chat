@@ -28,9 +28,6 @@ export class User {
   })
   avatar: string;
 
-  @Column({ default: 0 })
-  status: number;
-
   @Exclude()
   @Column({ nullable: true, default: null })
   otpSecret: string;

@@ -189,7 +189,6 @@ export class ChannelService {
       result.push({
         id: item['user'].id,
         avatar: item['user'].avatar,
-        status: item['user'].status,
         nickname: item['user'].nickname,
       });
     });
