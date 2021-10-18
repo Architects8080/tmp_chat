@@ -14,19 +14,29 @@ export type chatroomItemProps = {
 
 const ChatroomItem = ({channel} : {channel:any}) => {
   const modalHandler = ModalHandler();
+  const [userId, setUserId] = useState(0);
 
   const handleOnClick = async () => {
     if (channel.isProtected) {
       try {
-        const response = await axios.get(`http://localhost:5000/channel/me`, { withCredentials: true });
-        if (response.data.find((mychannel: any) => mychannel.roomId === channel.roomId)) {
-          window.location.href = `http://localhost:3000/chatroom/${channel.roomId}`
-        } else
-          modalHandler.handleModalOpen("enterPassword");
+        axios.all([
+          axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/user/me`),
+          axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/me`),
+        ])
+        .then(
+          axios.spread((user, myChannelList) => {
+            setUserId(user.data.id);
+            if (myChannelList.data.find((myChannel: any) => myChannel.roomId === channel.roomId))
+              window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/chatroom/${channel.roomId}`
+            else
+              modalHandler.handleModalOpen("enterPassword");
+          })
+        );
       }
       catch (e) { console.log(e); }
-    } else
-      window.location.href = `http://localhost:3000/chatroom/${channel.roomId}`
+    } else {
+      window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/chatroom/${channel.roomId}`
+    }
   };
 
   const handleModalClose = () => {
@@ -42,7 +52,7 @@ const ChatroomItem = ({channel} : {channel:any}) => {
         </div>
         <div className="chatroom-member-count">{channel.memberCount}명 참여중</div>
       </div>
-      <EnterPasswordModal open={modalHandler.isModalOpen.enterPassword} close={handleModalClose} roomId={channel.roomId}/>
+      <EnterPasswordModal open={modalHandler.isModalOpen.enterPassword} close={handleModalClose} userId={userId} roomId={channel.roomId}/>
     </>
   );
 }

@@ -41,18 +41,19 @@ const Main = () => {
   const [channels, setChannels] = useState<chatroomItemProps[] | null>(null);
   const [myChannels, setMyChannels] = useState<chatroomItemProps[] | null>(null);
 
+  const fetchData = async () => {
+    try {
+      let response = await axios.get(`http://localhost:5000/channel`, { withCredentials: true });
+      if (response.data.length != 0)
+        setChannels(response.data);
+      response = await axios.get(`http://localhost:5000/channel/me`, { withCredentials: true });
+      if (response.data.length != 0)
+        setMyChannels(response.data);
+    }
+    catch (e) { console.log(e); }
+  };
+
 	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				let response = await axios.get(`http://localhost:5000/channel`, { withCredentials: true });
-        if (response.data.length != 0)
-          setChannels(response.data);
-        response = await axios.get(`http://localhost:5000/channel/me`, { withCredentials: true });
-        if (response.data.length != 0)
-          setMyChannels(response.data);
-			}
-			catch (e) { console.log(e); }
-		};
 		fetchData();
 	}, []);
 /*

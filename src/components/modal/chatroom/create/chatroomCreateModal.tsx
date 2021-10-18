@@ -38,6 +38,7 @@ const ChatroomCreateModal = (prop: chatroomCreateModalProps) => {
 
   useEffect(() => {
     ioChannel.on('channelCreated', (channelId) => {
+      console.log(`channelId : `, channelId);
       window.location.href = `http://localhost:3000/chatroom/${channelId}`
     });
   }, []);
@@ -45,6 +46,7 @@ const ChatroomCreateModal = (prop: chatroomCreateModalProps) => {
   const handleUserInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
     setDescriptionText("비밀번호는 숫자 4자리로 구성 가능합니다.");
+    setErrorText("비밀번호를 적어주세요.");
     if (e.target.value.length !== 4)
       setErrorText("비밀번호를 숫자 4자리로 구성해주세요.");
     else if (
@@ -65,14 +67,17 @@ const ChatroomCreateModal = (prop: chatroomCreateModalProps) => {
   };
 
   const handleSubmitEvent = () => {
-    if (errorText === "" && title !== '') {
-      const newChannel: channelCreateDto = {
-        title: title,
-        type: selectedRoomType,
-        password: password,
+    const newChannel: channelCreateDto = {
+      title: title,
+      type: selectedRoomType,
+      password: password,
+    };
+
+    if (title !== '') {
+      if (selectedRoomType == roomType.protectedRoom && password.length == 4 || selectedRoomType != roomType.protectedRoom) {
+        ioChannel.emit('createChannel', newChannel);
+        prop.close();
       }
-      ioChannel.emit('createChannel', newChannel);
-      prop.close();
     }
   };
 
