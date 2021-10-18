@@ -13,8 +13,10 @@ function UserItem(prop: userItemProps) {
   return (
     <div className="user-item-wrap">
       <div className="user-photo-wrap">
-        <img className="avatar" src={prop.avatar} alt="cannot loaded avatar" />
-        <img className="status" src={userStatus} alt="cannot loaded status" />
+        <div className="profile">
+          <img className="avatar" src={prop.avatar} alt="cannot loaded avatar" />
+        </div>
+          <img className="status" src={userStatus} alt="cannot loaded status" />
       </div>
       <div className="nickname">{prop.nickname}</div>
     </div>

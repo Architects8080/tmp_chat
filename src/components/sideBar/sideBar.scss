@@ -48,35 +48,34 @@ aside {
   .user-list {
     max-height: calc(100vh - 92px - 96px);
     overflow-y: scroll;
+    li {
+      padding: 0;
+      .alert-overlay {
+        position: absolute;
+        opacity: 0;
+        width: 360px;
+        height: 102px;
+        background: rgb(#FFF6C7, 0.5);
+        animation: alert-animation 1s ease-in-out;
+      }
+    }
   }
 
-  // .DM {
-  //   height: auto;
-  //   border-radius: 5px;
-  //   box-shadow: 0 0 5px rgb(0, 0, 0, 0.3);
-  //   .DM-header {
-  //     display: flex;
-  //     justify-content: space-between;
-  //     span {
-  //       margin-top: 5px;
-  //       margin-left: 5px;
-  //     }
-  //     button {
-  //       margin-top: 5px;
-  //       margin-right: 5px;
-  //     }
-  //   }
-  //   ul {
-  //     height: 150px;
-  //     border: 1px solid #d5d5d5;
-  //     overflow: auto;
-  //   }
-  //   ul span {
-  //     font-weight: 600;
-  //   }
-  //   input {
-  //     width: 130px;
-  //     margin: 0 5px;
-  //   }
-  // }
+  @keyframes alert-animation {
+    0% {
+      opacity: 0;
+    }
+    25% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+    75% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
 }
