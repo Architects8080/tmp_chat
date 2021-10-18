@@ -1,6 +1,7 @@
 import { Exclude, Transform, TransformFnParams } from 'class-transformer';
 import { configuration } from 'config/configuration';
-import { Block, Friend } from 'src/community/entity/community.entity';
+import { Block } from 'src/block/entity/block.entity';
+import { Friend } from 'src/friend/entity/friend.entity';
 import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 
 @Entity('user')
