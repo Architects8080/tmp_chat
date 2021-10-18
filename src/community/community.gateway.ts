@@ -97,6 +97,7 @@ export class CommunityGateway
     const friend = await this.userService.getUserById(friendId);
     const friendStatus = this.statusService.getUserStatusById(friendId);
     client.emit('addFriendUser', { status: friendStatus, ...friend });
+    client.join(`user:${friendId.toString()}`);
   }
 
   async removeFriendUser(receiverId: number, friendId: number) {
