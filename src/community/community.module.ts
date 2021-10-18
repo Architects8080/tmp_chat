@@ -21,6 +21,6 @@ import { StatusService } from './status.service';
     UserModule,
   ],
   providers: [CommunityGateway, CommunitySocketUserService, StatusService],
-  exports: [CommunitySocketUserService, CommunityGateway],
+  exports: [CommunitySocketUserService, CommunityGateway, StatusService],
 })
 export class CommunityModule {}

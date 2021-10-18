@@ -26,15 +26,17 @@ export class BlockService {
 
   async deleteBlock(dto: BlockRelationshipDto) {
     await this.blockRepository.delete(dto);
-    const friend = this.friendService.getFriendById(dto);
-    if (friend) this.communityGateway.addFriendUser(dto.userId, dto.otherId);
+    try {
+      const friend = await this.friendService.getFriendById(dto);
+      if (friend) this.communityGateway.addFriendUser(dto.userId, dto.otherId);
+    } catch (error) {}
   }
 
   async setBlock(dto: BlockRelationshipDto) {
     if (dto.otherId == dto.userId) throw new BadRequestException();
     try {
       await this.blockRepository.insert(this.blockRepository.create(dto));
-      this.communityGateway.removeFriendUser(dto.userId, dto.otherId);
+      await this.communityGateway.removeFriendUser(dto.userId, dto.otherId);
     } catch (error) {
       switch (error.code) {
         case '23505':

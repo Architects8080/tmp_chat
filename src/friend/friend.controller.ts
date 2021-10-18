@@ -45,11 +45,11 @@ export class FriendController {
     @Req() req,
     @Param('friendId', ParseIntPipe) friendId: number,
   ) {
-    const response: Friend = await this.friendService.getFriendById({
+    const response = await this.friendService.getFriendById({
       userId: req.user.id,
       otherId: friendId,
     });
-    if (response) return response.other;
+    if (response) return response;
     throw new NotFoundException();
   }
 }

@@ -2,7 +2,6 @@ import {
   BadRequestException,
   ConflictException,
   forwardRef,
-  HttpException,
   Inject,
   Injectable,
   NotFoundException,
@@ -11,6 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { BlockService } from 'src/block/block.service';
 import { Block } from 'src/block/entity/block.entity';
 import { CommunityGateway } from 'src/community/community.gateway';
+import { StatusService } from 'src/community/status.service';
 import { Friend } from 'src/friend/entity/friend.entity';
 import { NotificationType } from 'src/notification/entity/notification.entity';
 import { NotificationService } from 'src/notification/notification.service';
@@ -34,6 +34,8 @@ export class FriendService {
     private userService: UserService,
     @Inject(forwardRef(() => CommunityGateway))
     private communityGateway: CommunityGateway,
+    @Inject(forwardRef(() => StatusService))
+    private statusService: StatusService,
   ) {}
 
   async deleteFriend(dto: FriendRelationshipDto) {
@@ -74,13 +76,19 @@ export class FriendService {
       .select('block.otherId')
       .where('block.userId = :userId', { userId: userId });
 
-    return await this.friendRepository
+    const friendList = await this.friendRepository
       .createQueryBuilder('friend')
       .where('friend.userId = :userId', { userId: userId })
       .andWhere(`friend.otherId NOT IN (${blockList.getSql()})`)
       .leftJoinAndSelect('friend.other', 'other')
       .orderBy('other.nickname', 'ASC')
       .getMany();
+    return friendList.map((friend) => {
+      return {
+        status: this.statusService.getUserStatusById(friend.otherId),
+        ...friend.other,
+      };
+    });
   }
 
   async getFriendById(dto: FriendRelationshipDto) {
@@ -89,7 +97,10 @@ export class FriendService {
       where: { userId: dto.userId, otherId: dto.otherId },
     });
     if (!result) throw new NotFoundException();
-    return result;
+    return {
+      status: this.statusService.getUserStatusById(result.otherId),
+      ...result.other,
+    };
   }
 
   throwRequestFriendError(result: RequestFriendResult) {
