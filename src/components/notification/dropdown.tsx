@@ -59,14 +59,13 @@ function NotificationOverlay(prop: DropdownProps) {
       case NotificationType.Friend:
         return `${noti.sender.nickname}님의 친구 요청입니다. 수락하시겠습니까?`;
       case NotificationType.Channel:
-        return "채팅방 초대 요청입니다. 수락하시겠습니까?";
+        return `${noti.sender.nickname}님의 채팅방 초대 요청입니다. 수락하시겠습니까?`;
     }
   };
 
   const acceptCallback = async (id: number) => {
     await axios.post(
       `${process.env.REACT_APP_SERVER_ADDRESS}/notification/accept/${id}`,
-      { withCredentials: true }
     );
     setNotiList((notiList) => {
       return notiList.filter((noti) => {
@@ -78,7 +77,6 @@ function NotificationOverlay(prop: DropdownProps) {
   const rejectCallback = async (id: number) => {
     await axios.delete(
       `${process.env.REACT_APP_SERVER_ADDRESS}/notification/${id}`,
-      { withCredentials: true }
     );
     setNotiList((notiList) => {
       return notiList.filter((noti) => {
