@@ -1,8 +1,9 @@
+import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import "./chatroomInviteModal.scss";
 
 enum Result {
-  Default = 0,
+  None = 0,
   Success,
   NotFoundUser,
   AlreadyJoined,
@@ -21,41 +22,46 @@ function ChatroomInviteModal(prop: chatroomInviteModalProps) {
   const nickPlaceholder = "플레이어 닉네임";
   const buttonTitle = "친구 초대";
 
-  const [input, setInput] = useState("");
+  const [nickname, setNickname] = useState("");
   const [resultText, setResultText] = useState("");
-  const resultCode = useRef(Result.Default);
+  const resultCode = useRef(Result.None);
 
   const handleUserInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value === "") {
       setResultText("");
       resultCode.current = 0;
     }
-    setInput(e.target.value);
+    setNickname(e.target.value);
   };
 
   const handleClose = () => {
-    setInput("");
+    setNickname("");
     setResultText("");
     prop.close();
   };
 
-  const handleSubmitEvent = () => {
-    console.log(`userInput : `, input);
-
+  const handleSubmitEvent = async () => {
     //axios.get(user/nickname), -> then axios.get(channelmember, check) -> then.
     //io.emit -> nickname & roomId send
     //io.on -> get result code
-    if (input == "ina") resultCode.current = 3;
-    else if (input == "yhan") resultCode.current = 1;
-    else resultCode.current = 2;
-
-    //set Result Text
-    if (resultCode.current == Result.AlreadyJoined)
-      setResultText(input + " 님은 이미 채팅방에 참여중입니다.");
-    else if (resultCode.current == Result.Success)
-      setResultText("초대 메시지를 보냈습니다!");
-    else if (resultCode.current == Result.NotFoundUser)
-      setResultText("존재하지 않는 플레이어입니다. 다시 시도해주세요.");
+    const user = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/user/me`);
+    console.log(`user.data.id : `, user.data);
+    axios.post(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/invite/${prop.roomId}`,
+      {
+        userId: user.data.id,
+        nickname: nickname,
+      }
+    )
+    .then((response) => {
+      console.log(`response.data : `, response.data);
+      resultCode.current = response.data;
+      if (response.data == Result.AlreadyJoined)
+        setResultText(nickname + " 님은 이미 채팅방에 참여중입니다.");
+      else if (response.data == Result.Success)
+        setResultText("초대 메시지를 보냈습니다!");
+      else if (response.data == Result.NotFoundUser)
+        setResultText("존재하지 않는 플레이어입니다. 다시 시도해주세요.");
+    })
   };
 
   return (
@@ -78,7 +84,7 @@ function ChatroomInviteModal(prop: chatroomInviteModalProps) {
             <input
               className="search-nickname"
               type="text"
-              value={input}
+              value={nickname}
               onChange={handleUserInputChange}
               placeholder={nickPlaceholder}
             />
@@ -90,7 +96,7 @@ function ChatroomInviteModal(prop: chatroomInviteModalProps) {
         <div className="result">
           <div
             className={
-              resultCode.current == Result.Default
+              resultCode.current == Result.None
                 ? ""
                 : resultCode.current == Result.Success
                 ? "success"
