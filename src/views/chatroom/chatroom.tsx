@@ -38,6 +38,7 @@ const Chatroom = () => {
   
   const [text, setText] = useState('');
   let { id } : any = useParams();
+
   useEffect(() => {
     function receivedMessage(message: Payload) {
       const newMessage: Message = {
@@ -83,21 +84,23 @@ const Chatroom = () => {
           modalHandler={modalHandler}
         />
         <div className="chatroom-wrap">
-          <div className="chatroom-message-list">
-            <ChatMessage isSelfMessage={false} nickname="chlee" content="test" />
-            {messages.map(message => (
-              <ChatMessage key={message.id} isSelfMessage={true} nickname={message.name} content={message.text}/>
-            ))}
-            <AlwaysScrollToBottom/>
-          </div>
-          <div className="chatroom-user-input">
-            <input 
-              className="input-field"
-              placeholder="내용을 입력하세요"
-              value={text}
-              onChange={e => setText(e.target.value)}
-              onKeyPress={sendMessage}
-            />
+          <div className="chatroom-message-list-wrap">
+            <div className="chatroom-message-list">
+              <ChatMessage isSelfMessage={false} nickname="chlee" content="test" />
+              {messages.map(message => (
+                <ChatMessage key={message.id} isSelfMessage={true} nickname={message.name} content={message.text}/>
+              ))}
+              <AlwaysScrollToBottom/>
+            </div>
+            <div className="chatroom-user-input">
+              <input 
+                className="input-field"
+                placeholder="내용을 입력하세요"
+                value={text}
+                onChange={e => setText(e.target.value)}
+                onKeyPress={sendMessage}
+              />
+            </div>
           </div>
         </div>
       </div>
