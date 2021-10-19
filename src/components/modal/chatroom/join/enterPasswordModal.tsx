@@ -31,11 +31,11 @@ const EnterPasswordModal = (prop: enterPasswordModalProps) => {
 
   const handleSubmitEvent = async () => {
     try {
-      const response = await axios.post(`http://localhost:5000/channel/enter-pw`, {
+      const response = await axios.post(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/enter-pw`, {
         userId: prop.userId,
         roomId: prop.roomId,
         password: input
-        });
+      });
       if (response.data) {
         prop.close();
         window.location.href = `http://localhost:3000/chatroom/${prop.roomId}`

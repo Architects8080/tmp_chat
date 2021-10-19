@@ -29,6 +29,7 @@ const ChatroomSettingModal = (prop: chatroomSettingModalProps) => {
   const handleUserInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
     setDescriptionText("비밀번호는 숫자 4자리로 구성 가능합니다.");
+    setErrorText("비밀번호를 적어주세요.");
     if (e.target.value.length !== 4)
       setErrorText("비밀번호를 숫자 4자리로 구성해주세요.");
     else if (
@@ -49,20 +50,24 @@ const ChatroomSettingModal = (prop: chatroomSettingModalProps) => {
   };
 
   const handleSubmitEvent = async () => {
-    if (errorText === "" && title !== '') {
-      try {
-        await axios.put(process.env.REACT_APP_SERVER_ADDRESS + "/channel/" + prop.roomId,
-        {
-          title,
-          type: selectedRoomType,
-          password,
-        }, { withCredentials: true }
-      );
-      prop.close();
-      } catch (e) {
-        console.log(e);
-        setErrorText("권한이 없습니다");
+    if (title !== '') {
+      if (selectedRoomType == roomType.protectedRoom && password.length == 4 || selectedRoomType != roomType.protectedRoom) {
+        try {
+          await axios.put(process.env.REACT_APP_SERVER_ADDRESS + "/channel/" + prop.roomId,
+          {
+            title,
+            type: selectedRoomType,
+            password,
+          });
+          prop.close();
+        } catch (e) {
+          console.log(e);
+          setErrorText("권한이 없습니다");
+        }
       }
+    }
+    if (errorText === "" && title !== '') {
+
     }
   };
 

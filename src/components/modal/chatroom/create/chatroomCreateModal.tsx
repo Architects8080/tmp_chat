@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { useState } from "react";
 import { useEffect } from "react";
 import { ioChannel } from "../../../../socket/socket";
@@ -13,6 +14,7 @@ type channelCreateDto = {
   title: string;
   type: number;
   password?: string;
+  ownerId: number;
 }
 
 export enum roomType {
@@ -38,8 +40,7 @@ const ChatroomCreateModal = (prop: chatroomCreateModalProps) => {
 
   useEffect(() => {
     ioChannel.on('channelCreated', (channelId) => {
-      console.log(`channelId : `, channelId);
-      window.location.href = `http://localhost:3000/chatroom/${channelId}`
+      window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/chatroom/${channelId}`
     });
   }, []);
 
@@ -66,17 +67,29 @@ const ChatroomCreateModal = (prop: chatroomCreateModalProps) => {
     prop.close();
   };
 
-  const handleSubmitEvent = () => {
+  const handleSubmitEvent = async () => {
+
+    const user = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/user/me`);
     const newChannel: channelCreateDto = {
       title: title,
       type: selectedRoomType,
       password: password,
+      ownerId: user.data.id,
     };
 
     if (title !== '') {
-      if (selectedRoomType == roomType.protectedRoom && password.length == 4 || selectedRoomType != roomType.protectedRoom) {
-        ioChannel.emit('createChannel', newChannel);
-        prop.close();
+      if (selectedRoomType == roomType.protectedRoom && password.length == 4 
+          || selectedRoomType != roomType.protectedRoom) {
+        try {
+          const roomId = await axios.post(
+            `${process.env.REACT_APP_SERVER_ADDRESS}/channel/create`, newChannel
+          );
+          prop.close();
+          window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/chatroom/${roomId.data}`
+        } catch (e) {
+          console.log(e);
+          setErrorText("채널 생성에 실패했습니다.");
+        }
       }
     }
   };
