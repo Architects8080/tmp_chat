@@ -31,7 +31,6 @@ function SideBar(prop: sidebarProps) {
   });
 
   // use UserAPI to get userId;
-  const [userId, setUserId] = useState<number>(0);
   const modalHandler = prop.modalHandler;
   const isModalOpen = modalHandler.isModalOpen;
   const handleModalOpen = modalHandler.handleModalOpen;
@@ -45,6 +44,7 @@ function SideBar(prop: sidebarProps) {
     } else if (prop.title === sidebarProperty.friendList) {
       fetchFriendList();
       getNewDM();
+      getMyProfile();
     } else if (prop.title === sidebarProperty.observerList)
       ioChannel.emit("observerList", prop.roomId);
   }, []);
@@ -71,19 +71,35 @@ function SideBar(prop: sidebarProps) {
         }
       });
     }
-  }, [userList]);
+  }, []);
 
-  const getChannelmember = () => {
-    axios.all([
-      axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/members/${prop.roomId}`),
-      axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/user/me`),
-    ])
-    .then(
-      axios.spread((memberList, user) => {
-        setUserList(memberList.data);
-        setUserId(user.data.id);
-      })
-    );
+  useEffect(() => {
+    if (prop.title === sidebarProperty.friendList) {
+      ioCommunity.on(
+        "addFriendUser",
+        async (friend: Omit<userItemProps, "alert">) => {
+          console.log(userList);
+          console.log(friend);
+          const existIndex = userList.findIndex((f) => f.id == friend.id);
+          console.log(existIndex);
+          if (existIndex == -1)
+            setUserList((userList) => [...userList, { alert: false, ...friend }]);
+        }
+      );
+  
+      ioCommunity.on("removeFriendUser", async (friendId: number) => {
+        setUserList((userList) => userList.filter((f) => f.id != friendId));
+      });
+    }
+  }, []);
+
+  const getChannelmember = async () => {
+    try {
+      const memberList = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/members/${prop.roomId}`);
+      setUserList(memberList.data);
+    } catch (error) {
+      console.log(`[getChannelmember] ${error}`);
+    }
   }
 
   const getMyProfile = async () => {
@@ -148,34 +164,14 @@ function SideBar(prop: sidebarProps) {
       const response = await axios.get(
         `${process.env.REACT_APP_SERVER_ADDRESS}/friend`
       );
-      console.log(response.data);
       const newUserList = response.data.map((user: any) =>
         friendToUserProps(user)
       );
-      console.log(newUserList);
       setUserList(newUserList);
     } catch (e) {
       console.log(`[FriendListError] ${e}`);
     }
   };
-
-  useEffect(() => {
-    ioCommunity.on(
-      "addFriendUser",
-      async (friend: Omit<userItemProps, "alert">) => {
-        console.log(userList);
-        console.log(friend);
-        const existIndex = userList.findIndex((f) => f.id == friend.id);
-        console.log(existIndex);
-        if (existIndex == -1)
-          setUserList((userList) => [...userList, { alert: false, ...friend }]);
-      }
-    );
-
-    ioCommunity.on("removeFriendUser", async (friendId: number) => {
-      setUserList((userList) => userList.filter((f) => f.id != friendId));
-    });
-  }, []);
 
   // direct message
   const [DMopen, setDMOpen] = useState<boolean>(false);
@@ -232,6 +228,7 @@ function SideBar(prop: sidebarProps) {
       if (!DMopen) setDMOpen(true);
     }
   };
+
   const closeDM = () => {
     setDMOpen(false);
     friendRef.current = null;
