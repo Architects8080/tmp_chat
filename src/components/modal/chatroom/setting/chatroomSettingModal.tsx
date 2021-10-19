@@ -79,10 +79,10 @@ const ChatroomSettingModal = (prop: chatroomSettingModalProps) => {
       .then((channel) => {
         console.log(`channel.data : `, channel.data);
         setTitle(channel.data.title);
-        setSelectedRoomType(channel.data.isProtected);
-        if (channel.data.isProtected === roomType.protectedRoom)
+        setSelectedRoomType(channel.data.type);
+        if (channel.data.type === roomType.protectedRoom)
           setErrorText("비밀번호를 새로 입력해주세요.");
-        if (channel.data.isProtected === roomType.privateRoom)
+        if (channel.data.type === roomType.privateRoom)
           setErrorText("public를 선택하면 공개방으로 변경됩니다.");
       })
     //io.on(getChatroomSettings)

@@ -9,7 +9,7 @@ export type chatroomItemProps = {
   roomId: number,
   title: string,
   memberCount: number,
-  isProtected: number,
+  type: ChatroomType,
 }
 
 enum ChatroomType {
@@ -23,7 +23,7 @@ const ChatroomItem = ({channel} : {channel:chatroomItemProps}) => {
   const [userId, setUserId] = useState(0);
 
   const handleOnClick = async () => {
-    if (channel.isProtected) {
+    if (channel.type) {
       try {
         axios.all([
           axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/user/me`),
@@ -54,9 +54,9 @@ const ChatroomItem = ({channel} : {channel:chatroomItemProps}) => {
       <div className="chatroom-item" onClick={handleOnClick}>
         <div className="chatroom-header">
           <div className="chatroom-title">[{channel.roomId}] {channel.title}</div>
-          { channel.isProtected === ChatroomType.private ? 
+          { channel.type === ChatroomType.private ? 
             <img className="chatroom-locked" alt="chatroom-locked" src="/icons/chat/private.svg"/> : ""}
-          { channel.isProtected === ChatroomType.protected ? 
+          { channel.type === ChatroomType.protected ? 
             <img className="chatroom-locked" alt="chatroom-locked" src="/icons/chat/protected.svg"/> : ""}
         </div>
         <div className="chatroom-member-count">{channel.memberCount}명 참여중</div>
