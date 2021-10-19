@@ -9,6 +9,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { CommunityGateway } from 'src/community/community.gateway';
 import { FriendService } from 'src/friend/friend.service';
+import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
 import { NotificationDto } from './dto/notification';
 import { Notification, NotificationType } from './entity/notification.entity';
@@ -22,15 +23,20 @@ export class NotificationService {
     private readonly friendService: FriendService,
     @Inject(forwardRef(() => CommunityGateway))
     private readonly communityGateway: CommunityGateway,
+    private readonly userService: UserService,
   ) {}
 
   async getNotifications(userId: number) {
-    return await this.notificationRepository.find({ receiverId: userId });
+    return await this.notificationRepository.find({
+      relations: ['sender'],
+      where: { receiverId: userId },
+    });
   }
 
   async getNotificationById(notiId: number) {
     const result = await this.notificationRepository.findOne({
-      id: notiId,
+      relations: ['sender'],
+      where: { id: notiId },
     });
     if (!result) throw new NotFoundException();
     return result;
@@ -40,6 +46,7 @@ export class NotificationService {
     const notification = this.notificationRepository.create({
       senderId: userId,
       ...dto,
+      sender: await this.userService.getUserById(userId),
     });
     const result = await this.notificationRepository.findOne(notification);
 
