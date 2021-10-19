@@ -1,16 +1,13 @@
 import axios from "axios";
 import React, { useState } from "react";
-import { ioCommunity } from "../../../../socket/socket";
 import "./addFriendModal.scss";
 
 enum Result {
-  Default = 0,
-  Success,
-  NotFoundUser,
-  AlreadyFriend,
-  Myself,
-  InProgress,
-  Block
+  NotFoundUser = "NotFoundUser",
+  Already = "Already",
+  Myself = "Myself",
+  InProgress = "InProgress",
+  Block = "Block",
 }
 
 type addFriendModalProps = {
@@ -27,12 +24,27 @@ function AddFriendModal(prop: addFriendModalProps) {
 
   const [input, setInput] = useState<string>("");
   const [resultText, setResultText] = useState<string>("");
-  const [resultCode, setresultCode] = useState<number>(0);
+  const [isSuccess, setIsSuccess] = useState<boolean>(false);
+
+  const resultToText = (result: Result) => {
+    switch (result) {
+      case Result.NotFoundUser:
+        return "존재하지 않는 플레이어입니다. 다시 시도해주세요.";
+      case Result.Already:
+        return `${input}님과는 이미 친구입니다.`;
+      case Result.Myself:
+        return "본인 외의 플레이어를 입력해주세요.";
+      case Result.InProgress:
+        return "이미 친구 요청을 보냈습니다.";
+      case Result.Block:
+        return "차단한 플레이어입니다. 차단을 해제한 후 다시 시도해주세요.";
+    }
+  };
 
   const handleUserInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value === "") {
       setResultText("");
-      setresultCode(Result.Default);
+      setIsSuccess(false);
     }
     setInput(e.target.value);
   };
@@ -40,7 +52,7 @@ function AddFriendModal(prop: addFriendModalProps) {
   const handleClose = () => {
     setInput("");
     setResultText("");
-    setresultCode(0);
+    setIsSuccess(false);
     prop.close();
   };
 
@@ -51,41 +63,23 @@ function AddFriendModal(prop: addFriendModalProps) {
     }
 
     try {
-      await axios.get(
-        `${process.env.REACT_APP_SERVER_ADDRESS}/user/search/${input}`,
-        { withCredentials: true }
-      )
-      .then((response) => {
-        //io.emit -> nickname send
-        ioCommunity.emit("requestToServer", {otherID: response.data.id, isFriendly: true});
-        //io.on -> get result code
-        ioCommunity.on("friendResponseToClient", (code: number) => {
-          //set Result Text
-          setresultCode(code);
-          if (code == Result.AlreadyFriend)
-            setResultText(input + "님과는 이미 친구입니다.");
-          else if (code == Result.Success)
-            setResultText("친구 신청을 보냈습니다!");
-          else if (code == Result.NotFoundUser)
-            setResultText("존재하지 않는 플레이어입니다. 다시 시도해주세요.");
-          else if (code == Result.Myself)
-            setResultText("본인 외의 플레이어를 입력해주세요.");
-          else if (code == Result.InProgress)
-            setResultText("이미 친구 요청을 보냈습니다.");
-          else if (code == Result.Block)
-            setResultText("차단한 플레이어입니다. 차단을 해제한 후 다시 시도해주세요.");
-        });
-      })
-      .catch (e => {
-        if (e.response.data.statusCode === 404) {
-          setresultCode(Result.NotFoundUser);
-          setResultText("존재하지 않는 플레이어입니다. 다시 시도해주세요.");
-        }
-      });
-    } catch (e) {
+      const user = await axios.get(
+        `${process.env.REACT_APP_SERVER_ADDRESS}/user/search/${input}`
+      );
+      const result = await axios.post(
+        `${process.env.REACT_APP_SERVER_ADDRESS}/friend/${user.data.id}`
+      );
+      setResultText("친구 신청을 보냈습니다!");
+      setIsSuccess(true);
+    } catch (e: any) {
+      if (e.response.status == 404)
+        setResultText("존재하지 않는 플레이어입니다. 다시 시도해주세요.");
+      else if (e.response.status == 400) {
+        setResultText(resultToText(e.response.data.message));
+      }
+      setIsSuccess(false);
       console.log(`[addFriendModal] ${e}`);
     }
-
     setInput("");
   };
 
@@ -119,17 +113,7 @@ function AddFriendModal(prop: addFriendModalProps) {
           </div>
         </div>
         <div className="result">
-          <div
-            className={
-              resultCode == Result.Default
-                ? ""
-                : resultCode == Result.Success
-                ? "success"
-                : "error"
-            }
-          >
-            {resultText}
-          </div>
+          <div className={isSuccess ? "success" : "error"}>{resultText}</div>
         </div>
       </div>
     </div>
