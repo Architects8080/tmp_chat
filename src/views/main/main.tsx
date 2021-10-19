@@ -17,6 +17,7 @@ import OTPModal from "../../components/modal/otp/otpModal";
 import axios from "axios";
 import GameSettingModal from "../../components/modal/game/gameSettingModal";
 import GameModalListener from "../../components/modal/gameModalListener";
+import { ioChannel } from "../../socket/socket";
 
 enum ChatroomCategory {
   AllChatroomList,
@@ -43,10 +44,10 @@ const Main = () => {
 
   const fetchData = async () => {
     try {
-      let response = await axios.get(`http://localhost:5000/channel`, { withCredentials: true });
+      let response = await axios.get(`http://localhost:5000/channel`);
       if (response.data.length != 0)
         setChannels(response.data);
-      response = await axios.get(`http://localhost:5000/channel/me`, { withCredentials: true });
+      response = await axios.get(`http://localhost:5000/channel/me`);
       if (response.data.length != 0)
         setMyChannels(response.data);
     }
@@ -54,17 +55,10 @@ const Main = () => {
   };
 
 	useEffect(() => {
+    // ioChannel.on('updateChannelList', )
 		fetchData();
 	}, []);
-/*
-  if (!channels) {
-		return (
-			<div>Loading..</div>
-		)
-	}*/
-  // to test empty info
-  // tempAllChatroomList = [];
-  // tempJoinedChatroomList = [];
+
 
   return (
     <>

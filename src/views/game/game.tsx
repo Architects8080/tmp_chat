@@ -58,7 +58,7 @@ function Game() {
       <div className="page">
         <SideBar
           title={sidebarProperty.observerList}
-          roomId={42}
+          roomId={Number(id)}
           modalHandler={modalHandler}
         />
         {gameInfo ? (

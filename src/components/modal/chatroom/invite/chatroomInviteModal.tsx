@@ -42,6 +42,7 @@ function ChatroomInviteModal(prop: chatroomInviteModalProps) {
   const handleSubmitEvent = () => {
     console.log(`userInput : `, input);
 
+    //axios.get(user/nickname), -> then axios.get(channelmember, check) -> then.
     //io.emit -> nickname & roomId send
     //io.on -> get result code
     if (input == "ina") resultCode.current = 3;

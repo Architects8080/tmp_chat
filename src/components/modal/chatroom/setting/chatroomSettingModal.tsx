@@ -53,7 +53,7 @@ const ChatroomSettingModal = (prop: chatroomSettingModalProps) => {
     if (title !== '') {
       if (selectedRoomType == roomType.protectedRoom && password.length == 4 || selectedRoomType != roomType.protectedRoom) {
         try {
-          await axios.put(process.env.REACT_APP_SERVER_ADDRESS + "/channel/" + prop.roomId,
+          await axios.put(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/update/${prop.roomId}`,
           {
             title,
             type: selectedRoomType,
@@ -72,6 +72,19 @@ const ChatroomSettingModal = (prop: chatroomSettingModalProps) => {
   };
 
   useEffect(() => {
+
+    console.log(`open?`);
+    axios
+      .get(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/${prop.roomId}`)
+      .then((channel) => {
+        console.log(`channel.data : `, channel.data);
+        setTitle(channel.data.title);
+        setSelectedRoomType(channel.data.isProtected);
+        if (channel.data.isProtected === roomType.protectedRoom)
+          setErrorText("비밀번호를 새로 입력해주세요.");
+        if (channel.data.isProtected === roomType.privateRoom)
+          setErrorText("public를 선택하면 공개방으로 변경됩니다.");
+      })
     //io.on(getChatroomSettings)
     // 1. public
     // 2. private

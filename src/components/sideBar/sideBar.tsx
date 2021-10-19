@@ -29,21 +29,15 @@ function SideBar(prop: sidebarProps) {
     id: 0,
     nickname: "",
   });
+
+  // use UserAPI to get userId;
+  const [userId, setUserId] = useState<number>(0);
   const modalHandler = prop.modalHandler;
   const isModalOpen = modalHandler.isModalOpen;
   const handleModalOpen = modalHandler.handleModalOpen;
   const handleModalClose = modalHandler.handleModalClose;
 
   // first render -> get userList according to sidebarType(prop.title)
-  const getChannelmember = async () => {
-    const data = await axios.get(
-      process.env.REACT_APP_SERVER_ADDRESS +
-        `/channel/members/${prop.roomId}`,
-      { withCredentials: true }
-    );
-    setUserList(data.data);
-  };
-
   useEffect(() => {
 
     if (prop.title === sidebarProperty.chatMemberList) {
@@ -77,13 +71,25 @@ function SideBar(prop: sidebarProps) {
         }
       });
     }
-  }, [userList, prop.title]);
+  }, [userList]);
+
+  const getChannelmember = () => {
+    axios.all([
+      axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/members/${prop.roomId}`),
+      axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/user/me`),
+    ])
+    .then(
+      axios.spread((memberList, user) => {
+        setUserList(memberList.data);
+        setUserId(user.data.id);
+      })
+    );
+  }
 
   const getMyProfile = async () => {
     try {
       const response = await axios.get(
         `${process.env.REACT_APP_SERVER_ADDRESS}/user/me`,
-        { withCredentials: true }
       );
       setMyProfile({ id: response.data.id, nickname: response.data.nickname });
     } catch (e) {
@@ -122,6 +128,7 @@ function SideBar(prop: sidebarProps) {
     dropdownMenuInfo: dropdownMenuInfo
   ) => {
     handleContextMenu(e);
+    //get info
     setResult(dropdownMenuInfo);
   };
 
@@ -238,24 +245,12 @@ function SideBar(prop: sidebarProps) {
           {/* set icon according to sidebarType */}
           {prop.title == sidebarProperty.friendList ? (
             // addFriendModal
-            <AddUserIcon
-              onClick={() => {
-                handleModalOpen("addFriend");
-              }}
-            />
+            <AddUserIcon onClick={() => {handleModalOpen("addFriend");}}/>
           ) : prop.title == sidebarProperty.chatMemberList ? (
             // inviteUserModal, chatroomSettingModal (with chatroomId), handler socket
             <>
-              <InviteUserIcon
-                onClick={() => {
-                  handleModalOpen("chatroomInvite");
-                }}
-              />
-              <SettingIcon
-                onClick={() => {
-                  handleModalOpen("chatroomSetting");
-                }}
-              />
+              <InviteUserIcon onClick={() => {handleModalOpen("chatroomInvite");}}/>
+              <SettingIcon onClick={() => {handleModalOpen("chatroomSetting");}}/>
             </>
           ) : null}
         </div>
@@ -332,6 +327,8 @@ function SideBar(prop: sidebarProps) {
         ""
       )}
 
+
+      {/* Modal */}
       {isModalOpen.addFriend ? (
         <AddFriendModal
           open={isModalOpen.addFriend}

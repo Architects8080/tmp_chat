@@ -9,10 +9,16 @@ export type chatroomItemProps = {
   roomId: number,
   title: string,
   memberCount: number,
-  isProtected: boolean
+  isProtected: number,
 }
 
-const ChatroomItem = ({channel} : {channel:any}) => {
+enum ChatroomType {
+  public = 0,
+  private,
+  protected,
+}
+
+const ChatroomItem = ({channel} : {channel:chatroomItemProps}) => {
   const modalHandler = ModalHandler();
   const [userId, setUserId] = useState(0);
 
@@ -47,8 +53,11 @@ const ChatroomItem = ({channel} : {channel:any}) => {
     <>
       <div className="chatroom-item" onClick={handleOnClick}>
         <div className="chatroom-header">
-          <div className="chatroom-title">{channel.title}</div>
-          { channel.isProtected ? <img className="chatroom-locked" alt="chatroom-locked" src="/icons/lock.svg"/> : ""}
+          <div className="chatroom-title">[{channel.roomId}] {channel.title}</div>
+          { channel.isProtected === ChatroomType.private ? 
+            <img className="chatroom-locked" alt="chatroom-locked" src="/icons/chat/private.svg"/> : ""}
+          { channel.isProtected === ChatroomType.protected ? 
+            <img className="chatroom-locked" alt="chatroom-locked" src="/icons/chat/protected.svg"/> : ""}
         </div>
         <div className="chatroom-member-count">{channel.memberCount}명 참여중</div>
       </div>
