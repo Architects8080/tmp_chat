@@ -53,6 +53,6 @@ export type dropdownMenuInfo = {
 };
 
 export type DM = {
-	id: number;
-	message: string;
+  id: number;
+  message: string;
 };

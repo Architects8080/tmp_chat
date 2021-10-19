@@ -1,5 +1,4 @@
-import React from "react";
-import { ioCommunity } from "../../../../socket/socket";
+import axios from "axios";
 import DefaultDropdownItem from "../../itemTemplate/default/item";
 
 type props = {
@@ -7,11 +6,10 @@ type props = {
 };
 
 function UnblockDMItem(prop: props) {
-  const handleUnblockDM = () => {
-    ioCommunity.emit("relationDeleteToServer", {
-      otherID: prop.targetId,
-      isFriendly: false
-    });
+  const handleUnblockDM = async () => {
+    await axios.delete(
+      `${process.env.REACT_APP_SERVER_ADDRESS}/block/${prop.targetId}`
+    );
   };
 
   return (

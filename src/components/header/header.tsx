@@ -7,7 +7,7 @@ import "./header.scss";
 enum NotifyIconURL {
   on = "/icons/notification/on.svg",
   off = "/icons/notification/off.svg",
-};
+}
 
 type headerProps = {
   isLoggedIn: boolean;
@@ -36,7 +36,7 @@ function Header(prop: headerProps) {
     setIsNotiOverlayActive(!isNotiOverlayActive);
   };
 
-  const handleProfileDropdown = () => {  
+  const handleProfileDropdown = () => {
     console.log(`test click!!`);
     setIsProfileMenuActive(!isProfileMenuActive);
   };
@@ -45,31 +45,34 @@ function Header(prop: headerProps) {
     //list check and url setting
     axios
       .all([
-        axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/user/me`, { withCredentials: true }),
-        axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/community/notification`, { withCredentials: true }),
+        axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/user/me`),
+        axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/notification`),
       ])
       .then(
         axios.spread((userInfo, notiList) => {
+          console.log(notiList);
           setUser(userInfo.data);
           setNotiCount(notiList.data.length);
 
-          if (notiList.data.length > 0)
-            setNotifyIconURL(NotifyIconURL.on);
+          if (notiList.data.length > 0) setNotifyIconURL(NotifyIconURL.on);
         })
-      )
+      );
   }, []);
 
-  const updateNotiCount = () => {
-    setNotiCount(notiCount - 1);
+  const updateNotiCount = (notiCount: number) => {
+    setNotiCount(notiCount);
     setNotifyIconURL(NotifyIconURL.off);
-    if (notiCount > 0)
-      setNotifyIconURL(NotifyIconURL.on);
-  }
+    if (notiCount > 0) setNotifyIconURL(NotifyIconURL.on);
+  };
 
   return (
     <div>
-      <NotificationOverlay isActive={isNotiOverlayActive} nicknameLength={user ? user.nickname.length : 0} updateIcon={updateNotiCount}/>
-      <ProfileMenu isActive={isProfileMenuActive}/>
+      <NotificationOverlay
+        isActive={isNotiOverlayActive}
+        nicknameLength={user ? user.nickname.length : 0}
+        updateIcon={updateNotiCount}
+      />
+      <ProfileMenu isActive={isProfileMenuActive} />
       <header>
         <div
           className="title"
