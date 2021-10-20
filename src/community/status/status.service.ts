@@ -20,14 +20,13 @@ export class StatusService {
 
   setUserStatusById(id: number, status: UserStatus) {
     const isPlaying = this.getUserStatusById(id) == UserStatus.PLAYING;
-    let updateStatus = status;
     if (isPlaying) {
       if (this.communitySocketUserService.getSocketById(id))
-        updateStatus = UserStatus.ONLINE;
-      else updateStatus = UserStatus.OFFLINE;
+      status = UserStatus.ONLINE;
+      else status = UserStatus.OFFLINE;
     }
     this.userMap.set(id, status);
-    if (this.getUserStatusById(id) != updateStatus)
+    if (this.getUserStatusById(id) != status)
       this.listenerList.forEach((l) => {
         l(id, status);
       });
