@@ -1,5 +1,5 @@
 export enum UserStatus {
-  ONLINE,
   OFFLINE,
+  ONLINE,
   PLAYING,
 }

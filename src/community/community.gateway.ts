@@ -22,7 +22,7 @@ import { UserStatus } from './data/user-status';
 import { COMMUNITY_SOCKET_USER_SERVICE_PROVIDER } from './community.socket-user.service';
 import { Notification } from 'src/notification/entity/notification.entity';
 import { UserService } from 'src/user/user.service';
-import { deserialize, serialize } from 'class-transformer';
+import { serialize } from 'class-transformer';
 import { mergeUserAndStatus } from './data/status-user';
 
 @UseGuards(JwtAuthGuard)
@@ -72,7 +72,8 @@ export class CommunityGateway
       const user = await this.jwtStrategy.validate(userPayload);
       client.user = user;
       this.socketUserService.removeSocket(client);
-      this.statusService.setUserStatusById(user.id, UserStatus.OFFLINE);
+      if (this.statusService.getUserStatusById(user.id) != UserStatus.PLAYING)
+        this.statusService.setUserStatusById(user.id, UserStatus.OFFLINE);
     } catch (error) {}
   }
 
