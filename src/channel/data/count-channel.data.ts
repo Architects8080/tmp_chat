@@ -1,4 +1,4 @@
-import { Channel } from "../entity/channel.entity";
+import { Channel } from '../entity/channel.entity';
 
 export class CountChannel extends Channel {
   memberCount: number;

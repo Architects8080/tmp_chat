@@ -10,7 +10,7 @@ import {
 import { ChannelMessage } from './channel-message.entity';
 import { Channel } from './channel.entity';
 
-export enum MemberRoleEnum {
+export enum MemberRole {
   MEMBER = 'member',
   ADMIN = 'admin',
   OWNER = 'owner',
@@ -38,8 +38,8 @@ export class ChannelMember {
 
   @Column({
     type: 'enum',
-    default: MemberRoleEnum.MEMBER,
-    enum: MemberRoleEnum,
+    default: MemberRole.MEMBER,
+    enum: MemberRole,
   })
-  roleType: MemberRoleEnum;
+  role: MemberRole;
 }

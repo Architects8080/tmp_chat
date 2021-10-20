@@ -15,6 +15,7 @@ import { cookieExtractor, JwtStrategy } from 'src/auth/strategy/jwt.strategy';
 import { SocketUser } from 'src/socket/socket-user';
 import { SocketUserService } from 'src/socket/socket-user.service';
 import { ChannelService } from './channel.service';
+import { CHANNEL_SOCKET_USER_SERVICE_PROVIDER } from './channel.socket-user.service';
 
 @UseGuards(JwtAuthGuard)
 @WebSocketGateway(4501, { namespace: 'channel' })
@@ -25,7 +26,7 @@ export class ChannelGateway
     private jwtService: JwtService,
     private jwtStrategy: JwtStrategy,
     private channelService: ChannelService,
-    @Inject('CHANNEL_SOCKET_USER_SERVICE')
+    @Inject(CHANNEL_SOCKET_USER_SERVICE_PROVIDER)
     private socketUserService: SocketUserService,
   ) {}
   @WebSocketServer() server: Server;

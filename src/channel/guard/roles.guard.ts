@@ -19,10 +19,10 @@ export class RolesGuard implements CanActivate {
     // 요청을 보낸 user 의 권한이 위 권한 array 에 있으면 true 반환
     const request = context.switchToHttp().getRequest();
     const result = await this.channelRoleService.getRole(
-      request.params.id,
+      request.params.channelId,
       request.user.id,
     );
-    if (!roles.includes(RoleDefaultList[`${+result}`])) {
+    if (!roles.includes(result)) {
       return false;
     }
     return true;
