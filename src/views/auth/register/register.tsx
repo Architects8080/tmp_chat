@@ -49,12 +49,10 @@ function Register() {
             setForbiddenError(true);
             snackbar.error("잘못된 접근입니다.");
           }
-          else if (error.response.data.statusCode === 400) {
-            if (error.response.data.message == "TOO LONG NICKNAME")
-              snackbar.error("닉네임은 최대 10자까지 가능합니다.");
-            else
-              snackbar.error("닉네임이 중복되었습니다. 다시 시도해주세요.");
-          }
+          else if (error.response.data.statusCode === 400)
+            snackbar.error("닉네임이 중복되었습니다. 다시 시도해주세요.");
+          else if (error.response.data.statusCode === 413)
+            snackbar.error("닉네임은 최대 10자까지 가능합니다.");
         });
     } catch (error) {};
 
