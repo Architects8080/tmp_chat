@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Channel, ChannelMember } from './entity/channel.entity';
+import { ChannelMember } from './entity/channel-member.entity';
+import { Channel } from './entity/channel.entity';
 
 @Injectable()
 export class ChannelRoleService {
@@ -13,15 +14,14 @@ export class ChannelRoleService {
   ) {}
 
   // 해당 유저의 role 해당 room에서의 role 확인
-  async getRole(roomId: number, userId: number) {
-    const role = await this.channelMemberRepository.find({
-      select: ['permissionType'],
+  async getRole(channelId: number, userId: number) {
+    const role = await this.channelMemberRepository.findOne({
+      select: ['roleType'],
       where: {
-        channelID: roomId,
-        userID: userId,
+        channelId: channelId,
+        userId: userId,
       },
     });
-    console.log('mypermission:', role[0].permissionType);
-    return role[0].permissionType;
+    return role.roleType;
   }
 }
