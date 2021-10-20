@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, MutableRefObject } from 'react';
 import './directMessage.scss';
 import axios from 'axios';
-import { DM, userItemProps } from '../sideBar/sideBarType';
+import { DM, userItemProps } from '../sidebar/sidebarType';
 import { ioCommunity } from '../../socket/socket';
 
 type DMProps = {
