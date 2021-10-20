@@ -66,8 +66,8 @@ export class AuthController {
     @Session() session: any,
   ) {
     if (!session.newUser) throw new ForbiddenException();
-    const token = await this.authService.register(nickname, session);
-    res.cookie('access_token', token);
+    const registerResult = await this.authService.register(nickname, session);
+    res.cookie('access_token', registerResult.token);
     session.destroy();
     return true;
   }
