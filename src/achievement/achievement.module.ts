@@ -8,6 +8,7 @@ import { UserAchievement } from './entity/user-achievement.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([Achievement, UserAchievement])],
   providers: [AchievementService],
-  controllers: [AchievementController]
+  controllers: [AchievementController],
+  exports: [AchievementService],
 })
 export class AchievementModule {}
