@@ -19,11 +19,10 @@ import { SocketUserService } from '../socket/socket-user.service';
 import { GameRoomService } from './game-room.service';
 import { GamePlayer } from './data/game-player.data';
 import { MatchmakerService } from './matchmaker/matchmaker.service';
-import { GameRoom } from './data/gameroom.data';
 import { User } from 'src/user/entity/user.entity';
-import { StatusService } from 'src/community/status.service';
 import { UserStatus } from 'src/community/data/user-status';
 import { UserService } from 'src/user/user.service';
+import { StatusService } from 'src/community/status/status.service';
 
 @UseGuards(JwtAuthGuard)
 @WebSocketGateway(4000, { namespace: 'game' })

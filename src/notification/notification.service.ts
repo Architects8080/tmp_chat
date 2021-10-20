@@ -1,15 +1,10 @@
 import {
-  BadRequestException,
   ForbiddenException,
-  forwardRef,
-  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CommunityGateway } from 'src/community/community.gateway';
 import { FriendService } from 'src/friend/friend.service';
-import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
 import { NotificationDto } from './dto/notification';
 import { Notification, NotificationType } from './entity/notification.entity';
@@ -19,11 +14,7 @@ export class NotificationService {
   constructor(
     @InjectRepository(Notification)
     private readonly notificationRepository: Repository<Notification>,
-    @Inject(forwardRef(() => FriendService))
     private readonly friendService: FriendService,
-    @Inject(forwardRef(() => CommunityGateway))
-    private readonly communityGateway: CommunityGateway,
-    private readonly userService: UserService,
   ) {}
 
   async getNotifications(userId: number) {
@@ -40,26 +31,6 @@ export class NotificationService {
     });
     if (!result) throw new NotFoundException();
     return result;
-  }
-
-  async setNotification(userId: number, dto: NotificationDto) {
-    const notification = this.notificationRepository.create({
-      senderId: userId,
-      ...dto,
-      sender: await this.userService.getUserById(userId),
-    });
-    const result = await this.notificationRepository.findOne(notification);
-
-    if (result) return null;
-    try {
-      const insertResult = await this.notificationRepository.insert(
-        notification,
-      );
-      this.communityGateway.notify(dto.receiverId, notification);
-      return insertResult;
-    } catch (error) {
-      throw new BadRequestException();
-    }
   }
 
   async deleteNotification(notification: NotificationDto) {

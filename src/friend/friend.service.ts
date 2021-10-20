@@ -1,22 +1,17 @@
 import {
   BadRequestException,
   ConflictException,
-  forwardRef,
-  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { plainToClass, serialize } from 'class-transformer';
-import { BlockService } from 'src/block/block.service';
 import { Block } from 'src/block/entity/block.entity';
-import { CommunityGateway } from 'src/community/community.gateway';
 import { mergeUserAndStatus, StatusUser } from 'src/community/data/status-user';
-import { StatusService } from 'src/community/status.service';
+import { CommunityEventService } from 'src/community/event/community-event.service';
+import { StatusService } from 'src/community/status/status.service';
 import { Friend } from 'src/friend/entity/friend.entity';
 import { NotificationType } from 'src/notification/entity/notification.entity';
-import { NotificationService } from 'src/notification/notification.service';
-import { User } from 'src/user/entity/user.entity';
+import { NotificationEventService } from 'src/notification/event/notification-event.service';
 import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
 import { RequestFriendResult } from './data/request-friend.result';
@@ -30,14 +25,9 @@ export class FriendService {
     private friendRepository: Repository<Friend>,
     @InjectRepository(Block)
     private blockRepository: Repository<Block>,
-    @Inject(forwardRef(() => BlockService))
-    private blockService: BlockService,
-    @Inject(forwardRef(() => NotificationService))
-    private notificationService: NotificationService,
+    private notificationEventService: NotificationEventService,
     private userService: UserService,
-    @Inject(forwardRef(() => CommunityGateway))
-    private communityGateway: CommunityGateway,
-    @Inject(forwardRef(() => StatusService))
+    private communityEventService: CommunityEventService,
     private statusService: StatusService,
   ) {}
 
@@ -47,8 +37,8 @@ export class FriendService {
       userId: dto.otherId,
       otherId: dto.userId,
     });
-    this.communityGateway.removeFriendUser(dto.otherId, dto.userId);
-    this.communityGateway.removeFriendUser(dto.userId, dto.otherId);
+    this.communityEventService.removeFriendUser(dto.otherId, dto.userId);
+    this.communityEventService.removeFriendUser(dto.userId, dto.otherId);
   }
 
   async setFriend(dto: FriendRelationshipDto) {
@@ -61,8 +51,8 @@ export class FriendService {
           otherId: dto.userId,
         }),
       );
-      this.communityGateway.addFriendUser(dto.userId, dto.otherId);
-      this.communityGateway.addFriendUser(dto.otherId, dto.userId);
+      this.communityEventService.addFriendUser(dto.userId, dto.otherId);
+      this.communityEventService.addFriendUser(dto.otherId, dto.userId);
     } catch (error) {
       switch (error.code) {
         case '23505':
@@ -128,13 +118,13 @@ export class FriendService {
       return this.throwRequestFriendError(RequestFriendResult.NotFoundUser);
     }
     try {
-      const block = await this.blockService.getBlockById(dto);
+      const block = await this.blockRepository.findOne(dto);
       if (block) return this.throwRequestFriendError(RequestFriendResult.Block);
     } catch (error) {
       if (error instanceof FriendException) throw error;
     }
     try {
-      const result = await this.notificationService.setNotification(
+      const result = await this.notificationEventService.setNotification(
         dto.userId,
         {
           receiverId: dto.otherId,
