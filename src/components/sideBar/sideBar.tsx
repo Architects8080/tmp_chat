@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ioChannel, ioCommunity } from "../../socket/socket";
+import { User } from "../../views/profile/profileType";
 import DirectMessage from "../directMessage/directMessage";
 import ChatroomAdminDropdownList from "../dropdown/dropdownList/chatroomAdmin";
 import ChatroomDefaultDropdownList from "../dropdown/dropdownList/chatroomDefault";
@@ -158,10 +159,14 @@ function SideBar(prop: sidebarProps) {
       async (friend: Omit<userItemProps, "alert">) => {
         console.log(userList);
         console.log(friend);
-        const existIndex = userList.findIndex((f) => f.id == friend.id);
-        console.log(existIndex);
-        if (existIndex == -1)
-          setUserList((userList) => [...userList, { alert: false, ...friend }]);
+        const response = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/block`);
+        const blockList: {other: User}[] = response.data;
+        if (blockList.findIndex((f) => f.other.id == friend.id) == -1) {
+          const existIndex = userList.findIndex((f) => f.id == friend.id);
+          console.log(existIndex);
+          if (existIndex == -1)
+            setUserList((userList) => [...userList, { alert: false, ...friend }]);
+        }
       }
     );
 
