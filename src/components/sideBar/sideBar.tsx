@@ -38,7 +38,6 @@ function SideBar(prop: sidebarProps) {
 
   // first render -> get userList according to sidebarType(prop.title)
   useEffect(() => {
-
     if (prop.title === sidebarProperty.chatMemberList) {
       getChannelmember();
     } else if (prop.title === sidebarProperty.friendList) {
@@ -57,8 +56,10 @@ function SideBar(prop: sidebarProps) {
       setUserList(leavedArr);
     };
 
-    if (prop.title === sidebarProperty.chatMemberList) {
+    if (prop.title == sidebarProperty.chatMemberList) {
+      console.log(`chatMemberList`);
       ioChannel.on("channelMemberAdd", (newMember: userItemProps) => {
+        console.log(`newMember : `, newMember);
         if (userList && !userList.some((user) => user.id === newMember.id)) {
           const newMemArr = [...userList, newMember];
           addMember(newMemArr);
@@ -75,6 +76,7 @@ function SideBar(prop: sidebarProps) {
 
   useEffect(() => {
     if (prop.title === sidebarProperty.friendList) {
+      console.log(`friendList`);
       ioCommunity.on(
         "addFriendUser",
         async (friend: Omit<userItemProps, "alert">) => {
@@ -93,13 +95,24 @@ function SideBar(prop: sidebarProps) {
     }
   }, []);
 
-  const getChannelmember = async () => {
-    try {
-      const memberList = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/members/${prop.roomId}`);
-      setUserList(memberList.data);
-    } catch (error) {
-      console.log(`[getChannelmember] ${error}`);
-    }
+  // const getChannelmember = async () => {
+  //   try {
+  //     const memberList = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/members/${prop.roomId}`);
+  //     setUserList(memberList.data);
+  //   } catch (error) {
+  //     console.log(`[getChannelmember] ${error}`);
+  //   }
+  // }
+
+  const getChannelmember = () => {
+    axios.all([
+      axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/members/${prop.roomId}`),
+    ])
+    .then(
+      axios.spread((memberList) => {
+        setUserList(memberList.data);
+      })
+    );
   }
 
   const getMyProfile = async () => {

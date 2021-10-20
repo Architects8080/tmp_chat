@@ -67,11 +67,16 @@ function NotificationOverlay(prop: DropdownProps) {
     await axios.post(
       `${process.env.REACT_APP_SERVER_ADDRESS}/notification/accept/${id}`,
     );
+    //TODO
+    //notiList에서 해당 id 찾아서 type이 channel이면 targetid로 redirection
     setNotiList((notiList) => {
       return notiList.filter((noti) => {
         return noti.id != id;
       });
     });
+
+    //Redirect
+
   };
 
   const rejectCallback = async (id: number) => {
