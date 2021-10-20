@@ -7,9 +7,6 @@ type achievementItemProps = {
   isAchieve: boolean;
 };
 
-//db achievementId -> achievementTitle X
-//isfront?
-
 function AchievementItem(prop: achievementItemProps) {
   return (
     <Tooltip title={prop.title} placement="top">
