@@ -1,6 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from 'src/auth/auth.module';
+import { CommunityModule } from 'src/community/community.module';
+import { CommunitySocketUserModule } from 'src/community/socket-user/community.socket-user.module';
+import { StatusService } from 'src/community/status/status.service';
 import { UserModule } from 'src/user/user.module';
 import { MatchPlayer } from '../match/entity/match-player.entity';
 import { Match } from '../match/entity/match.entity';
@@ -17,14 +20,16 @@ import { MatchmakerService } from './matchmaker/matchmaker.service';
     TypeOrmModule.forFeature([Match, MatchPlayer]),
     AuthModule,
     UserModule,
+    CommunitySocketUserModule,
   ],
   providers: [
     GameGateway,
     GameService,
     GameRoomService,
     GameRepository,
-    GameSocketUserService,
     MatchmakerService,
+    GameSocketUserService,
+    StatusService,
   ],
   controllers: [GameController],
   exports: [GameService, GameSocketUserService, GameRepository],

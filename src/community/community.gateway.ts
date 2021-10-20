@@ -79,7 +79,8 @@ export class CommunityGateway
       const user = await this.jwtStrategy.validate(userPayload);
       client.user = user;
       this.socketUserService.removeSocket(client);
-      this.statusService.setUserStatusById(user.id, UserStatus.OFFLINE);
+      if (this.statusService.getUserStatusById(user.id) != UserStatus.PLAYING)
+        this.statusService.setUserStatusById(user.id, UserStatus.OFFLINE);
     } catch (error) {}
   }
 

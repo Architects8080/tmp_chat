@@ -172,7 +172,7 @@ export class GameService {
         room.gameInfo.endAt = new Date();
         clearInterval(room.interval);
         await this.gameRepository.saveGameToDB(room.socketRoomId);
-        onFinish(room.gameInfo);
+        await onFinish(room.gameInfo);
         this.gameRepository.deleteGameRoom(room.socketRoomId);
       }
     };
@@ -219,7 +219,6 @@ export class GameService {
         },
         vector: { dx: 0, dy: 0 },
       });
-      console.log(gameInfo.obstacles);
     }
 
     gameRoom.gameInfo = gameInfo;
