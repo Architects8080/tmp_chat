@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Redirect } from "react-router";
 import { io } from "../../socket/socket";
-import { modalHandler } from "../sideBar/sideBarType";
+import { modalHandler } from "../sidebar/sidebarType";
 import snackbar from "../snackbar/snackbar";
 import GameInviteModal from "./game/gameInviteModal";
 import GameSettingModal from "./game/gameSettingModal";

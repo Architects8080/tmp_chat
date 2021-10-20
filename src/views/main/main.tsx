@@ -3,21 +3,13 @@ import Button from "../../components/button/button";
 import EmptyPageInfo from "../../components/emptyPage/empty";
 import Header from "../../components/header/header";
 import ChatroomCreateModal from "../../components/modal/chatroom/create/chatroomCreateModal";
-import SideBar from "../../components/sideBar/sideBar";
 import ChatroomItem, { chatroomItemProps } from "./chatroomItem/item";
 import "./main.scss";
-import { sidebarProperty } from "../../components/sideBar/sideBarType";
 import ModalHandler from "../../components/modal/modalhandler";
-import ChatroomDefaultDropdownList from "../../components/dropdown/dropdownList/chatroomDefault";
-import ChatroomAdminDropdownList from "../../components/dropdown/dropdownList/chatroomAdmin";
-import ChatroomOwnerDropdownList from "../../components/dropdown/dropdownList/chatroomOwner";
-import FriendDropdownList from "../../components/dropdown/dropdownList/friend";
-import HeaderDropdownList from "../../components/dropdown/dropdownList/header";
-import OTPModal from "../../components/modal/otp/otpModal";
 import axios from "axios";
-import GameSettingModal from "../../components/modal/game/gameSettingModal";
 import GameModalListener from "../../components/modal/gameModalListener";
 import { ioChannel } from "../../socket/socket";
+import FriendSidebar from "../../components/sidebar/friendSidebar";
 
 enum ChatroomCategory {
   AllChatroomList,
@@ -78,9 +70,8 @@ const Main = () => {
     <>
       <Header isLoggedIn={true} />
       <div className="page">
-        <SideBar
-          title={sidebarProperty.friendList}
-          roomId={1}
+        <FriendSidebar
+          roomId={0}
           modalHandler={modalHandler}
         />
         <div className="main-wrap">

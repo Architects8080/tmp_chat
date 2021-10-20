@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import GameSettingModal from "../../modal/game/gameSettingModal";
-import { modalHandler } from "../../sideBar/sideBarType";
+import { modalHandler } from "../../sidebar/sidebarType";
 import DefaultDropdownItem from "../itemTemplate/default/item";
 
 type props = {
@@ -31,7 +31,7 @@ function InviteGameItem(prop: props) {
       <GameSettingModal
         open={test}
         close={handleModalClose}
-        targetId={68874} //TODO
+        targetId={prop.targetId} //TODO
       />
       <DefaultDropdownItem
         title="게임 초대하기"
