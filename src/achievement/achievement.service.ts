@@ -13,7 +13,7 @@ export class AchievementService {
     @InjectRepository(UserAchievement)
     private userAchievementRepository: Repository<UserAchievement>,
   ) {
-    const achievementTitle = ['10회 승리', '20회 승리', '10전 이상 플레이', '20전 이상 플레이', 'OTP 등록'];
+    const achievementTitle = ['10회 승리', '20회 승리', '10회 이상 플레이', '20회 이상 플레이', 'OTP 등록'];
 
     achievementTitle.map((title, index) => {
       const achievement = achievementRepository.create();
