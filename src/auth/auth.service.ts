@@ -1,4 +1,4 @@
-import { ForbiddenException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { ForbiddenException, HttpException, HttpStatus, Injectable, PayloadTooLargeException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/user/entity/user.entity';
 import { UserService } from 'src/user/user.service';
@@ -45,7 +45,7 @@ export class AuthService {
     if (!session.newUser.nickname)
       session.newUser.nickname = session.newUser.intraLogin;
     if (nickname.length > 10)
-      throw new HttpException('TOO LONG NICKNAME', HttpStatus.BAD_REQUEST);
+      throw new PayloadTooLargeException();
     await this.userService.createUser(session.newUser);
 
     return this.login(session.newUser, session); // will return jwt
