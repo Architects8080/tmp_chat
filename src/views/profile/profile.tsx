@@ -22,7 +22,7 @@ function Profile() {
   const [topRate, setTopRate] = useState<string>("100");
   const [matchList, setMatchList] = useState<Match[] | null>(null);
   const [achievedList, setAchievedList] = useState<Achievement[] | null>(null);
-  const achievementTitle = ['10회 승리', '5연속 승리', '5연속 퍼펙트 게임', '50전 이상 플레이', 'OTP 등록'];
+  const achievementTitle = ['10회 승리', '20회 승리', '10회 이상 플레이', '20회 이상 플레이', 'OTP 등록'];
 
   const [winRatio, setWinRatio] = useState<MatchRatio | null>(null);
   const [search, setSearch] = useState("");

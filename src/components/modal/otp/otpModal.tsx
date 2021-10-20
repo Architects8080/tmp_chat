@@ -14,7 +14,7 @@ function OTPModal(prop: ModalProps) {
   };
 
   return (
-    <div className={prop.open ? "openModal modal" : "modal"}>
+    <div className={prop.open ? "modal-open modal-background" : "modal-background"}>
       {prop.open ? (
         <section>
           <div className="otp-modal-wrap">
@@ -30,9 +30,7 @@ function OTPModal(prop: ModalProps) {
             </pre>
             <div
               className="submit-button"
-              onClick={() => {
-                prop.close();
-              }}
+              onClick={handleClose}
             >
               확인
             </div>
