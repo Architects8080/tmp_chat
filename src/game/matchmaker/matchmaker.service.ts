@@ -27,8 +27,8 @@ export class MatchmakerService {
     const user = this.socketUserService.getSocketById(userId);
     const target = this.socketUserService.getSocketById(targetId);
     if (user && target) {
-      target.emit('invite', user.user.nickname, user.user.avatar, roomId);
-      user.emit('invite', target.user.nickname, target.user.avatar, roomId);
+      target.emit('invite', user.user.nickname, user.user.avatar, roomId, true);
+      user.emit('invite', target.user.nickname, target.user.avatar, roomId, true);
       return true;
     }
     return false;
