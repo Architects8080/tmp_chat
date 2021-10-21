@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ChannelService } from 'src/channel/channel.service';
 import { FriendService } from 'src/friend/friend.service';
 import { Repository } from 'typeorm';
 import { NotificationDto } from './dto/notification';
@@ -15,6 +16,7 @@ export class NotificationService {
     @InjectRepository(Notification)
     private readonly notificationRepository: Repository<Notification>,
     private readonly friendService: FriendService,
+    private readonly channelService: ChannelService,
   ) {}
 
   async getNotifications(userId: number) {
@@ -49,6 +51,7 @@ export class NotificationService {
         });
       }
       case NotificationType.CHANNEL: {
+        return this.channelService.acceptChannelInvitation(noti.receiverId, noti.targetId);
       }
     }
   }

@@ -36,8 +36,8 @@ export class Channel {
   @Column({ nullable: true })
   password: string;
 
-  @OneToMany(() => ChannelMember, (channelMember) => channelMember.channelId)
-  channelMemberList: ChannelMember[];
+  @OneToMany(() => ChannelMember, (channelMember) => channelMember.channel)
+  memberList: ChannelMember[];
 
   @BeforeInsert()
   @BeforeUpdate()

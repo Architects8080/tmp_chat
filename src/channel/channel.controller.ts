@@ -1,7 +1,9 @@
 import {
   Body,
+  ConflictException,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   Param,
   ParseIntPipe,
@@ -58,14 +60,48 @@ export class ChannelController {
     return await this.channelService.updateChannel(channelId, body);
   }
 
+  @Roles('owner', 'admin', 'member')
   @Get(':channelId/member')
-  async getChannelMemeberList() {}
+  async getChannelMemeberList(
+    @Req() req,
+    @Param('channelId', new ParseIntPipe()) channelId: number,
+  ) {
+    if (await this.channelService.isJoinChannel(req.user.id, channelId))
+      return await this.channelService.getChannelMemberList(channelId);
+    else throw new ForbiddenException();
+  }
 
-  @Put(':channelId/member')
-  async joinChannel() {}
+  @Post(':channelId/member')
+  async joinChannel(
+    @Req() req,
+    @Param('channelId', new ParseIntPipe()) channelId: number,
+    @Body('password') password: string,
+  ) {
+    return await this.channelService.joinChannel(
+      req.user.id,
+      channelId,
+      password,
+    );
+  }
 
+  @Roles('owner', 'admin', 'member')
   @Delete(':channelId/member')
-  async leaveChannel() {}
+  async leaveChannel(
+    @Req() req,
+    @Param('channelId', new ParseIntPipe()) channelId: number,
+  ) {
+    return await this.channelService.leaveChannel(req.user.id, channelId);
+  }
+
+  @Roles('owner', 'admin', 'member')
+  @Post(':channelId/invite/:userId')
+  async inviteUser(
+    @Req() req,
+    @Param('channelId', new ParseIntPipe()) channelId: number,
+    @Param('userId', new ParseIntPipe()) userId: number,
+  ) {
+    return await this.channelService.inviteUser(req.user.id, channelId, userId);
+  }
 
   @Roles('owner')
   @Put(':channelId/admin/:memberId')
@@ -75,9 +111,11 @@ export class ChannelController {
   @Delete(':channelId/admin/:memberId')
   async revokeAdmin() {}
 
+  @Roles('owner', 'admin')
   @Put(':channelId/mute/:memberId')
   async muteMember() {}
 
+  @Roles('owner', 'admin')
   @Put(':channelId/ban/:memberId')
   async banMember() {}
 }

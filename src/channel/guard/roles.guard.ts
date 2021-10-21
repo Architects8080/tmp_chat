@@ -1,6 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ChannelRoleService } from '../channel-role.service';
+import { MemberRole } from '../entity/channel-member.entity';
 import { RoleDefaultList } from './roles.type';
 
 @Injectable()
@@ -22,8 +23,18 @@ export class RolesGuard implements CanActivate {
       request.params.channelId,
       request.user.id,
     );
-    if (!roles.includes(result)) {
+    if (!result || !roles.includes(result)) {
       return false;
+    }
+    const memberId = request.params.memberId;
+    if (memberId) {
+      const targetRole = await this.channelRoleService.getRole(
+        request.params.channelId,
+        memberId,
+      );
+      const targetIndex = RoleDefaultList.indexOf(targetRole);
+      const userIndex = RoleDefaultList.indexOf(result);
+      if (userIndex <= targetIndex) return false;
     }
     return true;
   }

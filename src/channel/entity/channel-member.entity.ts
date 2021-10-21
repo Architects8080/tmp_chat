@@ -18,7 +18,7 @@ export enum MemberRole {
 
 @Entity('channel_member')
 export class ChannelMember {
-  @ManyToOne(() => Channel, (channel) => channel.channelMemberList, {
+  @ManyToOne(() => Channel, (channel) => channel.memberList, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })

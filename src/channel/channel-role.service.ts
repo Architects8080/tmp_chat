@@ -22,7 +22,8 @@ export class ChannelRoleService {
         userId: userId,
       },
     });
-    if (!channelMember) return MemberRole.MEMBER;
+    if (!channelMember)
+      return null;
     return channelMember.role;
   }
 }
