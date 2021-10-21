@@ -1,0 +1,7 @@
+export enum AchievementId {
+  WIN_10_TIMES = 1,
+  WIN_20_TIMES,
+  PLAY_10_GAMES,
+  PLAY_20_GAMES,
+  REGISTRATION_OTP
+}
