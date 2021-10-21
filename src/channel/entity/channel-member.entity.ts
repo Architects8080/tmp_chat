@@ -6,6 +6,8 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryColumn,
+  PrimaryGeneratedColumn,
+  Unique,
 } from 'typeorm';
 import { ChannelMessage } from './channel-message.entity';
 import { Channel } from './channel.entity';
@@ -17,24 +19,25 @@ export enum MemberRole {
 }
 
 @Entity('channel_member')
+@Unique(['channelId', 'userId'])
 export class ChannelMember {
+  @PrimaryGeneratedColumn()
+  id: number;
+
   @ManyToOne(() => Channel, (channel) => channel.memberList, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
   @JoinColumn({ name: 'channelId' })
   channel: Channel;
-  @PrimaryColumn()
+  @Column()
   channelId: number;
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'userId' })
   user: User;
-  @PrimaryColumn()
+  @Column()
   userId: number;
-
-  @OneToMany(() => ChannelMessage, (message) => message.sentBy)
-  messages: ChannelMessage[];
 
   @Column({
     type: 'enum',

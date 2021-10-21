@@ -9,6 +9,7 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
+import { validate, Validator } from 'class-validator';
 import { Server } from 'socket.io';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 import { cookieExtractor, JwtStrategy } from 'src/auth/strategy/jwt.strategy';
@@ -16,6 +17,7 @@ import { SocketUser } from 'src/socket/socket-user';
 import { SocketUserService } from 'src/socket/socket-user.service';
 import { ChannelService } from './channel.service';
 import { CHANNEL_SOCKET_USER_SERVICE_PROVIDER } from './channel.socket-user.service';
+import { ChannelMessageDto } from './dto/channel-message.dto';
 
 @UseGuards(JwtAuthGuard)
 @WebSocketGateway(4501, { namespace: 'channel' })
@@ -38,14 +40,12 @@ export class ChannelGateway
       const userPayload = this.jwtService.verify(token);
       const user = await this.jwtStrategy.validate(userPayload);
       client.user = user;
-      console.log(client.rooms);
-      console.log(user.id, user.intraLogin);
       this.socketUserService.addSocket(client);
     } catch (error) {
-      console.log(error);
       client.disconnect(true);
     }
   }
+
   async handleDisconnect(client: SocketUser) {
     console.log(`Client ${client.id} Disconnected`);
     try {
@@ -55,5 +55,20 @@ export class ChannelGateway
       client.user = user;
       this.socketUserService.removeSocket(client);
     } catch (error) {}
+  }
+
+  @SubscribeMessage('messageToServer')
+  async receiveMessage(
+    @ConnectedSocket() client: SocketUser,
+    dto: ChannelMessageDto,
+  ) {
+    const validatorError = await validate(dto);
+    if (validatorError.length > 0) return;
+    const result = await this.channelService.createMessage(
+      dto.channelId,
+      client.user.id,
+      dto.message,
+    );
+    this.server.to(`channel:${dto.channelId}`).emit('messageToClient', result);
   }
 }
