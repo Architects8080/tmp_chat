@@ -10,11 +10,16 @@ type chatroomCreateModalProps = {
   close: any;
 };
 
+enum ChannelType {
+  PUBLIC = 'public',
+  PRIVATE = 'private',
+  PROTECTED = 'protected',
+}
+
 type channelCreateDto = {
   title: string;
-  type: number;
+  type: ChannelType;
   password?: string;
-  ownerId: number;
 }
 
 export enum roomType {
@@ -25,7 +30,7 @@ export enum roomType {
 
 const ChatroomCreateModal = (prop: chatroomCreateModalProps) => {
   const modalTitle = "채팅방 생성";
-  const Description = "채팅방을 만들어 다른 유저와 소통해보세요!";
+  const description = "채팅방을 만들어 다른 유저와 소통해보세요!";
 
   const roomPlaceholder = "방 제목";
   const buttonTitle = "생성하기";
@@ -33,16 +38,10 @@ const ChatroomCreateModal = (prop: chatroomCreateModalProps) => {
   const [title, setTitle] = useState("");
   const [password, setPassword] = useState("");
 
+  const [errorText, setErrorText] = useState("");
   const [descriptionText, setDescriptionText] = useState(
     "비밀번호는 숫자 4자리로 구성 가능합니다."
   );
-  const [errorText, setErrorText] = useState("");
-
-  useEffect(() => {
-    ioChannel.on('channelCreated', (channelId) => {
-      window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/chatroom/${channelId}`
-    });
-  }, []);
 
   const handleUserInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
@@ -68,37 +67,29 @@ const ChatroomCreateModal = (prop: chatroomCreateModalProps) => {
   };
 
   const handleSubmitEvent = async () => {
-
-    const user = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/user/me`);
-    const newChannel: channelCreateDto = {
+    const channelDto: channelCreateDto = {
       title: title,
-      type: selectedRoomType,
+      type: channelType,
       password: password,
-      ownerId: user.data.id,
     };
 
-    if (title !== '') {
-      if (selectedRoomType == roomType.protectedRoom && password.length == 4 
-          || selectedRoomType != roomType.protectedRoom) {
-        try {
-          const roomId = await axios.post(
-            `${process.env.REACT_APP_SERVER_ADDRESS}/channel/create`, newChannel
-          );
-          prop.close();
-          window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/chatroom/${roomId.data}`
-        } catch (e) {
-          console.log(e);
-          setErrorText("채널 생성에 실패했습니다.");
-        }
-      }
+    if (title !== '' && (channelType == ChannelType.PROTECTED && password.length == 4 || channelType != ChannelType.PROTECTED)) {
+      axios.post(
+        `${process.env.REACT_APP_SERVER_ADDRESS}/channel/`, channelDto
+      ).then(response => {
+        prop.close();
+        window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/chatroom/${response.data.channelId}`
+      }).catch(e => {
+        console.log(e);
+        setErrorText("채널 생성에 실패했습니다.");
+      })
     }
   };
 
-  const [selectedRoomType, setSelectedRoomType] = useState(roomType.publicRoom);
+  const [channelType, setChannelType] = useState(ChannelType.PUBLIC);
 
-  const handleChange = (type: number) => {
-    (type == roomType.publicRoom) ? setSelectedRoomType(roomType.publicRoom) :
-      (type == roomType.privateRoom) ? setSelectedRoomType(roomType.privateRoom) : setSelectedRoomType(roomType.protectedRoom);
+  const handleChange = (selectedType: ChannelType) => {
+    setChannelType(selectedType);
   };
 
   return (
@@ -115,11 +106,10 @@ const ChatroomCreateModal = (prop: chatroomCreateModalProps) => {
             onClick={handleClose}
           />
         </div>
-        <div className="description">{Description}</div>
+        <div className="description">{description}</div>
 
         <div className="content">
           <div className="subtitle">방 제목</div>
-          {/* value={} onChage={}  */}
           <input
             className="room-title"
             type="text"
@@ -134,28 +124,28 @@ const ChatroomCreateModal = (prop: chatroomCreateModalProps) => {
           <div className="select">
             <RadioButton
               name="option"
-              value={0}
+              value={ChannelType.PUBLIC}
               label="Public"
-              isChecked={selectedRoomType === roomType.publicRoom}
+              isChecked={channelType === ChannelType.PUBLIC}
               handleChange={handleChange}
             />
             <RadioButton
               name="option"
-              value={1}
+              value={ChannelType.PRIVATE}
               label="Private"
-              isChecked={selectedRoomType === roomType.privateRoom}
+              isChecked={channelType === ChannelType.PRIVATE}
               handleChange={handleChange}
             />
             <RadioButton
               name="option"
-              value={2}
+              value={ChannelType.PROTECTED}
               label="Protected"
-              isChecked={selectedRoomType === roomType.protectedRoom}
+              isChecked={channelType === ChannelType.PROTECTED}
               handleChange={handleChange}
             />
             <div
               className={
-                selectedRoomType === roomType.protectedRoom
+                channelType === ChannelType.PROTECTED
                   ? "password-open"
                   : "password-close"
               }
@@ -180,7 +170,7 @@ const ChatroomCreateModal = (prop: chatroomCreateModalProps) => {
         {/* show or not */}
         <div
           className={
-            selectedRoomType === 2 ? "protected-open" : "protected-close"
+            channelType === ChannelType.PROTECTED ? "protected-open" : "protected-close"
           }
         >
           <div className="protected-description">{descriptionText}</div>

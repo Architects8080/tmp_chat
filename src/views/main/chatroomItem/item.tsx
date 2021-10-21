@@ -6,16 +6,16 @@ import { ioChannel } from "../../../socket/socket";
 import "./item.scss";
 
 export type chatroomItemProps = {
-  roomId: number,
+  id: number,
   title: string,
   memberCount: number,
-  type: ChatroomType,
+  type: ChannelType,
 }
 
-enum ChatroomType {
-  public = 0,
-  private,
-  protected,
+enum ChannelType {
+  PUBLIC = 'public',
+  PRIVATE = 'private',
+  PROTECTED = 'protected',
 }
 
 const ChatroomItem = ({channel} : {channel:chatroomItemProps}) => {
@@ -32,8 +32,8 @@ const ChatroomItem = ({channel} : {channel:chatroomItemProps}) => {
         .then(
           axios.spread((user, myChannelList) => {
             setUserId(user.data.id);
-            if (myChannelList.data.find((myChannel: any) => myChannel.roomId === channel.roomId))
-              window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/chatroom/${channel.roomId}`
+            if (myChannelList.data.find((myChannel: any) => myChannel.roomId === channel.id))
+              window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/chatroom/${channel.id}`
             else
               modalHandler.handleModalOpen("enterPassword");
           })
@@ -41,7 +41,7 @@ const ChatroomItem = ({channel} : {channel:chatroomItemProps}) => {
       }
       catch (e) { console.log(e); }
     } else {
-      window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/chatroom/${channel.roomId}`
+      window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/chatroom/${channel.id}`
     }
   };
 
@@ -53,15 +53,15 @@ const ChatroomItem = ({channel} : {channel:chatroomItemProps}) => {
     <>
       <div className="chatroom-item" onClick={handleOnClick}>
         <div className="chatroom-header">
-          <div className="chatroom-title">[{channel.roomId}] {channel.title}</div>
-          { channel.type === ChatroomType.private ? 
+          <div className="chatroom-title">[{channel.id}] {channel.title}</div>
+          { channel.type === ChannelType.PRIVATE ? 
             <img className="chatroom-locked" alt="chatroom-locked" src="/icons/chat/private.svg"/> : ""}
-          { channel.type === ChatroomType.protected ? 
+          { channel.type === ChannelType.PROTECTED ? 
             <img className="chatroom-locked" alt="chatroom-locked" src="/icons/chat/protected.svg"/> : ""}
         </div>
         <div className="chatroom-member-count">{channel.memberCount}명 참여중</div>
       </div>
-      <EnterPasswordModal open={modalHandler.isModalOpen.enterPassword} close={handleModalClose} userId={userId} roomId={channel.roomId}/>
+      <EnterPasswordModal open={modalHandler.isModalOpen.enterPassword} close={handleModalClose} userId={userId} roomId={channel.id}/>
     </>
   );
 }

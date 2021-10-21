@@ -12,9 +12,9 @@ import { io, ioChannel } from "../../socket/socket";
 import FriendSidebar from "../../components/sidebar/friendSidebar";
 import { modalHandler } from "../../components/sidebar/sidebarType";
 
-enum ChatroomCategory {
-  AllChatroomList,
-  JoinedChatroomList,
+enum ChannelCategory {
+  ALL_CHANNEL_LIST,
+  MY_CHANNEL_LIST,
 }
 
 const Main = () => {
@@ -28,7 +28,7 @@ const Main = () => {
   }
 
   const [category, setCategory] = useState(
-    ChatroomCategory.AllChatroomList
+    ChannelCategory.ALL_CHANNEL_LIST
   );
 
   const handleAddWaiting = () => {
@@ -41,9 +41,7 @@ const Main = () => {
     io.emit('leaveQueue');
   }
 
-  const changeCategory = (category: ChatroomCategory) => {
-    //io.emit : by category
-    //io.on   : get Chatrooms object
+  const changeCategory = (category: ChannelCategory) => {
     return () => {
       setCategory(category);
     };
@@ -55,6 +53,7 @@ const Main = () => {
   const getAllChannel = async () => {
     try {
       const response = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/channel`);
+      console.log(`getAllChannels : `, response.data);
       if (response.data.length != 0)
         setChannels(response.data);
     } catch (error) {
@@ -65,6 +64,7 @@ const Main = () => {
   const getMyChannel = async () => {
     try {
       const response = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/me`);
+      console.log(`getMyChannel : `, response.data);
       if (response.data.length != 0)
         setMyChannels(response.data);
     } catch (error) {
@@ -76,7 +76,7 @@ const Main = () => {
 		getAllChannel();
     getMyChannel();
     ioChannel.on('updateChannel', async () => {
-      if (category == ChatroomCategory.AllChatroomList)
+      if (category == ChannelCategory.ALL_CHANNEL_LIST)
         getAllChannel();
       else
         getMyChannel();
@@ -99,13 +99,13 @@ const Main = () => {
               <div className="focusable-button" tabIndex={1}>
                 <Button
                   title="전체 채팅방"
-                  onClick={changeCategory(ChatroomCategory.AllChatroomList)}
+                  onClick={changeCategory(ChannelCategory.ALL_CHANNEL_LIST)}
                 />
               </div>
               <div className="focusable-button" tabIndex={1}>
                 <Button
                   title="참여중인 채팅방"
-                  onClick={changeCategory(ChatroomCategory.JoinedChatroomList)}
+                  onClick={changeCategory(ChannelCategory.MY_CHANNEL_LIST)}
                 />
               </div>
             </div>
@@ -122,21 +122,17 @@ const Main = () => {
             </div>
           </div>
 
-          {(category === ChatroomCategory.AllChatroomList && !channels)
+          {(category === ChannelCategory.ALL_CHANNEL_LIST && !channels)
             ? <EmptyPageInfo description={`공개 채팅방이 존재하지 않습니다.\n'채팅방 만들기' 버튼으로 채팅방을 생성해보세요!`}/>
-            : (category === ChatroomCategory.JoinedChatroomList && !myChannels)
+            : (category === ChannelCategory.MY_CHANNEL_LIST && !myChannels)
               ? <EmptyPageInfo description={`현재 참여중인 채팅방이 없습니다.\n전체 채팅방 목록에서 참가해보세요!`}/> 
               : <div className="chatroom-list">
-                  {category === ChatroomCategory.AllChatroomList && channels
+                  {category === ChannelCategory.ALL_CHANNEL_LIST && channels
                     ? channels.map(item => (
-                        <ChatroomItem 
-                        channel = {item} 
-                        key = {item.roomId}/>
+                        <ChatroomItem channel = {item} />
                       ))
                        : myChannels ? myChannels.map(item => (
-                          <ChatroomItem 
-                          channel = {item} 
-                          key = {item.roomId}/>
+                          <ChatroomItem channel = {item} />
                         )) : null
                   }
                 </div>
