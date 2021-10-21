@@ -19,6 +19,7 @@ import { RolesGuard } from 'src/channel/guard/roles.guard';
 import { ChannelService } from './channel.service';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { UpdateChannelDto } from './dto/update-channel.dto';
+import { MemberGuard } from './guard/member.guard';
 import { Roles } from './guard/roles.decorator';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -104,12 +105,23 @@ export class ChannelController {
   }
 
   @Roles('owner')
+  @UseGuards(MemberGuard)
   @Put(':channelId/admin/:memberId')
-  async grantAdmin() {}
+  async grantAdmin(
+    @Param('channelId', new ParseIntPipe()) channelId: number,
+    @Param('memberId', new ParseIntPipe()) memberId: number,
+  ) {
+    return await this.channelService.grantAdmin(channelId, memberId);
+  }
 
   @Roles('owner')
   @Delete(':channelId/admin/:memberId')
-  async revokeAdmin() {}
+  async revokeAdmin(
+    @Param('channelId', new ParseIntPipe()) channelId: number,
+    @Param('memberId', new ParseIntPipe()) memberId: number,
+  ) {
+    return await this.channelService.revokeAdmin(channelId, memberId);
+  }
 
   @Roles('owner', 'admin')
   @Put(':channelId/mute/:memberId')

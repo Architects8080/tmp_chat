@@ -26,7 +26,7 @@ export class RolesGuard implements CanActivate {
     if (!result || !roles.includes(result)) {
       return false;
     }
-    const memberId = request.params.memberId;
+    const memberId = Number(request.params.memberId);
     if (memberId) {
       const targetRole = await this.channelRoleService.getRole(
         request.params.channelId,

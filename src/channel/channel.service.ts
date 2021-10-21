@@ -199,17 +199,45 @@ export class ChannelService {
   async inviteUser(senderId: any, channelId: number, receiverId: number) {
     if (senderId == receiverId)
       throw new BadRequestException('Cannot invite yourself.');
-    if (!await this.userService.getUserById(receiverId)) 
+    if (!(await this.userService.getUserById(receiverId)))
       throw new NotFoundException('Not found user');
-      console
+    console;
     if (await this.isJoinChannel(receiverId, channelId))
       throw new ConflictException('Already channel member');
-    const result = await this.notificationEventService.setNotification(senderId, {
-      receiverId: receiverId,
-      targetId: channelId,
-      type: NotificationType.CHANNEL,
-    });
-    if (!result) 
-      throw new ConflictException('Already invited');
+    const result = await this.notificationEventService.setNotification(
+      senderId,
+      {
+        receiverId: receiverId,
+        targetId: channelId,
+        type: NotificationType.CHANNEL,
+      },
+    );
+    if (!result) throw new ConflictException('Already invited');
   }
+
+  async grantAdmin(channelId: number, memberId: number) {
+    await this.channelMemberRepository.update(
+      {
+        channelId: channelId,
+        userId: memberId,
+      },
+      {
+        role: MemberRole.ADMIN,
+      },
+    );
+  }
+
+  async revokeAdmin(channelId: number, memberId: number) {
+    await this.channelMemberRepository.update(
+      {
+        channelId: channelId,
+        userId: memberId,
+      },
+      {
+        role: MemberRole.MEMBER,
+      },
+    );
+  }
+  // check ban
+  // check mute
 }

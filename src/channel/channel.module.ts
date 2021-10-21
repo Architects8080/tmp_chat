@@ -32,6 +32,6 @@ import { Channel } from './entity/channel.entity';
     ChannelSocketUserService,
     ChannelRoleService,
   ],
-  exports: [ChannelService]
+  exports: [ChannelService],
 })
 export class ChannelModule {}
