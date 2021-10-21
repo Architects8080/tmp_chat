@@ -13,17 +13,19 @@ const GameModalListener = ({modalHandler} : {modalHandler: modalHandler}) => {
     nickname: "",
     avatar: "",
     roomID: 0,
+    isLadder: false,
   });
   const [roomID, setRoomID] = useState(0);
 
   useEffect(() => {
-    io.on("invite", (inviteUserNickname, inviteUserAvatar, roomID) => {
+    io.on("invite", (inviteUserNickname, inviteUserAvatar, roomID, isLadder) => {
       setInviteUserInfo({
         nickname: inviteUserNickname,
         avatar: inviteUserAvatar,
         roomID: roomID,
+        isLadder: isLadder,
       });
-      modalHandler.handleModalOpen('gameSetting');
+      modalHandler.handleModalOpen('gameInvite');
     });
 
     io.on("ready", (roomID) => {
@@ -41,9 +43,9 @@ const GameModalListener = ({modalHandler} : {modalHandler: modalHandler}) => {
   return(
     <GameInviteModal
       inviteInfo={inviteUserInfo}
-      open={modalHandler.isModalOpen.gameSetting}
-      close={() => {modalHandler.handleModalClose("gameSetting"); 
-      
+      open={modalHandler.isModalOpen.gameInvite}
+      close={() => {modalHandler.handleModalClose("gameInvite");
+
       if (modalHandler.setWaiting)
         modalHandler.setWaiting(false);
       }}

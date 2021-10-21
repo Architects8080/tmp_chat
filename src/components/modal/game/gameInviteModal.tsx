@@ -6,6 +6,7 @@ type inviteInfo = {
   nickname: string;
   avatar: string;
   roomID: number;
+  isLadder: boolean;
 };
 
 type ModalProps = {
@@ -46,12 +47,22 @@ function GameInviteModal(prop: ModalProps) {
 
           <div className="modal-content center">{prop.inviteInfo.nickname}</div>
 
-          <div className="game-invite">
-            {prop.inviteInfo.nickname}님의 게임 신청이 도착했습니다.
-            <br /> 
-            <br />
-            게임 신청을 수락하시겠습니까?
-          </div>
+            {prop.inviteInfo.isLadder == true ? 
+              <div className="game-invite">
+                {prop.inviteInfo.nickname}님과의 대결이 성사되었습니다.
+                <br /> 
+                <br />
+                게임을 진행하시겠습니까?
+              </div>
+              :
+              <div className="game-invite">
+                {prop.inviteInfo.nickname}님의 게임 신청이 도착했습니다.
+                <br /> 
+                <br />
+                게임 신청을 수락하시겠습니까?
+              </div>
+            }
+
           <div className="game-invite-submit">
             <button className="accept" onClick={handleAccept}>
               수락
