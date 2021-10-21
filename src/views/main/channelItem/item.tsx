@@ -5,7 +5,7 @@ import ModalHandler from "../../../components/modal/modalhandler";
 import { ioChannel } from "../../../socket/socket";
 import "./item.scss";
 
-export type chatroomItemProps = {
+export type ChannelItemProps = {
   id: number,
   title: string,
   memberCount: number,
@@ -18,12 +18,12 @@ enum ChannelType {
   PROTECTED = 'protected',
 }
 
-const ChatroomItem = ({channel} : {channel:chatroomItemProps}) => {
+const ChannelItem = ({channel} : {channel:ChannelItemProps}) => {
   const modalHandler = ModalHandler();
   const [userId, setUserId] = useState(0);
 
   const handleOnClick = async () => {
-    if (channel.type) {
+    if (channel.type !== ChannelType.PUBLIC) {
       try {
         axios.all([
           axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/user/me`),
@@ -32,7 +32,7 @@ const ChatroomItem = ({channel} : {channel:chatroomItemProps}) => {
         .then(
           axios.spread((user, myChannelList) => {
             setUserId(user.data.id);
-            if (myChannelList.data.find((myChannel: any) => myChannel.roomId === channel.id))
+            if (myChannelList.data.find((myChannel: any) => myChannel.id === channel.id))
               window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/chatroom/${channel.id}`
             else
               modalHandler.handleModalOpen("enterPassword");
@@ -66,4 +66,4 @@ const ChatroomItem = ({channel} : {channel:chatroomItemProps}) => {
   );
 }
 
-export default ChatroomItem;
+export default ChannelItem;

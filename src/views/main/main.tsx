@@ -3,7 +3,7 @@ import Button from "../../components/button/button";
 import EmptyPageInfo from "../../components/emptyPage/empty";
 import Header from "../../components/header/header";
 import ChatroomCreateModal from "../../components/modal/chatroom/create/chatroomCreateModal";
-import ChatroomItem, { chatroomItemProps } from "./chatroomItem/item";
+import ChannelItem, { ChannelItemProps } from "./channelItem/item";
 import "./main.scss";
 import ModalHandler from "../../components/modal/modalhandler";
 import axios from "axios";
@@ -13,13 +13,14 @@ import FriendSidebar from "../../components/sidebar/friendSidebar";
 import { modalHandler } from "../../components/sidebar/sidebarType";
 
 enum ChannelCategory {
-  ALL_CHANNEL_LIST,
+  CHANNEL_LIST,
   MY_CHANNEL_LIST,
 }
 
 const Main = () => {
   const modalHandler = ModalHandler();
   const [isWaiting, setIsWaiting] = useState(false);
+
   const modalListener: modalHandler = {
     handleModalClose: modalHandler.handleModalClose,
     handleModalOpen: modalHandler.handleModalOpen,
@@ -28,7 +29,7 @@ const Main = () => {
   }
 
   const [category, setCategory] = useState(
-    ChannelCategory.ALL_CHANNEL_LIST
+    ChannelCategory.CHANNEL_LIST
   );
 
   const handleAddWaiting = () => {
@@ -47,15 +48,15 @@ const Main = () => {
     };
   };
 
-  const [channels, setChannels] = useState<chatroomItemProps[] | null>(null);
-  const [myChannels, setMyChannels] = useState<chatroomItemProps[] | null>(null);
+  const [channelList, setChannelList] = useState<ChannelItemProps[] | null>(null);
+  const [myChannelList, setMyChannelList] = useState<ChannelItemProps[] | null>(null);
 
   const getAllChannel = async () => {
     try {
       const response = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/channel`);
-      console.log(`getAllChannels : `, response.data);
+      console.log(`getAllChannelList : `, response.data);
       if (response.data.length != 0)
-        setChannels(response.data);
+        setChannelList(response.data);
     } catch (error) {
       console.log(error);
     }
@@ -66,7 +67,7 @@ const Main = () => {
       const response = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/me`);
       console.log(`getMyChannel : `, response.data);
       if (response.data.length != 0)
-        setMyChannels(response.data);
+        setMyChannelList(response.data);
     } catch (error) {
       console.log(error);
     }
@@ -75,12 +76,15 @@ const Main = () => {
 	useEffect(() => {
 		getAllChannel();
     getMyChannel();
-    ioChannel.on('updateChannel', async () => {
-      if (category == ChannelCategory.ALL_CHANNEL_LIST)
-        getAllChannel();
-      else
-        getMyChannel();
-    })
+
+    //TODO: socket.on update join/leave user
+
+    // ioChannel.on('updateChannel', async () => {
+    //   if (category == ChannelCategory.CHANNEL_LIST)
+    //     getAllChannel();
+    //   elListe
+    //     getMyChannel();
+    // })
 	}, [category]);
 
 
@@ -95,11 +99,10 @@ const Main = () => {
         <div className="main-wrap">
           <div className="button-list">
             <div className="button-left-side">
-              {/* to make a non-focusable element focusable */}
               <div className="focusable-button" tabIndex={1}>
                 <Button
                   title="전체 채팅방"
-                  onClick={changeCategory(ChannelCategory.ALL_CHANNEL_LIST)}
+                  onClick={changeCategory(ChannelCategory.CHANNEL_LIST)}
                 />
               </div>
               <div className="focusable-button" tabIndex={1}>
@@ -122,17 +125,17 @@ const Main = () => {
             </div>
           </div>
 
-          {(category === ChannelCategory.ALL_CHANNEL_LIST && !channels)
+          {(category === ChannelCategory.CHANNEL_LIST && !channelList)
             ? <EmptyPageInfo description={`공개 채팅방이 존재하지 않습니다.\n'채팅방 만들기' 버튼으로 채팅방을 생성해보세요!`}/>
-            : (category === ChannelCategory.MY_CHANNEL_LIST && !myChannels)
+            : (category === ChannelCategory.MY_CHANNEL_LIST && !myChannelList)
               ? <EmptyPageInfo description={`현재 참여중인 채팅방이 없습니다.\n전체 채팅방 목록에서 참가해보세요!`}/> 
               : <div className="chatroom-list">
-                  {category === ChannelCategory.ALL_CHANNEL_LIST && channels
-                    ? channels.map(item => (
-                        <ChatroomItem channel = {item} />
+                  {category === ChannelCategory.CHANNEL_LIST && channelList
+                    ? channelList.map(channel => (
+                        <ChannelItem channel={channel} />
                       ))
-                       : myChannels ? myChannels.map(item => (
-                          <ChatroomItem channel = {item} />
+                       : myChannelList ? myChannelList.map(channel => (
+                          <ChannelItem channel={channel} />
                         )) : null
                   }
                 </div>
