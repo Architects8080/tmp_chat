@@ -8,8 +8,9 @@ import "./main.scss";
 import ModalHandler from "../../components/modal/modalhandler";
 import axios from "axios";
 import GameModalListener from "../../components/modal/gameModalListener";
-import { ioChannel } from "../../socket/socket";
+import { io, ioChannel } from "../../socket/socket";
 import FriendSidebar from "../../components/sidebar/friendSidebar";
+import { modalHandler } from "../../components/sidebar/sidebarType";
 
 enum ChatroomCategory {
   AllChatroomList,
@@ -18,10 +19,27 @@ enum ChatroomCategory {
 
 const Main = () => {
   const modalHandler = ModalHandler();
+  const [isWaiting, setIsWaiting] = useState(false);
+  const modalListener: modalHandler = {
+    handleModalClose: modalHandler.handleModalClose,
+    handleModalOpen: modalHandler.handleModalOpen,
+    isModalOpen: modalHandler.isModalOpen,
+    setWaiting: setIsWaiting,
+  }
 
   const [category, setCategory] = useState(
     ChatroomCategory.AllChatroomList
   );
+
+  const handleAddWaiting = () => {
+    setIsWaiting(true);
+    io.emit('joinQueue');
+  }
+
+  const handleRemoveWaiting = () => {
+    setIsWaiting(false);
+    io.emit('leaveQueue');
+  }
 
   const changeCategory = (category: ChatroomCategory) => {
     //io.emit : by category
@@ -92,7 +110,11 @@ const Main = () => {
               </div>
             </div>
             <div className="button-right-side">
-              <Button title="게임 찾기" onClick={() => {}} />
+              {
+                isWaiting ? <Button title="매칭 취소하기" onClick={handleRemoveWaiting} />
+                : <Button title="게임 찾기" onClick={handleAddWaiting} />
+              }
+              
               <Button
                 title="채팅방 만들기"
                 onClick={() => modalHandler.handleModalOpen("chatroomCreate")}
@@ -125,7 +147,7 @@ const Main = () => {
         open={modalHandler.isModalOpen.chatroomCreate}
         close={() => modalHandler.handleModalClose("chatroomCreate")}
       />
-      <GameModalListener modalHandler={modalHandler}/>
+      <GameModalListener modalHandler={modalListener}/>
     </>
   );
 }

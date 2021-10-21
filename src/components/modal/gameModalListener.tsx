@@ -42,7 +42,11 @@ const GameModalListener = ({modalHandler} : {modalHandler: modalHandler}) => {
     <GameInviteModal
       inviteInfo={inviteUserInfo}
       open={modalHandler.isModalOpen.gameSetting}
-      close={() => modalHandler.handleModalClose("gameSetting")}
+      close={() => {modalHandler.handleModalClose("gameSetting"); 
+      
+      if (modalHandler.setWaiting)
+        modalHandler.setWaiting(false);
+      }}
     />
   );
 };
