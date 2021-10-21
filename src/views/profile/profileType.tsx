@@ -3,6 +3,14 @@ export enum GameType {
   LADDER,
 }
 
+export enum GameTier {
+  BRONZE = "Bronze",
+  SILVER = "Silver",
+  GOLD = "Gold",
+  PLATINUM = "Platinum",
+  DIAMOND = "Diamond",
+}
+
 export type User = {
   id: number;
   nickname: string;
@@ -33,6 +41,7 @@ export type MatchPlayer = {
   isWinner: boolean;
   ladderPoint: number;
   ladderIncrease: number;
+  tier: GameTier;
 }
 
 export type MatchRatio = {

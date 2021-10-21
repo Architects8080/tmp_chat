@@ -22,6 +22,7 @@ export type modalHandler = {
   isModalOpen: any;
   handleModalOpen: any;
   handleModalClose: any;
+  setWaiting?: any;
 };
 
 export type sidebarProps = {

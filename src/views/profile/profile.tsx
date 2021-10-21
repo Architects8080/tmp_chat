@@ -1,4 +1,3 @@
-import { Match } from "@testing-library/dom";
 import axios from "axios";
 import { userInfo } from "os";
 import React, { useEffect, useState } from "react";
@@ -12,14 +11,15 @@ import FriendSidebar from "../../components/sidebar/friendSidebar";
 import snackbar from "../../components/snackbar/snackbar";
 import GameLogItem from "./gamelog/item";
 import "./profile.scss";
-import { Achievement, MatchRatio, User } from "./profileType";
+import { Achievement, GameTier, Match, MatchRatio, User } from "./profileType";
 
 function Profile() {
   const modalHandler = ModalHandler();
   const { id } = useParams<{ id: string }>();
 
   const [user, setUser] = useState<User | null>(null);
-  const [topRate, setTopRate] = useState<string>("100");
+  // const [topRate, setTopRate] = useState<string>("100");
+  const [tier, setTier] = useState<GameTier>(GameTier.BRONZE);
   const [matchList, setMatchList] = useState<Match[] | null>(null);
   const [achievedList, setAchievedList] = useState<Achievement[] | null>(null);
   const achievementTitle = ['10회 승리', '20회 승리', '10회 이상 플레이', '20회 이상 플레이', 'OTP 등록'];
@@ -42,6 +42,19 @@ function Profile() {
       });
   };
 
+  const getTier = (ladderPoint: number) => {
+    if (ladderPoint > 2100)
+      return GameTier.DIAMOND;
+    else if (ladderPoint > 1900)
+      return GameTier.PLATINUM;
+    else if (ladderPoint > 1600)
+      return GameTier.GOLD;
+    else if (ladderPoint > 1300)
+      return GameTier.SILVER;
+    else
+      return GameTier.BRONZE;
+  }
+
   // var gameLog;
   useEffect(() => {
     var win = 0;
@@ -57,7 +70,7 @@ function Profile() {
     .then(
       axios.spread((userList, userInfo, matchList, achievementList) => { //achievementList
         setUser(userInfo.data);
-        setTopRate(((userInfo.data.ladderLevel) / userList.data.length).toFixed(2).toString());
+        // setTopRate(((userInfo.data.ladderLevel) / userList.data.length).toFixed(2).toString());
         setMatchList(matchList.data);
         setAchievedList(achievementList.data);
         matchList.data.map((match: any) => {
@@ -67,6 +80,7 @@ function Profile() {
           total++;
         });
 
+        setTier(getTier(userInfo.data.ladderPoint));
         setWinRatio({win: win, total: total, lose: total - win});
       })
     )
@@ -97,7 +111,8 @@ function Profile() {
                   <div className="profile-nickname">{user.nickname}</div>
                   <div className="profile-gameInfo">
                     <div className="ladder-rank">
-                      Ladder Rank : #{user.ladderLevel} ({topRate}% of top)
+                      {/* Ladder Rank : #{user.ladderLevel} ({topRate}% of top) */}
+                      Ladder Tier : {tier}
                     </div>
                     <div className="ladder-point">
                       Ladder Point : {user.ladderPoint}
@@ -150,8 +165,10 @@ function Profile() {
           ) : (
             <div className="gameLogList">
               {user &&
-                matchList.map((match: any) => {
+                matchList.map((match: Match) => {
                   match.targetId = user.id;
+                  match.players[0].tier = getTier(match.players[0].ladderPoint);
+                  match.players[1].tier = getTier(match.players[1].ladderPoint);
                   return <GameLogItem {...match} />;
                 })}
             </div>
