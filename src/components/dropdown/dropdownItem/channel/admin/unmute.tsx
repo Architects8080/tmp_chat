@@ -2,14 +2,14 @@ import React from "react";
 import { io } from "../../../../../socket/socket";
 import DefaultDropdownItem from "../../../itemTemplate/default/item";
 
-type props = {
+type ItemProps = {
   targetId: number;
   roomId: number;
 };
 
-function UnmuteUserItem(prop: props) {
+const UnmuteUserItem = (prop: ItemProps) => {
   const handleUnmuteUser = () => {
-    io.emit("chatroom/unmute", prop.roomId, prop.targetId);
+    io.emit("channel/unmute", prop.roomId, prop.targetId);
   };
 
   return (

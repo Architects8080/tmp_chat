@@ -2,27 +2,21 @@ import axios from "axios";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ioChannel, ioCommunity } from "../../socket/socket";
 import DirectMessage from "../directMessage/directMessage";
-import ChatroomAdminDropdownList from "../dropdown/dropdownList/chatroomAdmin";
-import ChatroomDefaultDropdownList from "../dropdown/dropdownList/chatroomDefault";
-import ChatroomOwnerDropdownList from "../dropdown/dropdownList/chatroomOwner";
-import ChatroomInviteModal from "../modal/chatroom/invite/chatroomInviteModal";
-import ChatroomSettingModal from "../modal/chatroom/setting/chatroomSettingModal";
+import ChannelAdminDropdownList from "../dropdown/dropdownList/channelAdmin";
+import ChannelMemberDropdownList from "../dropdown/dropdownList/channelMember";
+import ChannelOwnerDropdownList from "../dropdown/dropdownList/channelOwner";
+import ChannelInviteModal from "../modal/channel/invite/channelInviteModal";
+import ChannelSettingModal from "../modal/channel/setting/channelSettingModal";
 import snackbar from "../snackbar/snackbar";
 import InviteUserIcon from "./icon/inviteUser";
 import SettingIcon from "./icon/setting";
 import "./sidebar.scss";
 import SidebarItem from "./sidebarItem";
-import {
-  chatroomPermission,
-  DM,
-  dropdownMenuInfo,
-  sidebarProperty,
-  sidebarProps,
-  userItemProps,
-} from "./sidebarType";
+import { DM, DropdownMenuInfo, MemberRole, SidebarProperty, SidebarProps, UserItemProps } from "./sidebarType";
 
-function ChatroomSidebar(prop: sidebarProps) {
-  const [userList, setUserList] = useState<userItemProps[]>([]);
+
+const ChannelSidebar = (prop: SidebarProps) => {
+  const [userList, setUserList] = useState<UserItemProps[]>([]);
   const [myProfile, setMyProfile] = useState<{ id: number; nickname: string }>({
     id: 0,
     nickname: "",
@@ -35,10 +29,10 @@ function ChatroomSidebar(prop: sidebarProps) {
   const handleModalClose = modalHandler.handleModalClose;
 
   // first render -> get userList according to sidebarType(prop.title)
-  const addMember = (newMemArr: userItemProps[]) => {
+  const addMember = (newMemArr: UserItemProps[]) => {
     setUserList(newMemArr);
   };
-  const removeMember = (leavedArr: userItemProps[]) => {
+  const removeMember = (leavedArr: UserItemProps[]) => {
     setUserList(leavedArr);
   };
 
@@ -47,7 +41,7 @@ function ChatroomSidebar(prop: sidebarProps) {
     getMyProfile();
     getNewDM();
   
-    ioChannel.on("channelMemberAdd", (newMember: userItemProps) => {
+    ioChannel.on("channelMemberAdd", (newMember: UserItemProps) => {
       if (userList && !userList.some((user) => user.id === newMember.id)) {
         const newMemArr = [...userList, newMember];
         addMember(newMemArr);
@@ -85,7 +79,7 @@ function ChatroomSidebar(prop: sidebarProps) {
   // to contextMenu
   const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
   const [show, setShow] = useState(false);
-  const [result, setResult] = useState<dropdownMenuInfo | null>();
+  const [result, setResult] = useState<DropdownMenuInfo | null>();
 
   const handleContextMenu = useCallback(
     (event) => {
@@ -110,7 +104,7 @@ function ChatroomSidebar(prop: sidebarProps) {
   //get dropdownMenuInfo according to user's relation & sidebarType
   const contextMenuHandler = (
     e: React.MouseEvent,
-    dropdownMenuInfo: dropdownMenuInfo
+    dropdownMenuInfo: DropdownMenuInfo
   ) => {
     handleContextMenu(e);
     setResult(dropdownMenuInfo);
@@ -118,14 +112,14 @@ function ChatroomSidebar(prop: sidebarProps) {
 
   //DM
   const [DMopen, setDMOpen] = useState<boolean>(false);
-  const [DMReceiver, setDMReceiver] = useState<userItemProps>({
+  const [DMReceiver, setDMReceiver] = useState<UserItemProps>({
     id: 0,
     avatar: "",
     status: 1,
     nickname: "",
     alert: false,
   });
-  const DMReceiverRef = useRef<userItemProps | null>(null);
+  const DMReceiverRef = useRef<UserItemProps | null>(null);
   const timerRef = useRef<NodeJS.Timeout>();
 
   const getNewDM = () => {
@@ -185,10 +179,10 @@ function ChatroomSidebar(prop: sidebarProps) {
   return (
     <aside>
       <div className="sidebar-header">
-        <div className="sidebar-title">{sidebarProperty.chatMemberList}</div>
+        <div className="sidebar-title">{SidebarProperty.CHAT_MEMBER_LIST}</div>
         <div className="sidebar-icon-list">
-          <InviteUserIcon onClick={() => {handleModalOpen("chatroomInvite");}}/>
-          <SettingIcon onClick={() => {handleModalOpen("chatroomSetting");}}/>
+          <InviteUserIcon onClick={() => {handleModalOpen("channelInvite");}}/>
+          <SettingIcon onClick={() => {handleModalOpen("channelSetting");}}/>
         </div>
       </div>
       <ul className="user-list">
@@ -197,7 +191,7 @@ function ChatroomSidebar(prop: sidebarProps) {
             {user.alert && <span className="alert-overlay"></span>}
             <SidebarItem
               key={user.id}
-              itemType={sidebarProperty.chatMemberList}
+              itemType={SidebarProperty.CHAT_MEMBER_LIST}
               itemInfo={user}
               contextMenuHandler={contextMenuHandler}
               roomId={prop.roomId}
@@ -217,8 +211,8 @@ function ChatroomSidebar(prop: sidebarProps) {
         />
       )}
 
-      {show && result?.permission == chatroomPermission.member ? (
-        <ChatroomDefaultDropdownList
+      {show && result?.permission == MemberRole.MEMBER ? (
+        <ChannelMemberDropdownList
           anchorPoint={anchorPoint}
           dropdownListInfo={result}
           modalHandler={modalHandler}
@@ -226,8 +220,8 @@ function ChatroomSidebar(prop: sidebarProps) {
       ) : (
         ""
       )}
-      {show && result?.permission == chatroomPermission.admin ? (
-        <ChatroomAdminDropdownList
+      {show && result?.permission == MemberRole.ADMIN ? (
+        <ChannelAdminDropdownList
           anchorPoint={anchorPoint}
           dropdownListInfo={result}
           modalHandler={modalHandler}
@@ -235,8 +229,8 @@ function ChatroomSidebar(prop: sidebarProps) {
       ) : (
         ""
       )}
-      {show && result?.permission == chatroomPermission.owner ? (
-        <ChatroomOwnerDropdownList
+      {show && result?.permission == MemberRole.OWNER ? (
+        <ChannelOwnerDropdownList
           anchorPoint={anchorPoint}
           dropdownListInfo={result}
           modalHandler={modalHandler}
@@ -246,16 +240,16 @@ function ChatroomSidebar(prop: sidebarProps) {
       )}
 
       {/* Modal */}
-      <ChatroomInviteModal
-        open={isModalOpen.chatroomInvite}
-        close={() => handleModalClose("chatroomInvite")}
+      <ChannelInviteModal
+        open={isModalOpen.channelInvite}
+        close={() => handleModalClose("channelInvite")}
         roomId={prop.roomId}/>
-      <ChatroomSettingModal
-        open={isModalOpen.chatroomSetting}
-        close={() => handleModalClose("chatroomSetting")}
+      <ChannelSettingModal
+        open={isModalOpen.channelSetting}
+        close={() => handleModalClose("channelSetting")}
         roomId={prop.roomId}/>
     </aside>
   );
 }
 
-export default ChatroomSidebar;
+export default ChannelSidebar;

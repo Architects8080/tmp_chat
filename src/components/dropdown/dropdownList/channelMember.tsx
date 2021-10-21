@@ -1,16 +1,16 @@
 import React from "react";
-import AddFriendItem from "../dropdownItem/chatroom/addFriend";
+import AddFriendItem from "../dropdownItem/channel/addFriend";
 import InviteGameItem from "../dropdownItem/inviteGame";
 import ObserveGameItem from "../dropdownItem/observeGame";
 import ViewProfileItem from "../dropdownItem/viewProfile";
 import "./dropdownList.scss";
-import { dropdownListProps } from "./dropdownListType";
+import { DropdownListType } from "./dropdownListType";
 
-function ChatroomDefaultDropdownList(prop: dropdownListProps) {
+const ChannelMemberDropdownList = (prop: DropdownListType) => {
   const info = prop.dropdownListInfo;
   const position = { top: prop.anchorPoint.y, left: prop.anchorPoint.x };
   {
-    console.log("chatroom default", prop);
+    console.log("channel default", prop);
   }
 
   return (
@@ -35,4 +35,4 @@ function ChatroomDefaultDropdownList(prop: dropdownListProps) {
   );
 }
 
-export default ChatroomDefaultDropdownList;
+export default ChannelMemberDropdownList;

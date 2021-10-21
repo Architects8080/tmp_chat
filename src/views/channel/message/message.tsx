@@ -1,13 +1,13 @@
 import React from "react";
 import "./message.scss";
 
-type chatMessageProp = {
+type ChatMessageProp = {
   isSelfMessage: boolean;
   nickname: string;
   content: string;
 };
 
-function ChatMessage(prop: chatMessageProp) {
+const ChatMessage = (prop: ChatMessageProp) => {
   return (
     <>
       {!prop.isSelfMessage ? (

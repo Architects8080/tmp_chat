@@ -2,11 +2,11 @@ import React from "react";
 import { io } from "../../../../socket/socket";
 import DefaultDropdownItem from "../../itemTemplate/default/item";
 
-type props = {
+type ItemProps = {
   targetId: number;
 };
 
-function AddFriendItem(prop: props) {
+const AddFriendItem = (prop: ItemProps) => {
   const handleAddFriend = () => {
     io.emit("friend/add", prop.targetId); //TODO
   };

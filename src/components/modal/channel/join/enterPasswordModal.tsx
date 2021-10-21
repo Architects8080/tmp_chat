@@ -34,12 +34,12 @@ const EnterPasswordModal = (prop: EnterPasswordModalProps) => {
     })
     .then(() => {
       prop.close();
-      window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/chatroom/${prop.channelId}`
+      window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/channel/${prop.channelId}`
     })
     .catch((e) => {
       if (e.response.data.statusCode == 409) {
         prop.close();
-        window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/chatroom/${prop.channelId}`
+        window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/channel/${prop.channelId}`
       }
       setErrorText("접속에 실패했습니다. 다시 시도해주세요.");
       setInput("");

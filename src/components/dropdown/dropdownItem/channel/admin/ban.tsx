@@ -2,14 +2,14 @@ import React from "react";
 import { io } from "../../../../../socket/socket";
 import DefaultDropdownItem from "../../../itemTemplate/default/item";
 
-type props = {
+type ItemProps = {
   targetId: number;
   roomId: number;
 };
 
-function BanUserItem(prop: props) {
+const BanUserItem = (prop: ItemProps) => {
   const handleBanUser = () => {
-    io.emit("chatroom/ban", prop.roomId, prop.targetId); //TODO
+    io.emit("channel/ban", prop.roomId, prop.targetId); //TODO
   };
 
   return (

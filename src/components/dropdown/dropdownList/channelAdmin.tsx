@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
-import AddFriendItem from "../dropdownItem/chatroom/addFriend";
-import BanUserItem from "../dropdownItem/chatroom/admin/ban";
-import MuteUserItem from "../dropdownItem/chatroom/admin/mute";
-import UnmuteUserItem from "../dropdownItem/chatroom/admin/unmute";
+import AddFriendItem from "../dropdownItem/channel/addFriend";
+import BanUserItem from "../dropdownItem/channel/admin/ban";
+import MuteUserItem from "../dropdownItem/channel/admin/mute";
+import UnmuteUserItem from "../dropdownItem/channel/admin/unmute";
 import InviteGameItem from "../dropdownItem/inviteGame";
 import ObserveGameItem from "../dropdownItem/observeGame";
 import ViewProfileItem from "../dropdownItem/viewProfile";
 import "./dropdownList.scss";
-import { dropdownListProps } from "./dropdownListType";
+import { DropdownListType } from "./dropdownListType";
 
-function ChatroomAdminDropdownList(prop: dropdownListProps) {
+const ChannelAdminDropdownList = (prop: DropdownListType) => {
   const info = prop.dropdownListInfo;
   const position = { top: prop.anchorPoint.y, left: prop.anchorPoint.x };
 
@@ -47,4 +47,4 @@ function ChatroomAdminDropdownList(prop: dropdownListProps) {
   );
 }
 
-export default ChatroomAdminDropdownList;
+export default ChannelAdminDropdownList;

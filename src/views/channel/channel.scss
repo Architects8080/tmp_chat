@@ -3,7 +3,7 @@
   display: flex;
   flex-direction: row;
 
-  .chatroom-wrap {
+  .channel-wrap {
     flex-grow: 1;
     margin: 32px;
     border: 1px solid #000000;
@@ -13,22 +13,22 @@
     display: flex;
     flex-direction: column;
 
-    .chatroom-message-list-wrap {
+    .channel-message-list-wrap {
       margin: 32px;
       margin-top: auto;
     }
 
-    .chatroom-message-list {
+    .channel-message-list {
       overflow-y: hidden;
       max-height: calc(100vh - 92px - 194px - 32px);
     }
 
-    .chatroom-message-list:hover {
+    .channel-message-list:hover {
       overflow-y: auto;
       max-height: calc(100vh - 92px - 194px - 32px);
     }
 
-    .chatroom-user-input {
+    .channel-user-input {
       display: flex;
       background: #ffffff;
       border: 1px solid #000000;
@@ -56,7 +56,7 @@
   }
 }
 
-.button-chatroom-exit {
+.button-channel-exit {
   position: fixed;
   left: 24px;
   bottom: 32px;

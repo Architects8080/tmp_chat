@@ -1,47 +1,30 @@
 import axios from "axios";
-import React, { useState } from "react";
-import { useEffect } from "react";
-import { ioChannel } from "../../../../socket/socket";
+import React, { useEffect, useState } from "react";
 import RadioButton from "../../../button/radio/radio";
-import "./chatroomCreateModal.scss";
+import { ChannelCreateDto, ChannelType } from "../create/channelCreateModal";
+import "./channelSettingModal.scss";
 
-type chatroomCreateModalProps = {
+type ChannelSettingModalProps = {
   open: boolean;
   close: any;
+  roomId: number;
 };
 
-enum ChannelType {
-  PUBLIC = 'public',
-  PRIVATE = 'private',
-  PROTECTED = 'protected',
-}
-
-type channelCreateDto = {
-  title: string;
-  type: ChannelType;
-  password?: string;
-}
-
-export enum roomType {
-  publicRoom,
-  privateRoom,
-  protectedRoom
-}
-
-const ChatroomCreateModal = (prop: chatroomCreateModalProps) => {
-  const modalTitle = "채팅방 생성";
-  const description = "채팅방을 만들어 다른 유저와 소통해보세요!";
+const ChannelSettingModal = (prop: ChannelSettingModalProps) => {
+  const modalTitle = "채팅방 설정";
+  const Description = "채팅방 설정을 변경해보세요.";
 
   const roomPlaceholder = "방 제목";
-  const buttonTitle = "생성하기";
+  const buttonTitle = "변경하기";
 
   const [title, setTitle] = useState("");
+  const [channelType, setChannelType] = useState(ChannelType.PUBLIC);
   const [password, setPassword] = useState("");
 
-  const [errorText, setErrorText] = useState("");
   const [descriptionText, setDescriptionText] = useState(
     "비밀번호는 숫자 4자리로 구성 가능합니다."
   );
+  const [errorText, setErrorText] = useState("");
 
   const handleUserInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
@@ -67,54 +50,69 @@ const ChatroomCreateModal = (prop: chatroomCreateModalProps) => {
   };
 
   const handleSubmitEvent = async () => {
-    const channelDto: channelCreateDto = {
+    const channelDto: ChannelCreateDto = {
       title: title,
       type: channelType,
       password: password,
     };
 
     if (title !== '' && (channelType == ChannelType.PROTECTED && password.length == 4 || channelType != ChannelType.PROTECTED)) {
-      axios.post(
-        `${process.env.REACT_APP_SERVER_ADDRESS}/channel/`, channelDto
-      ).then(response => {
+      axios.put(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/update/${prop.roomId}`, channelDto)
+      .then(() => {
         prop.close();
-        window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/chatroom/${response.data.channelId}`
-      }).catch(e => {
-        console.log(e);
-        setErrorText("채널 생성에 실패했습니다.");
       })
+      .catch((e) => {
+        console.log(e);
+        setErrorText("권한이 없습니다");
+      });
     }
   };
 
-  const [channelType, setChannelType] = useState(ChannelType.PUBLIC);
+  useEffect(() => {
+    axios
+      .get(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/${prop.roomId}`)
+      .then((channel) => {
+        console.log(`channel.data : `, channel.data);
+        setTitle(channel.data.title);
+        setChannelType(channel.data.type);
+        if (channel.data.type === ChannelType.PROTECTED)
+          setErrorText("비밀번호를 새로 입력해주세요.");
+        if (channel.data.type === ChannelType.PRIVATE)
+          setErrorText("public를 선택하면 공개방으로 변경됩니다.");
+      })
+  }, []);
 
   const handleChange = (selectedType: ChannelType) => {
     setChannelType(selectedType);
+    if (selectedType != ChannelType.PROTECTED) {
+      setErrorText("");
+      setPassword("");
+    }
   };
 
   return (
     <div
       className={prop.open ? "modal-open modal-background" : "modal-background"}
     >
-      <div className="chatroom-create-modal-wrap">
+      <div className="channel-setting-modal-wrap">
         <div className="modal-header">
           <div className="title">{modalTitle}</div>
           <img
             className="close"
-            alt="close"
             src="/icons/modal/close.svg"
             onClick={handleClose}
           />
         </div>
-        <div className="description">{description}</div>
+        <div className="description">{Description}</div>
 
         <div className="content">
           <div className="subtitle">방 제목</div>
+          {/* value={} onChage={}  */}
           <input
-            className="room-title"
+            className="roomTitle"
             type="text"
-            value={title} 
-            onChange={e => setTitle(e.target.value)} 
+            value={title}
+            onChange={e => setTitle(e.target.value)}
             placeholder={roomPlaceholder}
           ></input>
         </div>
@@ -150,11 +148,7 @@ const ChatroomCreateModal = (prop: chatroomCreateModalProps) => {
                   : "password-close"
               }
             >
-              <img
-                className="password-icon"
-                alt="password-icon"
-                src="/icons/modal/password.svg"
-              />
+              <img className="password-icon" alt="password-icon" src="/icons/modal/password.svg"/>
               <input
                 className="password-input"
                 type="password"
@@ -176,6 +170,8 @@ const ChatroomCreateModal = (prop: chatroomCreateModalProps) => {
           <div className="protected-description">{descriptionText}</div>
           <div className="protected-error">{errorText}</div>
         </div>
+        <div className={
+          channelType !== ChannelType.PROTECTED ? "role-error": "protected-close"}>{errorText}</div>
 
         <div className="submit-wrap">
           <div className="submit" onClick={handleSubmitEvent}>
@@ -187,4 +183,4 @@ const ChatroomCreateModal = (prop: chatroomCreateModalProps) => {
   );
 }
 
-export default ChatroomCreateModal;
+export default ChannelSettingModal;

@@ -1,18 +1,17 @@
 import React from "react";
-import AddFriendItem from "../dropdownItem/chatroom/addFriend";
-import BanUserItem from "../dropdownItem/chatroom/admin/ban";
-import MuteUserItem from "../dropdownItem/chatroom/admin/mute";
-import UnmuteUserItem from "../dropdownItem/chatroom/admin/unmute";
-import AddAdminItem from "../dropdownItem/chatroom/owner/addAdmin";
-import RemoveAdminItem from "../dropdownItem/chatroom/owner/removeAdmin";
+import AddFriendItem from "../dropdownItem/channel/addFriend";
+import BanUserItem from "../dropdownItem/channel/admin/ban";
+import MuteUserItem from "../dropdownItem/channel/admin/mute";
+import UnmuteUserItem from "../dropdownItem/channel/admin/unmute";
+import AddAdminItem from "../dropdownItem/channel/owner/addAdmin";
+import RemoveAdminItem from "../dropdownItem/channel/owner/removeAdmin";
 import InviteGameItem from "../dropdownItem/inviteGame";
 import ObserveGameItem from "../dropdownItem/observeGame";
 import ViewProfileItem from "../dropdownItem/viewProfile";
-
 import "./dropdownList.scss";
-import { dropdownListProps } from "./dropdownListType";
+import { DropdownListType } from "./dropdownListType";
 
-function ChatroomOwnerDropdownList(prop: dropdownListProps) {
+const ChannelOwnerDropdownList = (prop: DropdownListType) => {
   const info = prop.dropdownListInfo;
   const position = { top: prop.anchorPoint.y, left: prop.anchorPoint.x };
 
@@ -55,4 +54,4 @@ function ChatroomOwnerDropdownList(prop: dropdownListProps) {
   );
 }
 
-export default ChatroomOwnerDropdownList;
+export default ChannelOwnerDropdownList;

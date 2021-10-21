@@ -5,13 +5,12 @@ import { useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import Header from "../../components/header/header";
 import ModalHandler from "../../components/modal/modalhandler";
-import { sidebarProperty } from "../../components/sidebar/sidebarType";
 import ChatMessage from "./message/message";
 import { ioChannel } from "../../socket/socket";
-import "./chatroom.scss";
+import "./channel.scss";
 import GameModalListener from "../../components/modal/gameModalListener";
-import ChatroomSidebar from "../../components/sidebar/chatroomSidebar";
 import axios from "axios";
+import ChannelSidebar from "../../components/sidebar/channelSidebar";
 
 // 서버로부터 받아서 message state 에 넣을 때 들어가는 형태
 type Message = {
@@ -33,7 +32,7 @@ const AlwaysScrollToBottom = () => {
   return <div ref={elementRef} />;
 };
 
-const Chatroom = () => {
+const Channel = () => {
   const modalHandler = ModalHandler();
   const [messages, setMessages] = useState<Message[]>([]);
   
@@ -41,7 +40,7 @@ const Chatroom = () => {
   let { id } : any = useParams();
 
   useEffect(() => {
-    function receivedMessage(message: Payload) {
+    const receivedMessage = (message: Payload) => {
       const newMessage: Message = {
         id: uuid.v4(),
         name: message.name,
@@ -56,7 +55,7 @@ const Chatroom = () => {
     .catch((e) => {
       console.log(`error : `, e.response.data);
       if (e.response.data.statusCode !== 409) { //Conflict Exception : is already join channel
-        window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}`;
+        window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/main `;
         window.alert("비정상적인 접근입니다");
       }
     })
@@ -80,27 +79,27 @@ const Chatroom = () => {
   const leaveChannel = () => {
     //post 
     ioChannel.emit("leaveChannel", id);
-    window.location.href = "http://localhost:3000/main";
+    window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/main`;
   }
 
   return (
     <>
       <Header isLoggedIn={true} />
       <div className="page">
-        <ChatroomSidebar
+        <ChannelSidebar
           roomId={id}
           modalHandler={modalHandler}
         />
-        <div className="chatroom-wrap">
-          <div className="chatroom-message-list-wrap">
-            <div className="chatroom-message-list">
+        <div className="channel-wrap">
+          <div className="channel-message-list-wrap">
+            <div className="channel-message-list">
               <ChatMessage isSelfMessage={false} nickname="chlee" content="test" />
               {messages.map(message => (
                 <ChatMessage key={message.id} isSelfMessage={true} nickname={message.name} content={message.text}/>
               ))}
               <AlwaysScrollToBottom/>
             </div>
-            <div className="chatroom-user-input">
+            <div className="channel-user-input">
               <input 
                 className="input-field"
                 placeholder="내용을 입력하세요"
@@ -113,7 +112,7 @@ const Chatroom = () => {
         </div>
       </div>
       <div
-        className="button-chatroom-exit"
+        className="button-channel-exit"
         onClick={leaveChannel}
       >
         채팅방 나가기
@@ -123,4 +122,4 @@ const Chatroom = () => {
   );
 }
 
-export default Chatroom;
+export default Channel;

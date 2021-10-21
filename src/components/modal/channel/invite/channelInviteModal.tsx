@@ -1,21 +1,21 @@
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
-import "./chatroomInviteModal.scss";
+import "./channelInviteModal.scss";
 
 enum Result {
-  None = 0,
-  Success,
-  NotFoundUser,
-  AlreadyJoined,
+  NONE = 0,
+  SUCCESS,
+  NOT_FOUND_USER,
+  ALREADY_FRIEND,
 }
 
-type chatroomInviteModalProps = {
+type ChannelInviteModalProps = {
   open: boolean;
   close: any;
   roomId: number;
 };
 
-function ChatroomInviteModal(prop: chatroomInviteModalProps) {
+const ChannelInviteModal = (prop: ChannelInviteModalProps) => {
   const Title = "채팅방 초대";
   const Description = "친구의 닉네임을 알고 있다면 채팅방에 초대해보세요!";
 
@@ -24,7 +24,7 @@ function ChatroomInviteModal(prop: chatroomInviteModalProps) {
 
   const [nickname, setNickname] = useState("");
   const [resultText, setResultText] = useState("");
-  const resultCode = useRef(Result.None);
+  const resultCode = useRef(Result.NONE);
 
   const handleUserInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value === "") {
@@ -55,11 +55,11 @@ function ChatroomInviteModal(prop: chatroomInviteModalProps) {
     .then((response) => {
       console.log(`response.data : `, response.data);
       resultCode.current = response.data;
-      if (response.data == Result.AlreadyJoined)
+      if (response.data == Result.ALREADY_FRIEND)
         setResultText(nickname + " 님은 이미 채팅방에 참여중입니다.");
-      else if (response.data == Result.Success)
+      else if (response.data == Result.SUCCESS)
         setResultText("초대 메시지를 보냈습니다!");
-      else if (response.data == Result.NotFoundUser)
+      else if (response.data == Result.NOT_FOUND_USER)
         setResultText("존재하지 않는 플레이어입니다. 다시 시도해주세요.");
     })
   };
@@ -96,9 +96,9 @@ function ChatroomInviteModal(prop: chatroomInviteModalProps) {
         <div className="result">
           <div
             className={
-              resultCode.current == Result.None
+              resultCode.current == Result.NONE
                 ? ""
-                : resultCode.current == Result.Success
+                : resultCode.current == Result.SUCCESS
                 ? "success"
                 : "error"
             }
@@ -111,4 +111,4 @@ function ChatroomInviteModal(prop: chatroomInviteModalProps) {
   );
 }
 
-export default ChatroomInviteModal;
+export default ChannelInviteModal;

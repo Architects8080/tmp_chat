@@ -2,12 +2,12 @@ import React from "react";
 import { io } from "../../../../../socket/socket";
 import DefaultDropdownItem from "../../../itemTemplate/default/item";
 
-type props = {
+type ItemProps = {
   targetId: number;
   roomId: number;
 };
 
-function AddAdminItem(prop: props) {
+const AddAdminItem = (prop: ItemProps) => {
   const handleAddAdmin = () => {
     io.emit("channel/admin/add", prop.roomId, prop.targetId); //TODO
   };
