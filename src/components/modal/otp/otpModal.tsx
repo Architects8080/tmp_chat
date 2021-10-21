@@ -7,9 +7,8 @@ type ModalProps = {
   close: any;
 };
 
-function OTPModal(prop: ModalProps) {
+const OTPModal = (prop: ModalProps) => {
   const handleClose = () => {
-    //redirect to main
     prop.close();
   };
 

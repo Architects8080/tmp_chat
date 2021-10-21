@@ -2,7 +2,7 @@ import React from "react";
 import { io } from "../../../../socket/socket";
 import DefaultDropdownItem from "../../itemTemplate/default/item";
 
-function LogoutItem() {
+const LogoutItem = () => {
   const handleLogout = () => {
     io.emit("logout"); //TODO
   };

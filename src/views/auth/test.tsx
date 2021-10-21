@@ -1,10 +1,9 @@
 import React, { useEffect } from "react";
 
-function TestLogin() {
-  const url = `http://localhost:5000/auth/test`;
+const TestLogin = () => {
 
   useEffect(() => {
-    window.location.href = url;
+    window.location.href = `${process.env.REACT_APP_SERVER_ADDRESS}/auth/test`;
   }, []);
 
   return <></>;

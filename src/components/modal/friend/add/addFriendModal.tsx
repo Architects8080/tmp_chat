@@ -3,19 +3,19 @@ import React, { useState } from "react";
 import "./addFriendModal.scss";
 
 enum Result {
-  NotFoundUser = "NotFoundUser",
-  Already = "Already",
-  Myself = "Myself",
-  InProgress = "InProgress",
-  Block = "Block",
+  NOT_FOUND_USER = "NotFoundUser",
+  ALREADY = "Already",
+  MYSELF = "Myself",
+  IN_PROGRESS = "InProgress",
+  BLOCK = "Block",
 }
 
-type addFriendModalProps = {
+type AddFriendModalProps = {
   open: boolean;
   close: any;
 };
 
-function AddFriendModal(prop: addFriendModalProps) {
+const AddFriendModal = (prop: AddFriendModalProps) => {
   const Title = "친구 추가";
   const Description = "친구의 닉네임을 알고 있다면 친구 요청을 보내보세요!";
 
@@ -28,15 +28,15 @@ function AddFriendModal(prop: addFriendModalProps) {
 
   const resultToText = (result: Result) => {
     switch (result) {
-      case Result.NotFoundUser:
+      case Result.NOT_FOUND_USER:
         return "존재하지 않는 플레이어입니다. 다시 시도해주세요.";
-      case Result.Already:
+      case Result.ALREADY:
         return `${input}님과는 이미 친구입니다.`;
-      case Result.Myself:
+      case Result.MYSELF:
         return "본인 외의 플레이어를 입력해주세요.";
-      case Result.InProgress:
+      case Result.IN_PROGRESS:
         return "이미 친구 요청을 보냈습니다.";
-      case Result.Block:
+      case Result.BLOCK:
         return "차단한 플레이어입니다. 차단을 해제한 후 다시 시도해주세요.";
     }
   };

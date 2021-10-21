@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
-import EnterPasswordModal from "../../../components/modal/chatroom/join/enterPasswordModal";
+import EnterPasswordModal from "../../../components/modal/channel/join/enterPasswordModal";
 import ModalHandler from "../../../components/modal/modalhandler";
 import { ioChannel } from "../../../socket/socket";
 import "./item.scss";
@@ -29,7 +29,7 @@ const ChannelItem = ({channel} : {channel:ChannelItemProps}) => {
         modalHandler.handleModalOpen("enterPassword");
     }
     else
-      window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/chatroom/${channel.id}`
+      window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/channel/${channel.id}`
   };
 
   const handleModalClose = () => {
@@ -38,15 +38,15 @@ const ChannelItem = ({channel} : {channel:ChannelItemProps}) => {
 
   return (
     <>
-      <div className="chatroom-item" onClick={handleOnClick}>
-        <div className="chatroom-header">
-          <div className="chatroom-title">[{channel.id}] {channel.title}</div>
+      <div className="channel-item" onClick={handleOnClick}>
+        <div className="channel-header">
+          <div className="channel-title">[{channel.id}] {channel.title}</div>
           { channel.type === ChannelType.PRIVATE ? 
-            <img className="chatroom-locked" alt="chatroom-locked" src="/icons/chat/private.svg"/> : ""}
+            <img className="channel-locked" alt="channel-locked" src="/icons/chat/private.svg"/> : ""}
           { channel.type === ChannelType.PROTECTED ? 
-            <img className="chatroom-locked" alt="chatroom-locked" src="/icons/chat/protected.svg"/> : ""}
+            <img className="channel-locked" alt="channel-locked" src="/icons/chat/protected.svg"/> : ""}
         </div>
-        <div className="chatroom-member-count">{channel.memberCount}명 참여중</div>
+        <div className="channel-member-count">{channel.memberCount}명 참여중</div>
       </div>
       <EnterPasswordModal open={modalHandler.isModalOpen.enterPassword} close={handleModalClose} channelId={channel.id}/>
     </>

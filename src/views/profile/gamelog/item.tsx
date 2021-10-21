@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { GameType, Match, MatchPlayer } from "../profileType";
 import "./item.scss";
 
-function GameLogItem(match: Match) {
+const GameLogItem = (match: Match) => {
 
   const [leftPlayer, setLeftPlayer] = useState<MatchPlayer>(match.players[0]);
   const [rightPlayer, setRightPlayer] = useState<MatchPlayer>(match.players[1]);

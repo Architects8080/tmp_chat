@@ -1,16 +1,16 @@
-export enum status {
-  online = "/icons/status/online.svg",
-  offline = "/icons/status/offline.svg",
-  ingame = "/icons/status/ingame.svg",
+export enum Status {
+  ONLINE = "/icons/status/online.svg",
+  OFFLINE = "/icons/status/offline.svg",
+  INGAME = "/icons/status/ingame.svg",
 }
 
-export enum sidebarProperty {
-  friendList = "친구 목록",
-  chatMemberList = "채팅 참여자 목록",
-  observerList = "관전자 목록",
+export enum SidebarProperty {
+  FRIEND_LIST = "친구 목록",
+  CHAT_MEMBER_LIST = "채팅 참여자 목록",
+  // OBSERVER_LIST = "관전자 목록",
 }
 
-export type userItemProps = {
+export type UserItemProps = {
   id: number;
   avatar: string;
   status: number;
@@ -18,32 +18,32 @@ export type userItemProps = {
   alert: boolean;
 };
 
-export type modalHandler = {
+export type ModalManager = {
   isModalOpen: any;
   handleModalOpen: any;
   handleModalClose: any;
   setWaiting?: any;
 };
 
-export type sidebarProps = {
+export type SidebarProps = {
   roomId: number; //chat or game인데 이걸 여기서 가지는게 맞나?
 
-  modalHandler: modalHandler; //game에서는 필요가 없어..
+  modalHandler: ModalManager; //game에서는 필요가 없어..
   // userId: number;
 };
 
-export enum chatroomPermission {
-  member,
-  admin,
-  owner,
+export enum MemberRole {
+  MEMBER = 'member',
+  ADMIN = 'admin',
+  OWNER = 'owner',
 }
 
-export type dropdownMenuInfo = {
+export type DropdownMenuInfo = {
   roomId: number;
   userId: number;
   targetId: number;
 
-  permission: chatroomPermission;
+  permission: MemberRole;
   isInGame: boolean;
   isBlocked: boolean; //friend
   isFriend: boolean;

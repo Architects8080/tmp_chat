@@ -4,7 +4,7 @@ import Header from "../../../components/header/header";
 import snackbar from "../../../components/snackbar/snackbar";
 import "./otp.scss";
 
-function OTP() {
+const OTP = () => {
   const [OTP, setOTP] = useState("");
 
   const handleUserInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -17,12 +17,11 @@ function OTP() {
     if (userInput.length === 6) {
       axios
         .post(
-          "http://localhost:5000/otp/login",
+          `${process.env.REACT_APP_SERVER_ADDRESS}/otp/login`,
           { token: userInput },
-          { withCredentials: true }
         )
         .then((res) => {
-          window.location.href = "http://localhost:3000/main";
+          window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/main`;
         })
         .catch((err) => {
           snackbar.error("잘못된 코드입니다.");

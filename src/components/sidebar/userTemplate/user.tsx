@@ -1,20 +1,21 @@
 import React from "react";
-import { status } from "../sidebarType";
+import { Status } from "../sidebarType";
 import "./user.scss";
 
-type userItemProps = {
+type UserItemProps = {
   avatar: string;
   status: number;
   nickname: string;
 };
 
-function UserItem(prop: userItemProps) {
+const UserItem = (prop: UserItemProps) => {
   const userStatus =
     prop.status === 0
-      ? status.offline
+      ? Status.OFFLINE
       : prop.status === 1
-      ? status.online
-      : status.ingame;
+      ? Status.ONLINE
+      : Status.INGAME;
+
   return (
     <div className="user-item-wrap">
       <div className="user-photo-wrap">

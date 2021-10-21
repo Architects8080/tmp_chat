@@ -1,18 +1,18 @@
 import React, { useEffect, useState, useRef, MutableRefObject } from 'react';
 import './directMessage.scss';
 import axios from 'axios';
-import { DM, userItemProps } from '../sidebar/sidebarType';
+import { DM, UserItemProps,  } from '../sidebar/sidebarType';
 import { ioCommunity } from '../../socket/socket';
 
 type DMProps = {
 	myProfile: {id: number, nickname: string},
-	DMReceiver: userItemProps,
-	DMReceiverRef: MutableRefObject<userItemProps | null>,
+	DMReceiver: UserItemProps,
+	DMReceiverRef: MutableRefObject<UserItemProps | null>,
 	closeDM: () => void,
 	alertNewDM: (senderID: number) => void
 };
 
-function DirectMessage({myProfile, DMReceiver, DMReceiverRef, closeDM, alertNewDM}: DMProps) {
+const DirectMessage = ({myProfile, DMReceiver, DMReceiverRef, closeDM, alertNewDM}: DMProps) => {
 	const [message, setMessage] = useState<string>('');
 	const [DMList, setDMList] = useState<DM[]>([]);
 	const DMRef = useRef<HTMLLIElement | null>(null);
@@ -21,10 +21,7 @@ function DirectMessage({myProfile, DMReceiver, DMReceiverRef, closeDM, alertNewD
 		try {
 			let newDMList: DM[] = [];
 			const response = await axios.get(
-				`${process.env.REACT_APP_SERVER_ADDRESS}/dm?friendID=${friendID}`,
-				{
-					withCredentials: true,
-				}
+				`${process.env.REACT_APP_SERVER_ADDRESS}/dm?friendID=${friendID}`
 			);
 			response.data.map((dm: any) => newDMList.push({
 				id: (dm.isSender) ? dm.userID : dm.friendID,

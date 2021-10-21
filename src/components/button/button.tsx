@@ -1,12 +1,12 @@
 import React from "react";
 import "./button.scss";
 
-type ButtonProp = {
+type ButtonProps = {
   title: string;
   onClick: any;
 };
 
-function Button(prop: ButtonProp) {
+const Button = (prop: ButtonProps) => {
   return (
     <div className="button" onClick={prop.onClick}>
       <div className="button-title">{prop.title}</div>

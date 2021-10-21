@@ -1,11 +1,11 @@
 import axios from "axios";
 import DefaultDropdownItem from "../../itemTemplate/default/item";
 
-type props = {
+type ItemProps = {
   targetId: number;
 };
 
-function UnblockDMItem(prop: props) {
+const UnblockDMItem = (prop: ItemProps) => {
   const handleUnblockDM = async () => {
     await axios.delete(
       `${process.env.REACT_APP_SERVER_ADDRESS}/block/${prop.targetId}`

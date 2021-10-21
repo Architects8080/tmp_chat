@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import Button from "../../components/button/button";
 import EmptyPageInfo from "../../components/emptyPage/empty";
 import Header from "../../components/header/header";
-import ChatroomCreateModal from "../../components/modal/chatroom/create/chatroomCreateModal";
 import ChannelItem, { ChannelItemProps } from "./channelItem/item";
 import "./main.scss";
 import ModalHandler from "../../components/modal/modalhandler";
@@ -10,7 +9,8 @@ import axios from "axios";
 import GameModalListener from "../../components/modal/gameModalListener";
 import { io, ioChannel } from "../../socket/socket";
 import FriendSidebar from "../../components/sidebar/friendSidebar";
-import { modalHandler } from "../../components/sidebar/sidebarType";
+import { ModalManager } from "../../components/sidebar/sidebarType";
+import ChannelCreateModal from "../../components/modal/channel/create/channelCreateModal";
 
 enum ChannelCategory {
   CHANNEL_LIST,
@@ -21,7 +21,7 @@ const Main = () => {
   const modalHandler = ModalHandler();
   const [isWaiting, setIsWaiting] = useState(false);
 
-  const modalListener: modalHandler = {
+  const modalListener: ModalManager = {
     handleModalClose: modalHandler.handleModalClose,
     handleModalOpen: modalHandler.handleModalOpen,
     isModalOpen: modalHandler.isModalOpen,
@@ -108,7 +108,7 @@ const Main = () => {
               }
               <Button
                 title="채팅방 만들기"
-                onClick={() => modalHandler.handleModalOpen("chatroomCreate")}
+                onClick={() => modalHandler.handleModalOpen("channelCreate")}
               />
             </div>
           </div>
@@ -117,7 +117,7 @@ const Main = () => {
             ? <EmptyPageInfo description={`공개 채팅방이 존재하지 않습니다.\n'채팅방 만들기' 버튼으로 채팅방을 생성해보세요!`}/>
             : (category === ChannelCategory.MY_CHANNEL_LIST && !myChannelList)
               ? <EmptyPageInfo description={`현재 참여중인 채팅방이 없습니다.\n전체 채팅방 목록에서 참가해보세요!`}/> 
-              : <div className="chatroom-list">
+              : <div className="channel-list">
                   {category === ChannelCategory.CHANNEL_LIST && channelList
                     ? channelList.map(channel => (
                         <ChannelItem channel={channel} key={channel.id}/>
@@ -130,9 +130,9 @@ const Main = () => {
           }
         </div>
       </div>
-      <ChatroomCreateModal
-        open={modalHandler.isModalOpen.chatroomCreate}
-        close={() => modalHandler.handleModalClose("chatroomCreate")}
+      <ChannelCreateModal
+        open={modalHandler.isModalOpen.channelCreate}
+        close={() => modalHandler.handleModalClose("channelCreate")}
       />
       <GameModalListener modalHandler={modalListener}/>
     </>

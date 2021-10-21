@@ -7,7 +7,7 @@ import Header from "../../../components/header/header";
 import snackbar from "../../../components/snackbar/snackbar";
 import "./register.scss";
 
-function Register() {
+const Register = () => {
   const [form, setForm] = useState({
     nickname: "",
   });
@@ -32,13 +32,10 @@ function Register() {
     try {
       await axios
         .post(
-          `http://localhost:5000/auth/register`,
+          `${process.env.REACT_APP_SERVER_ADDRESS}/auth/register`,
           {
             nickname: nickname,
           },
-          {
-            withCredentials: true,
-          }
         )
         .then((response) => {
           setRegisted(true);

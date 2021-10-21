@@ -1,8 +1,8 @@
-type iconProps = {
+type IconProps = {
   onClick: any;
 };
 
-function SettingIcon(prop: iconProps) {
+const SettingIcon = (prop: IconProps) => {
   return (
     <img
       className="icon"

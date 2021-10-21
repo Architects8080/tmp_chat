@@ -1,4 +1,4 @@
-.chatroom-item {
+.channel-item {
   width: calc(100%);
   display: flex;
   flex-direction: column;
@@ -13,11 +13,11 @@
   }
 }
 
-.chatroom-header {
+.channel-header {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  .chatroom-title {
+  .channel-title {
     word-break: break-all;
     font-family: Spoqa Han Sans Neo;
     font-style: normal;
@@ -28,7 +28,7 @@
   }
 }
 
-.chatroom-member-count {
+.channel-member-count {
   font-family: Spoqa Han Sans Neo;
   font-style: normal;
   font-weight: 300;

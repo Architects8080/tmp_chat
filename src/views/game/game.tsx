@@ -8,7 +8,7 @@ import Pong from "./pong/pong";
 import "./game.scss";
 import ModalHandler from "../../components/modal/modalhandler";
 
-function Game() {
+const Game = () => {
   const { id } = useParams<{ id: string }>();
 
   const modalHandler = ModalHandler();
@@ -23,8 +23,7 @@ function Game() {
 
   const getPlayerInfo = async (playerId: number): Promise<any> => {
     return axios.get(
-      process.env.REACT_APP_SERVER_ADDRESS + "/user/" + playerId,
-      { withCredentials: true }
+      process.env.REACT_APP_SERVER_ADDRESS + "/user/" + playerId
     );
   };
 
@@ -44,7 +43,7 @@ function Game() {
     });
     io.on("vanished", (roomId: string) => {
       if (roomId == id) {
-        window.location.href = "http://localhost:3000/main";
+        window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/main`;
       }
     });
     io.emit("observe", [id]);

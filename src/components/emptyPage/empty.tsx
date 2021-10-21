@@ -1,11 +1,11 @@
 import React from "react";
 import "./empty.scss";
 
-type emptyPageInfoProps = {
+type EmptyPageInfoProps = {
   description: string;
 };
 
-function EmptyPageInfo(prop: emptyPageInfoProps) {
+const EmptyPageInfo = (prop: EmptyPageInfoProps) => {
   return (
     <div className="empty-info">
       <img

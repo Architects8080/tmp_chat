@@ -6,7 +6,7 @@ type props = {
   roomId: number;
 };
 
-function ObserveGameItem(prop: props) {
+const ObserveGameItem = (prop: props) => {
   const handleObserveGame = () => {
     io.emit("observe", [prop.roomId]); //TODO
   };

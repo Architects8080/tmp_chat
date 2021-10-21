@@ -1,8 +1,8 @@
-type iconProps = {
+type IconProps = {
   onClick: any;
 };
 
-function AddUserIcon(prop: iconProps) {
+const AddUserIcon = (prop: IconProps) => {
   return (
     <img
       className="icon"
