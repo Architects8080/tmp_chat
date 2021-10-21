@@ -13,7 +13,7 @@ export class AchievementService {
     @InjectRepository(UserAchievement)
     private userAchievementRepository: Repository<UserAchievement>,
   ) {
-    const achievementTitle = ['10회 승리', '5연속 승리', '5연속 퍼펙트 게임', '50전 이상 플레이', 'OTP 등록'];
+    const achievementTitle = ['10회 승리', '20회 승리', '10회 이상 플레이', '20회 이상 플레이', 'OTP 등록'];
 
     achievementTitle.map((title, index) => {
       const achievement = achievementRepository.create();
@@ -37,10 +37,13 @@ export class AchievementService {
   }
 
   async updateAchievementInfo(userId: number, achievementId: number) {
-    const userAchievement = this.userAchievementRepository.create();
+    const userAchievement = this.userAchievementRepository.create({
+      userId: userId,
+      achievementId: achievementId,
+    });
 
-    userAchievement.userId = userId;
-    userAchievement.achievementId = achievementId;
-    this.userAchievementRepository.insert(userAchievement);
+    try {
+      await this.userAchievementRepository.save(userAchievement);
+    } catch (error) {}
   }
 }

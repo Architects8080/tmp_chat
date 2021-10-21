@@ -117,6 +117,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         client.user.nickname,
         client.user.avatar,
         roomId,
+        false,
       );
     }
   }
