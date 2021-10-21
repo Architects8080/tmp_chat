@@ -1,5 +1,7 @@
 import { User } from 'src/user/entity/user.entity';
 import {
+  BeforeInsert,
+  BeforeUpdate,
   Column,
   Entity,
   JoinColumn,
@@ -24,23 +26,26 @@ export class ChannelPenalty {
     onUpdate: 'CASCADE',
   })
   @JoinColumn()
-  @PrimaryColumn()
   channelId: number;
 
   @ManyToOne(() => User)
   @JoinColumn()
-  @PrimaryColumn()
   userId: number;
 
   @Column({
     type: 'enum',
     enum: ChannelPenaltyType,
   })
-  level: ChannelPenaltyType;
+  type: ChannelPenaltyType;
 
-  @Column({
-    type: 'date',
-    default: () => 'now()',
-  })
+  @Column({ type: 'timestamp' })
   expired: Date;
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  async initExpireDate(): Promise<void> {
+    console.log('hello?');
+    this.expired = new Date();
+    this.expired.setHours(this.expired.getHours() + 2);
+  }
 }

@@ -115,6 +115,7 @@ export class ChannelController {
   }
 
   @Roles('owner')
+  @UseGuards(MemberGuard)
   @Delete(':channelId/admin/:memberId')
   async revokeAdmin(
     @Param('channelId', new ParseIntPipe()) channelId: number,
@@ -124,10 +125,22 @@ export class ChannelController {
   }
 
   @Roles('owner', 'admin')
+  @UseGuards(MemberGuard)
   @Put(':channelId/mute/:memberId')
-  async muteMember() {}
+  async muteMember(
+    @Param('channelId', new ParseIntPipe()) channelId: number,
+    @Param('memberId', new ParseIntPipe()) memberId: number,
+  ) {
+    return await this.channelService.muteMember(channelId, memberId);
+  }
 
   @Roles('owner', 'admin')
+  @UseGuards(MemberGuard)
   @Put(':channelId/ban/:memberId')
-  async banMember() {}
+  async banMember(
+    @Param('channelId', new ParseIntPipe()) channelId: number,
+    @Param('memberId', new ParseIntPipe()) memberId: number,
+  ) {
+    return await this.channelService.banMember(channelId, memberId);
+  }
 }

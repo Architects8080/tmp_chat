@@ -11,7 +11,10 @@ import { mergeChannelAndCount } from './data/count-channel.data';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { UpdateChannelDto } from './dto/update-channel.dto';
 import { ChannelMember, MemberRole } from './entity/channel-member.entity';
-import { ChannelPenalty } from './entity/channel-penalty.entity';
+import {
+  ChannelPenalty,
+  ChannelPenaltyType,
+} from './entity/channel-penalty.entity';
 import { Channel, ChannelType } from './entity/channel.entity';
 import * as bcrypt from 'bcrypt';
 import { NotificationEventService } from 'src/notification/event/notification-event.service';
@@ -137,7 +140,8 @@ export class ChannelService {
   async acceptChannelInvitation(userId: number, channelId: number) {
     if (await this.isJoinChannel(userId, channelId))
       throw new ConflictException();
-    // TODO check ban
+    if (await this.isBanMember(channelId, userId))
+      throw new ForbiddenException();
     try {
       await this.channelMemberRepository.insert({
         userId: userId,
@@ -146,12 +150,14 @@ export class ChannelService {
     } catch (error) {
       throw new NotFoundException();
     }
+    // TODO new member emit
   }
 
   async joinChannel(userId: number, channelId: number, password?: string) {
     if (await this.isJoinChannel(userId, channelId))
       throw new ConflictException();
-    // TODO check ban
+    if (await this.isBanMember(channelId, userId))
+      throw new ForbiddenException();
     const channel = await this.channelRepository.findOne(channelId);
     if (!channel || channel.type == ChannelType.PRIVATE)
       throw new NotFoundException();
@@ -172,6 +178,7 @@ export class ChannelService {
     } catch (error) {
       throw new NotFoundException();
     }
+    // TODO new member emit
   }
 
   async leaveChannel(userId: number, channelId: number) {
@@ -238,6 +245,86 @@ export class ChannelService {
       },
     );
   }
-  // check ban
-  // check mute
+
+  async getPenaltyMember(channelId: number, memberId: number) {
+    const result = await this.channelPenaltyRepository.findOne({
+      where: {
+        channelId: channelId,
+        userId: memberId,
+      },
+    });
+    return result;
+  }
+
+  async isBanMember(channelId: number, memberId: number) {
+    const result = await this.getPenaltyMember(channelId, memberId);
+    if (result && result.type == ChannelPenaltyType.BAN) {
+      if (result.expired < new Date()) {
+        await this.channelPenaltyRepository.delete(result);
+        return false;
+      }
+      return true;
+    }
+    return false;
+  }
+
+  async isMuteMember(channelId: number, memberId: number) {
+    const result = await this.getPenaltyMember(channelId, memberId);
+    if (result && result.type == ChannelPenaltyType.MUTE) {
+      if (result.expired < new Date()) {
+        await this.channelPenaltyRepository.delete(result);
+        return false;
+      }
+      return true;
+    }
+    return false;
+  }
+
+  async muteMember(channelId: number, memberId: number) {
+    const exist = await this.channelPenaltyRepository.findOne({
+      where: {
+        channelId: channelId,
+        userId: memberId,
+      },
+    });
+    if (exist && exist.type == ChannelPenaltyType.MUTE) {
+      exist.expired = new Date();
+      await this.channelPenaltyRepository.save(exist);
+      // TODO emit mute
+    } else {
+      await this.channelPenaltyRepository.insert(
+        this.channelPenaltyRepository.create({
+          channelId: channelId,
+          userId: memberId,
+          type: ChannelPenaltyType.MUTE,
+          expired: new Date(),
+        }),
+      );
+      // TODO emit mute
+    }
+  }
+
+  async banMember(channelId: number, memberId: number) {
+    const exist = await this.channelPenaltyRepository.findOne({
+      where: {
+        channelId: channelId,
+        userId: memberId,
+      },
+    });
+    if (exist) {
+      exist.expired = new Date();
+      exist.type = ChannelPenaltyType.BAN;
+      await this.channelPenaltyRepository.save(exist);
+      this.leaveChannel(memberId, channelId);
+    } else {
+      await this.channelPenaltyRepository.insert(
+        this.channelPenaltyRepository.create({
+          channelId: channelId,
+          userId: memberId,
+          type: ChannelPenaltyType.BAN,
+        }),
+      );
+      this.leaveChannel(memberId, channelId);
+    }
+  }
 }
