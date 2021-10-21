@@ -1,18 +1,18 @@
 import React, { useEffect, useState, useRef, MutableRefObject } from 'react';
 import './directMessage.scss';
 import axios from 'axios';
-import { DM, userItemProps } from '../sideBar/sideBarType';
+import { DM, userItemProps } from '../sidebar/sidebarType';
 import { ioCommunity } from '../../socket/socket';
 
 type DMProps = {
 	myProfile: {id: number, nickname: string},
-	friend: userItemProps,
-	friendRef: MutableRefObject<userItemProps | null>,
+	DMReceiver: userItemProps,
+	DMReceiverRef: MutableRefObject<userItemProps | null>,
 	closeDM: () => void,
 	alertNewDM: (senderID: number) => void
 };
 
-function DirectMessage({myProfile, friend, friendRef, closeDM, alertNewDM}: DMProps) {
+function DirectMessage({myProfile, DMReceiver, DMReceiverRef, closeDM, alertNewDM}: DMProps) {
 	const [message, setMessage] = useState<string>('');
 	const [DMList, setDMList] = useState<DM[]>([]);
 	const DMRef = useRef<HTMLLIElement | null>(null);
@@ -36,10 +36,10 @@ function DirectMessage({myProfile, friend, friendRef, closeDM, alertNewDM}: DMPr
 			console.log(`[DMError] ${e}`);
 		}
 	};
-	useEffect(() => { fetchDMList(friend.id) }, [friend]);
+	useEffect(() => { fetchDMList(DMReceiver.id) }, [DMReceiver]);
 
 	const receiveDM = (newDM: DM) => {
-		if (newDM.id === friendRef?.current?.id || newDM.id === myProfile.id) {
+		if (newDM.id === DMReceiverRef?.current?.id || newDM.id === myProfile.id) {
 			setDMList(DMList => [...DMList, newDM]);
 			DMRef.current?.scrollIntoView({ behavior: 'smooth' });
 		}
@@ -54,7 +54,7 @@ function DirectMessage({myProfile, friend, friendRef, closeDM, alertNewDM}: DMPr
 			return;
 		const newDM = {
 			userID: myProfile.id,
-			friendID: friend.id,
+			friendID: DMReceiver.id,
 			message: message,
 		};
 		ioCommunity.emit('dmToServer', newDM);
@@ -67,11 +67,11 @@ function DirectMessage({myProfile, friend, friendRef, closeDM, alertNewDM}: DMPr
 		<div className="DM">
 			<div className="DM-header">
 				<div className="profile small">
-					<img className="avatar" src={friend.avatar} alt="cannot loaded avatar" />
+					<img className="avatar" src={DMReceiver.avatar} alt="cannot loaded avatar" />
 				</div>
-				<h3>{friend.nickname}</h3>
+				<h3>{DMReceiver.nickname}</h3>
 				<button onClick={closeDM}>
-					<img src="icons/dm/close.svg"/>
+					<img src="/icons/dm/close.svg"/>
 				</button>
 			</div>
 			<ul>
@@ -84,10 +84,10 @@ function DirectMessage({myProfile, friend, friendRef, closeDM, alertNewDM}: DMPr
 					):(
 						<li className="dm-message other-dm" ref={DMRef}>
 							<div className="profile small">
-								<img className="avatar" src={friend.avatar} alt="cannot loaded avatar" />
+								<img className="avatar" src={DMReceiver.avatar} alt="cannot loaded avatar" />
 							</div>
 							<div>
-								<div className="dm-user">{friend.nickname}</div>
+								<div className="dm-user">{DMReceiver.nickname}</div>
 								<div className="dm-text">{DM.message}</div>
 							</div>
 						</li>

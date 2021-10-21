@@ -8,19 +8,21 @@ ul li {
 }
 
 .profile {
-	border: solid 0.5px rgb(0,0,0, 0.2);
-	border-radius: 50%;
-	background: #FFF;
-	overflow: hidden;
+	// border: solid 0.5px rgb(0,0,0, 0.2);
+	// background: #FFF;
+	// overflow: hidden;
 }
+
 .avatar {
 	width: 32px;
 	height: 32px;
 	border: 0.5px solid rgba(0, 0, 0, 0.2);
+	border-radius: 100%;
 	object-fit: cover;
 }
 
 .DM {
+  z-index: 1;
 	position: absolute;
 	width: 360px;
 	height: fit-content;
@@ -56,6 +58,9 @@ ul li {
 			border-style: none;
 			background: transparent;
 			margin-right: 14px;
+      &:hover{
+        cursor: pointer;
+      }
 		}
 	}
 	ul {
@@ -89,6 +94,7 @@ ul li {
 		}
 		.dm-text {
 			max-width: 287px;
+			word-break: break-all;
 		}
 	}
 	ul span {

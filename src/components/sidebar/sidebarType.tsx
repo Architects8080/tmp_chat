@@ -25,7 +25,6 @@ export type modalHandler = {
 };
 
 export type sidebarProps = {
-  title: sidebarProperty;
   roomId: number; //chat or game인데 이걸 여기서 가지는게 맞나?
 
   modalHandler: modalHandler; //game에서는 필요가 없어..

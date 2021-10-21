@@ -8,8 +8,7 @@ import EmptyPageInfo from "../../components/emptyPage/empty";
 import Header from "../../components/header/header";
 import GameModalListener from "../../components/modal/gameModalListener";
 import ModalHandler from "../../components/modal/modalhandler";
-import SideBar from "../../components/sideBar/sideBar";
-import { sidebarProperty } from "../../components/sideBar/sideBarType";
+import FriendSidebar from "../../components/sidebar/friendSidebar";
 import snackbar from "../../components/snackbar/snackbar";
 import GameLogItem from "./gamelog/item";
 import "./profile.scss";
@@ -81,8 +80,7 @@ function Profile() {
     <>
       <Header isLoggedIn={true} />
       <div className="page">
-        <SideBar
-          title={sidebarProperty.friendList}
+        <FriendSidebar
           roomId={0}
           modalHandler={modalHandler}
         />

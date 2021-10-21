@@ -6,7 +6,7 @@ import {
   sidebarProperty,
   status,
   userItemProps,
-} from "./sideBarType";
+} from "./sidebarType";
 import UserItem from "./userTemplate/user";
 
 type sidebarItemProps = {

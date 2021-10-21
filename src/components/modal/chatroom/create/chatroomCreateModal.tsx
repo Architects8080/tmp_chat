@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { useState } from "react";
 import { useEffect } from "react";
 import { ioChannel } from "../../../../socket/socket";
@@ -13,6 +14,7 @@ type channelCreateDto = {
   title: string;
   type: number;
   password?: string;
+  ownerId: number;
 }
 
 export enum roomType {
@@ -38,13 +40,14 @@ const ChatroomCreateModal = (prop: chatroomCreateModalProps) => {
 
   useEffect(() => {
     ioChannel.on('channelCreated', (channelId) => {
-      window.location.href = `http://localhost:3000/chatroom/${channelId}`
+      window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/chatroom/${channelId}`
     });
   }, []);
 
   const handleUserInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
     setDescriptionText("비밀번호는 숫자 4자리로 구성 가능합니다.");
+    setErrorText("비밀번호를 적어주세요.");
     if (e.target.value.length !== 4)
       setErrorText("비밀번호를 숫자 4자리로 구성해주세요.");
     else if (
@@ -64,15 +67,30 @@ const ChatroomCreateModal = (prop: chatroomCreateModalProps) => {
     prop.close();
   };
 
-  const handleSubmitEvent = () => {
-    if (errorText === "" && title !== '') {
-      const newChannel: channelCreateDto = {
-        title: title,
-        type: selectedRoomType,
-        password: password,
+  const handleSubmitEvent = async () => {
+
+    const user = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/user/me`);
+    const newChannel: channelCreateDto = {
+      title: title,
+      type: selectedRoomType,
+      password: password,
+      ownerId: user.data.id,
+    };
+
+    if (title !== '') {
+      if (selectedRoomType == roomType.protectedRoom && password.length == 4 
+          || selectedRoomType != roomType.protectedRoom) {
+        try {
+          const roomId = await axios.post(
+            `${process.env.REACT_APP_SERVER_ADDRESS}/channel/create`, newChannel
+          );
+          prop.close();
+          window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/chatroom/${roomId.data}`
+        } catch (e) {
+          console.log(e);
+          setErrorText("채널 생성에 실패했습니다.");
+        }
       }
-      ioChannel.emit('createChannel', newChannel);
-      prop.close();
     }
   };
 

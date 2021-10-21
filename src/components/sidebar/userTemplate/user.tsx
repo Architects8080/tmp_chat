@@ -1,5 +1,5 @@
 import React from "react";
-import { status } from "../sideBarType";
+import { status } from "../sidebarType";
 import "./user.scss";
 
 type userItemProps = {
