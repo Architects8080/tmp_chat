@@ -1,15 +1,14 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./enterPasswordModal.scss";
 
-type enterPasswordModalProps = {
+type EnterPasswordModalProps = {
   open: boolean;
   close: any;
-  userId: number;
-  roomId: number;
+  channelId: number;
 };
 
-const EnterPasswordModal = (prop: enterPasswordModalProps) => {
+const EnterPasswordModal = (prop: EnterPasswordModalProps) => {
   const Title = "채팅방 접속";
   const Description = "비밀번호를 입력해주세요.";
 
@@ -30,24 +29,25 @@ const EnterPasswordModal = (prop: enterPasswordModalProps) => {
   };
 
   const handleSubmitEvent = async () => {
-    try {
-      const response = await axios.post(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/enter-pw`, {
-        userId: prop.userId,
-        roomId: prop.roomId,
-        password: input
-      });
-      if (response.data) {
+    axios.post(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/${prop.channelId}/member`, {
+      password: input
+    })
+    .then(() => {
+      prop.close();
+      window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/chatroom/${prop.channelId}`
+    })
+    .catch((e) => {
+      if (e.response.data.statusCode == 409) {
         prop.close();
-        window.location.href = `http://localhost:3000/chatroom/${prop.roomId}`
-      } else
-        setErrorText("비밀번호가 틀렸습니다.");
-    }
-    catch (e) { console.log(e); }
-  };
+        window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/chatroom/${prop.channelId}`
+      }
+      setErrorText("접속에 실패했습니다. 다시 시도해주세요.");
+      setInput("");
+    })
+  }
+
   return (
-    <div
-      className={prop.open ? "modal-open modal-background" : "modal-background"}
-    >
+    <div className={prop.open ? "modal-open modal-background" : "modal-background"}>
       <div className="modal-wrap">
         <div className="modal-header">
           <div className="title">{Title}</div>

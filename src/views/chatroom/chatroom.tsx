@@ -11,6 +11,7 @@ import { ioChannel } from "../../socket/socket";
 import "./chatroom.scss";
 import GameModalListener from "../../components/modal/gameModalListener";
 import ChatroomSidebar from "../../components/sidebar/chatroomSidebar";
+import axios from "axios";
 
 // 서버로부터 받아서 message state 에 넣을 때 들어가는 형태
 type Message = {
@@ -48,15 +49,18 @@ const Chatroom = () => {
       };
       setMessages([...messages, newMessage]);
     }
-    //post joinChannel -> data 없이 
-    //결과값 따라서 false면 아래 alert 가져와서 하고
-    //true면 sidebar socket
-    //useeefect 끝날때 return () => {} -> unsubscribe 
-    ioChannel.emit("joinChannel", id);
-    ioChannel.on("joinRefused", () => {
-      window.location.href = "http://localhost:3000/main";
-      window.alert("비정상적인 접근입니다");
-    });
+
+    axios
+    .post(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/${id}/member`)
+    .then() //SUCCESS
+    .catch((e) => {
+      console.log(`error : `, e.response.data);
+      if (e.response.data.statusCode !== 409) { //Conflict Exception : is already join channel
+        window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}`;
+        window.alert("비정상적인 접근입니다");
+      }
+    })
+
     ioChannel.on('msgToClient', (message: Payload) => {
       receivedMessage(message);
     });

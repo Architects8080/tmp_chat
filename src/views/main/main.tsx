@@ -54,7 +54,6 @@ const Main = () => {
   const getAllChannel = async () => {
     try {
       const response = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/channel`);
-      console.log(`getAllChannelList : `, response.data);
       if (response.data.length != 0)
         setChannelList(response.data);
     } catch (error) {
@@ -65,7 +64,6 @@ const Main = () => {
   const getMyChannel = async () => {
     try {
       const response = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/me`);
-      console.log(`getMyChannel : `, response.data);
       if (response.data.length != 0)
         setMyChannelList(response.data);
     } catch (error) {
@@ -76,15 +74,6 @@ const Main = () => {
 	useEffect(() => {
 		getAllChannel();
     getMyChannel();
-
-    //TODO: socket.on update join/leave user
-
-    // ioChannel.on('updateChannel', async () => {
-    //   if (category == ChannelCategory.CHANNEL_LIST)
-    //     getAllChannel();
-    //   elListe
-    //     getMyChannel();
-    // })
 	}, [category]);
 
 
@@ -117,7 +106,6 @@ const Main = () => {
                 isWaiting ? <Button title="매칭 취소하기" onClick={handleRemoveWaiting} />
                 : <Button title="게임 찾기" onClick={handleAddWaiting} />
               }
-              
               <Button
                 title="채팅방 만들기"
                 onClick={() => modalHandler.handleModalOpen("chatroomCreate")}
@@ -132,10 +120,10 @@ const Main = () => {
               : <div className="chatroom-list">
                   {category === ChannelCategory.CHANNEL_LIST && channelList
                     ? channelList.map(channel => (
-                        <ChannelItem channel={channel} />
+                        <ChannelItem channel={channel} key={channel.id}/>
                       ))
                        : myChannelList ? myChannelList.map(channel => (
-                          <ChannelItem channel={channel} />
+                          <ChannelItem channel={channel} key={channel.id}/>
                         )) : null
                   }
                 </div>

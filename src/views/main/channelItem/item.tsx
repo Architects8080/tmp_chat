@@ -20,29 +20,16 @@ enum ChannelType {
 
 const ChannelItem = ({channel} : {channel:ChannelItemProps}) => {
   const modalHandler = ModalHandler();
-  const [userId, setUserId] = useState(0);
 
   const handleOnClick = async () => {
-    if (channel.type !== ChannelType.PUBLIC) {
-      try {
-        axios.all([
-          axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/user/me`),
-          axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/me`),
-        ])
-        .then(
-          axios.spread((user, myChannelList) => {
-            setUserId(user.data.id);
-            if (myChannelList.data.find((myChannel: any) => myChannel.id === channel.id))
-              window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/chatroom/${channel.id}`
-            else
-              modalHandler.handleModalOpen("enterPassword");
-          })
-        );
-      }
-      catch (e) { console.log(e); }
-    } else {
-      window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/chatroom/${channel.id}`
+    const response = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/me`);
+
+    if (channel.type === ChannelType.PROTECTED && 
+        !response.data.find((element: any) => element.id === channel.id)) {
+        modalHandler.handleModalOpen("enterPassword");
     }
+    else
+      window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/chatroom/${channel.id}`
   };
 
   const handleModalClose = () => {
@@ -61,7 +48,7 @@ const ChannelItem = ({channel} : {channel:ChannelItemProps}) => {
         </div>
         <div className="chatroom-member-count">{channel.memberCount}명 참여중</div>
       </div>
-      <EnterPasswordModal open={modalHandler.isModalOpen.enterPassword} close={handleModalClose} userId={userId} roomId={channel.id}/>
+      <EnterPasswordModal open={modalHandler.isModalOpen.enterPassword} close={handleModalClose} channelId={channel.id}/>
     </>
   );
 }
