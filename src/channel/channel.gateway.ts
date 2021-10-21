@@ -15,7 +15,7 @@ import { cookieExtractor, JwtStrategy } from 'src/auth/strategy/jwt.strategy';
 import { SocketUser } from 'src/socket/socket-user';
 import { SocketUserService } from 'src/socket/socket-user.service';
 import { ChannelService } from './channel.service';
-import { CreateChannelDto } from './dto/create-channel.dto';
+import { CHANNEL_SOCKET_USER_SERVICE_PROVIDER } from './channel.socket-user.service';
 
 @UseGuards(JwtAuthGuard)
 @WebSocketGateway(4501, { namespace: 'channel' })
@@ -26,7 +26,7 @@ export class ChannelGateway
     private jwtService: JwtService,
     private jwtStrategy: JwtStrategy,
     private channelService: ChannelService,
-    @Inject('CHANNEL_SOCKET_USER_SERVICE')
+    @Inject(CHANNEL_SOCKET_USER_SERVICE_PROVIDER)
     private socketUserService: SocketUserService,
   ) {}
   @WebSocketServer() server: Server;
@@ -55,62 +55,5 @@ export class ChannelGateway
       client.user = user;
       this.socketUserService.removeSocket(client);
     } catch (error) {}
-  }
-
-  @SubscribeMessage('createChannel')
-  async createChannel(
-    @MessageBody() data: CreateChannelDto,
-    @ConnectedSocket() client: SocketUser,
-  ) {
-    data.ownerId = client.user.id;
-    const channelId = await this.channelService.createChannel(data);
-    this.server.emit('channelCreated', channelId);
-  }
-
-  @SubscribeMessage('joinChannel')
-  async joinChannel(
-    @MessageBody() data: any,
-    @ConnectedSocket() client: SocketUser,
-  ) {
-    if (this.channelService.channelMap.get(+data).isProtected > 0) {
-      const myChannel = await this.channelService.getMyChannel(client.user.id);
-      if (myChannel.find((myChannel) => myChannel.roomId == data)) {
-        client.join(data.toString());
-        this.channelService.joinChannel(data, client.user.id);
-      } else {
-        this.server.emit('joinRefused', false);
-      }
-    } else {
-      client.join(data.toString());
-      const newMember = {
-        id: client.user.id,
-        nickname: client.user.nickname.toString(),
-        avatar: client.user.avatar.toString(),
-      };
-      this.server.to(data.toString()).emit('channelMemberAdd', newMember);
-      this.channelService.joinChannel(data, client.user.id);
-      console.log(client.rooms);
-    }
-  }
-
-  @SubscribeMessage('msgToChannel')
-  handleMessage(
-    @MessageBody() data: any,
-    @ConnectedSocket() client: SocketUser,
-  ) {
-    const payload = {
-      text: data.text,
-      name: client.user.nickname,
-    };
-    this.server.to(data.roomId).emit('msgToClient', payload);
-  }
-
-  @SubscribeMessage('leaveChannel')
-  leaveChannel(
-    @MessageBody() data: any,
-    @ConnectedSocket() client: SocketUser,
-  ) {
-    this.channelService.leaveChannel(data, client.user.id);
-    this.server.to(data).emit('channelMemberRemove', client.user.id);
   }
 }
