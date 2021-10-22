@@ -19,7 +19,7 @@ const ChannelSettingModal = (prop: ChannelSettingModalProps) => {
 
   const [title, setTitle] = useState("");
   const [channelType, setChannelType] = useState(ChannelType.PUBLIC);
-  const [password, setPassword] = useState("");
+  const [password, setPassword] = useState<string | undefined>(undefined);
 
   const [descriptionText, setDescriptionText] = useState(
     "비밀번호는 숫자 4자리로 구성 가능합니다."
@@ -45,7 +45,10 @@ const ChannelSettingModal = (prop: ChannelSettingModalProps) => {
   };
 
   const handleClose = () => {
+    setTitle("");
+    setChannelType(ChannelType.PUBLIC)
     setPassword("");
+    setErrorText("");
     prop.close();
   };
 
@@ -56,8 +59,8 @@ const ChannelSettingModal = (prop: ChannelSettingModalProps) => {
       password: password,
     };
 
-    if (title !== '' && (channelType == ChannelType.PROTECTED && password.length == 4 || channelType != ChannelType.PROTECTED)) {
-      axios.put(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/update/${prop.channelId}`, channelDto)
+    if (title !== '' && (channelType == ChannelType.PROTECTED && password && password.length == 4 || channelType != ChannelType.PROTECTED)) {
+      axios.put(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/${prop.channelId}`, channelDto)
       .then(() => {
         prop.close();
       })
@@ -68,19 +71,19 @@ const ChannelSettingModal = (prop: ChannelSettingModalProps) => {
     }
   };
 
-  useEffect(() => {
-    axios
-      .get(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/${prop.channelId}`)
-      .then((channel) => {
-        console.log(`channel.data : `, channel.data);
-        setTitle(channel.data.title);
-        setChannelType(channel.data.type);
-        if (channel.data.type === ChannelType.PROTECTED)
-          setErrorText("비밀번호를 새로 입력해주세요.");
-        if (channel.data.type === ChannelType.PRIVATE)
-          setErrorText("public를 선택하면 공개방으로 변경됩니다.");
-      })
-  }, []);
+  // useEffect(() => {
+  //   axios
+  //     .get(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/${prop.channelId}`)
+  //     .then((channel) => {
+  //       console.log(`channel.data : `, channel.data);
+  //       setTitle(channel.data.title);
+  //       setChannelType(channel.data.type);
+  //       if (channel.data.type === ChannelType.PROTECTED)
+  //         setErrorText("비밀번호를 새로 입력해주세요.");
+  //       if (channel.data.type === ChannelType.PRIVATE)
+  //         setErrorText("public를 선택하면 공개방으로 변경됩니다.");
+  //     })
+  // }, []);
 
   const handleChange = (selectedType: ChannelType) => {
     setChannelType(selectedType);
