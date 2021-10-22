@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from 'src/auth/auth.module';
 import { NotificationEventModule } from 'src/notification/event/notification-event.module';
 import { UserModule } from 'src/user/user.module';
+import { ChannelEventService } from './channel-event.service';
 import { ChannelRoleService } from './channel-role.service';
 import { ChannelController } from './channel.controller';
 import { ChannelGateway } from './channel.gateway';
@@ -31,6 +32,7 @@ import { Channel } from './entity/channel.entity';
     ChannelGateway,
     ChannelSocketUserService,
     ChannelRoleService,
+    ChannelEventService,
   ],
   exports: [ChannelService],
 })

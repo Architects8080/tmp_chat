@@ -5,6 +5,7 @@ import {
   MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
+  OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
@@ -15,6 +16,7 @@ import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 import { cookieExtractor, JwtStrategy } from 'src/auth/strategy/jwt.strategy';
 import { SocketUser } from 'src/socket/socket-user';
 import { SocketUserService } from 'src/socket/socket-user.service';
+import { ChannelEventService } from './channel-event.service';
 import { ChannelService } from './channel.service';
 import { CHANNEL_SOCKET_USER_SERVICE_PROVIDER } from './channel.socket-user.service';
 import { ChannelMessageDto } from './dto/channel-message.dto';
@@ -22,7 +24,7 @@ import { ChannelMessageDto } from './dto/channel-message.dto';
 @UseGuards(JwtAuthGuard)
 @WebSocketGateway(4501, { namespace: 'channel' })
 export class ChannelGateway
-  implements OnGatewayConnection, OnGatewayDisconnect
+  implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit
 {
   constructor(
     private jwtService: JwtService,
@@ -30,8 +32,14 @@ export class ChannelGateway
     private channelService: ChannelService,
     @Inject(CHANNEL_SOCKET_USER_SERVICE_PROVIDER)
     private socketUserService: SocketUserService,
+    private channelEventService: ChannelEventService,
   ) {}
+
   @WebSocketServer() server: Server;
+
+  afterInit(server: any) {
+    this.channelEventService.server = this.server;
+  }
 
   async handleConnection(client: SocketUser) {
     console.log(`Client ${client.id} Connected to channel`);
@@ -55,6 +63,23 @@ export class ChannelGateway
       client.user = user;
       this.socketUserService.removeSocket(client);
     } catch (error) {}
+  }
+
+  @SubscribeMessage('subscribeChannel')
+  async subscribeChannel(
+    @ConnectedSocket() client: SocketUser,
+    channelId: number,
+  ) {
+    if (this.channelService.isJoinChannel(client.user.id, channelId))
+      client.join(`channel:${channelId}`);
+  }
+
+  @SubscribeMessage('unsubscribeChannel')
+  async unsubscribeChannel(
+    @ConnectedSocket() client: SocketUser,
+    channelId: number,
+  ) {
+    client.leave(`channel:${channelId}`);
   }
 
   @SubscribeMessage('messageToServer')
