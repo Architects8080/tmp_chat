@@ -1,3 +1,4 @@
+import { User } from 'src/user/entity/user.entity';
 import {
   Column,
   CreateDateColumn,
@@ -7,21 +8,33 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { ChannelMember } from './channel-member.entity';
+import { Channel } from './channel.entity';
 
 @Entity('channel_message')
 export class ChannelMessage {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => ChannelMember, (message) => message.messages, {
+  @ManyToOne(() => ChannelMember, {
     onDelete: 'SET NULL',
     onUpdate: 'NO ACTION',
   })
   @JoinColumn([
-    { name: 'cid', referencedColumnName: 'channelId' },
-    { name: 'uid', referencedColumnName: 'userId' },
+    { name: 'userId', referencedColumnName: 'userId' },
+    { name: 'channelId', referencedColumnName: 'channelId' },
   ])
-  sentBy: ChannelMember;
+  sender: ChannelMember;
+  @Column()
+  userId: number;
+
+  @ManyToOne(() => Channel, (channel) => channel.messageList, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  @JoinColumn({ name: 'channelId' })
+  channel: Channel;
+  @Column()
+  channelId: number;
 
   @Column()
   message: string;

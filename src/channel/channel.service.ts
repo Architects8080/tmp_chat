@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { In, InsertResult, Repository } from 'typeorm';
 import { mergeChannelAndCount } from './data/count-channel.data';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { UpdateChannelDto } from './dto/update-channel.dto';
@@ -20,6 +20,8 @@ import * as bcrypt from 'bcrypt';
 import { NotificationEventService } from 'src/notification/event/notification-event.service';
 import { NotificationType } from 'src/notification/entity/notification.entity';
 import { UserService } from 'src/user/user.service';
+import { ChannelMessage } from './entity/channel-message.entity';
+import { channel } from 'diagnostics_channel';
 
 @Injectable()
 export class ChannelService {
@@ -30,6 +32,8 @@ export class ChannelService {
     private channelMemberRepository: Repository<ChannelMember>,
     @InjectRepository(ChannelPenalty)
     private channelPenaltyRepository: Repository<ChannelPenalty>,
+    @InjectRepository(ChannelMessage)
+    private channelMessageRepository: Repository<ChannelMessage>,
     private notificationEventService: NotificationEventService,
     private userService: UserService,
   ) {}
@@ -166,7 +170,7 @@ export class ChannelService {
         !password ||
         password.length != 4 ||
         !password.match('^[0-9]+$') ||
-        channel.password != (await bcrypt.hash(password, 10))
+        !(await bcrypt.compare(password, channel.password))
       )
         throw new ForbiddenException();
     }
@@ -326,5 +330,36 @@ export class ChannelService {
       );
       this.leaveChannel(memberId, channelId);
     }
+  }
+
+  async getChannelMessageList(channelId: number) {
+    const result = await this.channelMessageRepository.find({
+      relations: ['sender', 'sender.user'],
+      where: {
+        channelId: channelId,
+      },
+    });
+    return result.map((cm: any) => {
+      if (cm.sender) cm.sender = cm.sender.user;
+      return cm;
+    });
+  }
+
+  async createMessage(channelId: number, memberId: number, message: string) {
+    if (!(await this.isJoinChannel(memberId, channelId))) return;
+    if (await this.isMuteMember(channelId, memberId)) return;
+    const insertResult = await this.channelMessageRepository.insert({
+      userId: memberId,
+      channelId: channelId,
+      message: message,
+    });
+    const result: any = await this.channelMessageRepository.findOne({
+      relations: ['sender', 'sender.user'],
+      where: {
+        id: insertResult.identifiers[0].id,
+      },
+    });
+    result.sender = result.sender.user;
+    return result;
   }
 }

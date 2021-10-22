@@ -44,7 +44,6 @@ export class ChannelPenalty {
   @BeforeInsert()
   @BeforeUpdate()
   async initExpireDate(): Promise<void> {
-    console.log('hello?');
     this.expired = new Date();
     this.expired.setHours(this.expired.getHours() + 2);
   }
