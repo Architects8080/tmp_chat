@@ -69,7 +69,7 @@ const Channel = () => {
 		if (e.key !== 'Enter' || text === '')
 			return;
 		const newMessageSend = {
-      roomId: id,
+      channelId: id,
       text: text,
 		};
 		ioChannel.emit('msgToChannel', newMessageSend);
@@ -87,7 +87,7 @@ const Channel = () => {
       <Header isLoggedIn={true} />
       <div className="page">
         <ChannelSidebar
-          roomId={id}
+          channelId={id}
           modalHandler={modalHandler}
         />
         <div className="channel-wrap">

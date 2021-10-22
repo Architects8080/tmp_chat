@@ -22,7 +22,7 @@ const ChannelAdminDropdownList = (prop: DropdownListType) => {
         <React.Fragment>
           {!info.isFriend ? <AddFriendItem targetId={info.targetId} /> : ""};
           {info.isInGame ? (
-            <ObserveGameItem roomId={info.roomId} />
+            <ObserveGameItem channelId={info.channelId} />
           ) : (
             <InviteGameItem
               targetId={info.targetId}
@@ -31,15 +31,15 @@ const ChannelAdminDropdownList = (prop: DropdownListType) => {
           )}
           {/* showing only other's permission is member */}
           {info.isBannable != undefined && info.isBannable ? (
-            <BanUserItem roomId={info.roomId} targetId={info.targetId} />
+            <BanUserItem channelId={info.channelId} targetId={info.targetId} />
           ) : (
             ""
           )}
           {/* showing only other's permission is member or admin */}
           {info.isMuted != undefined && info.isMuted ? (
-            <UnmuteUserItem roomId={info.roomId} targetId={info.targetId} />
+            <UnmuteUserItem channelId={info.channelId} targetId={info.targetId} />
           ) : (
-            <MuteUserItem roomId={info.roomId} targetId={info.targetId} />
+            <MuteUserItem channelId={info.channelId} targetId={info.targetId} />
           )}
         </React.Fragment>
       )}

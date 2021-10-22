@@ -20,7 +20,7 @@ const FriendDropdownList = (prop: DropdownListType) => {
       ) : (
         <React.Fragment>
           {info.isInGame ? (
-            <ObserveGameItem roomId={info.roomId} />
+            <ObserveGameItem channelId={info.channelId} />
           ) : (
             <InviteGameItem
               targetId={info.targetId}

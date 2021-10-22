@@ -3,12 +3,12 @@ import { io } from "../../../socket/socket";
 import DefaultDropdownItem from "../itemTemplate/default/item";
 
 type props = {
-  roomId: number;
+  channelId: number;
 };
 
 const ObserveGameItem = (prop: props) => {
   const handleObserveGame = () => {
-    io.emit("observe", [prop.roomId]); //TODO
+    io.emit("observe", [prop.channelId]); //TODO
   };
 
   return (

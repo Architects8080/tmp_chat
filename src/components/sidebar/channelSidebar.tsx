@@ -39,7 +39,7 @@ const ChannelSidebar = (prop: SidebarProps) => {
   useEffect(() => {
     getChannelmember();
     getMyProfile();
-    getNewDM();
+    // getNewDM();
   
     ioChannel.on("channelMemberAdd", (newMember: UserItemProps) => {
       if (userList && !userList.some((user) => user.id === newMember.id)) {
@@ -58,7 +58,7 @@ const ChannelSidebar = (prop: SidebarProps) => {
 
   const getChannelmember = async () => {
     try {
-      const memberList = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/members/${prop.roomId}`);
+      const memberList = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/members/${prop.channelId}`);
       setUserList(memberList.data);
     } catch (error) {
       console.log(`[getChannelmember] ${error}`);
@@ -111,70 +111,70 @@ const ChannelSidebar = (prop: SidebarProps) => {
   };
 
   //DM
-  const [DMopen, setDMOpen] = useState<boolean>(false);
-  const [DMReceiver, setDMReceiver] = useState<UserItemProps>({
-    id: 0,
-    avatar: "",
-    status: 1,
-    nickname: "",
-    alert: false,
-  });
-  const DMReceiverRef = useRef<UserItemProps | null>(null);
-  const timerRef = useRef<NodeJS.Timeout>();
+  // const [DMopen, setDMOpen] = useState<boolean>(false);
+  // const [DMReceiver, setDMReceiver] = useState<UserItemProps>({
+  //   id: 0,
+  //   avatar: "",
+  //   status: 1,
+  //   nickname: "",
+  //   alert: false,
+  // });
+  // const DMReceiverRef = useRef<UserItemProps | null>(null);
+  // const timerRef = useRef<NodeJS.Timeout>();
 
-  const getNewDM = () => {
-    ioCommunity.on("dmToClient", (newDM: DM) => {
-      if (!DMReceiverRef.current) alertNewDM(newDM.id);
-    });
-  };
+  // const getNewDM = () => {
+  //   ioCommunity.on("dmToClient", (newDM: DM) => {
+  //     if (!DMReceiverRef.current) alertNewDM(newDM.id);
+  //   });
+  // };
 
-  const alertNewDM = (senderID: number) => {
-    setUserList((userList) =>
-      userList
-        ? userList.map((user) =>
-            user.id === senderID ? { ...user, alert: true } : user
-          )
-        : userList
-    );
-    timerRef.current = setTimeout(() => {
-      setUserList((userList) =>
-        userList
-          ? userList.map((user) =>
-              user.id === senderID ? { ...user, alert: false } : user
-            )
-          : userList
-      );
-    }, 1200);
-  };
+  // const alertNewDM = (senderID: number) => {
+  //   setUserList((userList) =>
+  //     userList
+  //       ? userList.map((user) =>
+  //           user.id === senderID ? { ...user, alert: true } : user
+  //         )
+  //       : userList
+  //   );
+  //   timerRef.current = setTimeout(() => {
+  //     setUserList((userList) =>
+  //       userList
+  //         ? userList.map((user) =>
+  //             user.id === senderID ? { ...user, alert: false } : user
+  //           )
+  //         : userList
+  //     );
+  //   }, 1200);
+  // };
 
-  const openDM = (e: React.MouseEvent<HTMLLIElement>) => {
-    if (userList) {
-      DMReceiverRef.current = userList.filter(
-        (user) => user.id === e.currentTarget.value
-      )[0];
+  // const openDM = (e: React.MouseEvent<HTMLLIElement>) => {
+  //   if (userList) {
+  //     DMReceiverRef.current = userList.filter(
+  //       (user) => user.id === e.currentTarget.value
+  //     )[0];
 
-      if (DMReceiverRef.current.id == myProfile.id)
-      {
-        snackbar.error("자기 자신과의 대화는 불가능합니다.")
-        return ;
-      }
-      setDMReceiver(DMReceiverRef.current);
-    }
+  //     if (DMReceiverRef.current.id == myProfile.id)
+  //     {
+  //       snackbar.error("자기 자신과의 대화는 불가능합니다.")
+  //       return ;
+  //     }
+  //     setDMReceiver(DMReceiverRef.current);
+  //   }
 
-    if (timerRef.current) {
-      if (userList)
-        userList.map((user) =>
-          user.id === e.currentTarget.value ? { ...user, alert: true } : user
-        );
-      clearTimeout(timerRef.current);
-    }
-    if (!DMopen) setDMOpen(true);
-  };
+  //   if (timerRef.current) {
+  //     if (userList)
+  //       userList.map((user) =>
+  //         user.id === e.currentTarget.value ? { ...user, alert: true } : user
+  //       );
+  //     clearTimeout(timerRef.current);
+  //   }
+  //   if (!DMopen) setDMOpen(true);
+  // };
 
-  const closeDM = () => {
-    setDMOpen(false);
-    DMReceiverRef.current = null;
-  };
+  // const closeDM = () => {
+  //   setDMOpen(false);
+  //   DMReceiverRef.current = null;
+  // };
 
   return (
     <aside>
@@ -187,21 +187,21 @@ const ChannelSidebar = (prop: SidebarProps) => {
       </div>
       <ul className="user-list">
         {userList ? userList.map((user) => (
-          <li onClick={openDM} value={user.id}>
-            {user.alert && <span className="alert-overlay"></span>}
+          // <li onClick={openDM} value={user.id}>
+            // {user.alert && <span className="alert-overlay"></span>}
             <SidebarItem
               key={user.id}
               itemType={SidebarProperty.CHAT_MEMBER_LIST}
               itemInfo={user}
               contextMenuHandler={contextMenuHandler}
-              roomId={prop.roomId}
+              channelId={prop.channelId}
               userId={myProfile.id}
               targetId={user.id}
             />
-          </li>
+          // </li>
         )) : null}
       </ul>
-      {DMopen && (
+      {/* {DMopen && (
         <DirectMessage
           myProfile={myProfile}
           DMReceiver={DMReceiver}
@@ -209,7 +209,7 @@ const ChannelSidebar = (prop: SidebarProps) => {
           closeDM={closeDM}
           alertNewDM={alertNewDM}
         />
-      )}
+      )} */}
 
       {show && result?.permission == MemberRole.MEMBER ? (
         <ChannelMemberDropdownList
@@ -243,11 +243,11 @@ const ChannelSidebar = (prop: SidebarProps) => {
       <ChannelInviteModal
         open={isModalOpen.channelInvite}
         close={() => handleModalClose("channelInvite")}
-        roomId={prop.roomId}/>
+        channelId={prop.channelId}/>
       <ChannelSettingModal
         open={isModalOpen.channelSetting}
         close={() => handleModalClose("channelSetting")}
-        roomId={prop.roomId}/>
+        channelId={prop.channelId}/>
     </aside>
   );
 }

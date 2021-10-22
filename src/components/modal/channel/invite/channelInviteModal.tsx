@@ -12,7 +12,7 @@ enum Result {
 type ChannelInviteModalProps = {
   open: boolean;
   close: any;
-  roomId: number;
+  channelId: number;
 };
 
 const ChannelInviteModal = (prop: ChannelInviteModalProps) => {
@@ -42,11 +42,11 @@ const ChannelInviteModal = (prop: ChannelInviteModalProps) => {
 
   const handleSubmitEvent = async () => {
     //axios.get(user/nickname), -> then axios.get(channelmember, check) -> then.
-    //io.emit -> nickname & roomId send
+    //io.emit -> nickname & channelId send
     //io.on -> get result code
     const user = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/user/me`);
     console.log(`user.data.id : `, user.data);
-    axios.post(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/invite/${prop.roomId}`,
+    axios.post(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/invite/${prop.channelId}`,
       {
         userId: user.data.id,
         nickname: nickname,

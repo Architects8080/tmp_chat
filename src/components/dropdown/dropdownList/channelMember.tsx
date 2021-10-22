@@ -22,7 +22,7 @@ const ChannelMemberDropdownList = (prop: DropdownListType) => {
         <React.Fragment>
           {!info.isFriend ? <AddFriendItem targetId={info.targetId} /> : ""}
           {info.isInGame ? (
-            <ObserveGameItem roomId={info.roomId} />
+            <ObserveGameItem channelId={info.channelId} />
           ) : (
             <InviteGameItem
               targetId={info.targetId}

@@ -26,7 +26,7 @@ export type ModalManager = {
 };
 
 export type SidebarProps = {
-  roomId: number; //chat or game인데 이걸 여기서 가지는게 맞나?
+  channelId: number; //chat or game인데 이걸 여기서 가지는게 맞나?
 
   modalHandler: ModalManager; //game에서는 필요가 없어..
   // userId: number;
@@ -39,7 +39,7 @@ export enum MemberRole {
 }
 
 export type DropdownMenuInfo = {
-  roomId: number;
+  channelId: number;
   userId: number;
   targetId: number;
 

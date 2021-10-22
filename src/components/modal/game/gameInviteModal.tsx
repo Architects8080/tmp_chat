@@ -5,7 +5,7 @@ import { io } from "../../../socket/socket";
 type InviteInfo = {
   nickname: string;
   avatar: string;
-  roomID: number;
+  channelId: number;
   isLadder: boolean;
 };
 
@@ -17,13 +17,13 @@ type ModalProps = {
 
 const GameInviteModal = (prop: ModalProps) => {
   const handleAccept = () => {
-    io.emit("accept", [prop.inviteInfo.roomID]);
+    io.emit("accept", [prop.inviteInfo.channelId]);
 
     prop.close();
   };
 
   const handleReject = () => {
-    io.emit("cancel", [prop.inviteInfo.roomID]);
+    io.emit("cancel", [prop.inviteInfo.channelId]);
 
     prop.close();
   };

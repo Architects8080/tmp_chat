@@ -200,7 +200,7 @@ const FriendSidebar = (prop: SidebarProps) => {
               key={user.id}
               itemInfo={user}
               contextMenuHandler={contextMenuHandler}
-              roomId={0}
+              channelId={0}
               userId={myProfile.id}
               targetId={user.id}
             />

@@ -7,7 +7,7 @@ import "./channelSettingModal.scss";
 type ChannelSettingModalProps = {
   open: boolean;
   close: any;
-  roomId: number;
+  channelId: number;
 };
 
 const ChannelSettingModal = (prop: ChannelSettingModalProps) => {
@@ -57,7 +57,7 @@ const ChannelSettingModal = (prop: ChannelSettingModalProps) => {
     };
 
     if (title !== '' && (channelType == ChannelType.PROTECTED && password.length == 4 || channelType != ChannelType.PROTECTED)) {
-      axios.put(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/update/${prop.roomId}`, channelDto)
+      axios.put(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/update/${prop.channelId}`, channelDto)
       .then(() => {
         prop.close();
       })
@@ -70,7 +70,7 @@ const ChannelSettingModal = (prop: ChannelSettingModalProps) => {
 
   useEffect(() => {
     axios
-      .get(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/${prop.roomId}`)
+      .get(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/${prop.channelId}`)
       .then((channel) => {
         console.log(`channel.data : `, channel.data);
         setTitle(channel.data.title);

@@ -4,12 +4,12 @@ import DefaultDropdownItem from "../../../itemTemplate/default/item";
 
 type ItemProps = {
   targetId: number;
-  roomId: number;
+  channelId: number;
 };
 
 const UnmuteUserItem = (prop: ItemProps) => {
   const handleUnmuteUser = () => {
-    io.emit("channel/unmute", prop.roomId, prop.targetId);
+    io.emit("channel/unmute", prop.channelId, prop.targetId);
   };
 
   return (

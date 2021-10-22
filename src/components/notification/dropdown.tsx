@@ -23,7 +23,7 @@ type Notification = {
   id: number;
   senderId: number;
   receiverId: number;
-  //채널 초대: roomId
+  //채널 초대: channelId
   //친구 요청: senderId
   sender: User;
   targetId: number;

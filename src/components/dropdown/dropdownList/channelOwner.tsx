@@ -3,8 +3,8 @@ import AddFriendItem from "../dropdownItem/channel/addFriend";
 import BanUserItem from "../dropdownItem/channel/admin/ban";
 import MuteUserItem from "../dropdownItem/channel/admin/mute";
 import UnmuteUserItem from "../dropdownItem/channel/admin/unmute";
-import AddAdminItem from "../dropdownItem/channel/owner/addAdmin";
-import RemoveAdminItem from "../dropdownItem/channel/owner/removeAdmin";
+import GrantAdminItem from "../dropdownItem/channel/owner/grantAdmin";
+import RevokeAdminItem from "../dropdownItem/channel/owner/revokeAdmin";
 import InviteGameItem from "../dropdownItem/inviteGame";
 import ObserveGameItem from "../dropdownItem/observeGame";
 import ViewProfileItem from "../dropdownItem/viewProfile";
@@ -24,7 +24,7 @@ const ChannelOwnerDropdownList = (prop: DropdownListType) => {
         <React.Fragment>
           {!info.isFriend ? <AddFriendItem targetId={info.targetId} /> : ""}
           {info.isInGame ? (
-            <ObserveGameItem roomId={info.roomId} />
+            <ObserveGameItem channelId={info.channelId} />
           ) : (
             <InviteGameItem
               targetId={info.targetId}
@@ -34,19 +34,19 @@ const ChannelOwnerDropdownList = (prop: DropdownListType) => {
 
           {/* showing below all dropdown menu because owner's permission is best */}
           {!info.isAdmin ? (
-            <AddAdminItem roomId={info.roomId} targetId={info.targetId} />
+            <GrantAdminItem channelId={info.channelId} targetId={info.targetId} />
           ) : (
-            <RemoveAdminItem roomId={info.roomId} targetId={info.targetId} />
+            <RevokeAdminItem channelId={info.channelId} targetId={info.targetId} />
           )}
           {info.isBannable != undefined && info.isBannable ? (
-            <BanUserItem roomId={info.roomId} targetId={info.targetId} />
+            <BanUserItem channelId={info.channelId} targetId={info.targetId} />
           ) : (
             ""
           )}
           {info.isMuted != undefined && info.isMuted ? (
-            <UnmuteUserItem roomId={info.roomId} targetId={info.targetId} />
+            <UnmuteUserItem channelId={info.channelId} targetId={info.targetId} />
           ) : (
-            <MuteUserItem roomId={info.roomId} targetId={info.targetId} />
+            <MuteUserItem channelId={info.channelId} targetId={info.targetId} />
           )}
         </React.Fragment>
       )}
