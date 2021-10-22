@@ -9,7 +9,7 @@ type ItemProps = {
 };
 
 const GrantAdminItem = (prop: ItemProps) => {
-  const handleAddAdmin = async () => {
+  const handleGrantAdmin = async () => {
     await axios.put(`${process.env.REACT_APP_SERVER_ADDRESS}/${prop.channelId}/admin/${prop.targetId}`);
   };
 
@@ -17,7 +17,7 @@ const GrantAdminItem = (prop: ItemProps) => {
     <DefaultDropdownItem
       title="어드민 권한 부여하기"
       color="black"
-      callback={handleAddAdmin}
+      callback={handleGrantAdmin}
     />
   );
 }

@@ -9,7 +9,7 @@ type ItemProps = {
 };
 
 const RevokeAdminItem = (prop: ItemProps) => {
-  const handleAddAdmin = async () => {
+  const handleRevokeAdmin = async () => {
     await axios.delete(`${process.env.REACT_APP_SERVER_ADDRESS}/${prop.channelId}/admin/${prop.targetId}`);
   };
 
@@ -17,7 +17,7 @@ const RevokeAdminItem = (prop: ItemProps) => {
     <DefaultDropdownItem
       title="어드민 권한 제거하기"
       color="red"
-      callback={handleAddAdmin}
+      callback={handleRevokeAdmin}
     />
   );
 }
