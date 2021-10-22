@@ -1,3 +1,5 @@
+import { User } from "../../views/profile/profileType";
+
 export enum Status {
   ONLINE = "/icons/status/online.svg",
   OFFLINE = "/icons/status/offline.svg",
@@ -10,7 +12,15 @@ export enum SidebarProperty {
   // OBSERVER_LIST = "관전자 목록",
 }
 
-export type UserItemProps = {
+export type ChannelMember = {
+  id: number;
+  channelId: number;
+  role: MemberRole;
+  user: User;
+  userId: number;
+}
+
+export type DMUser = {
   id: number;
   avatar: string;
   status: number;
@@ -38,18 +48,21 @@ export enum MemberRole {
   OWNER = 'owner',
 }
 
-export type DropdownMenuInfo = {
-  channelId: number;
+export type ContextMenuInfo = {
   userId: number;
   targetId: number;
 
-  permission: MemberRole;
   isInGame: boolean;
-  isBlocked: boolean; //friend
+
+  gameId: number;
+  channelId: number;
+
   isFriend: boolean;
   isBannable: boolean; //chat: admin
-  isMuted: boolean; //chat: admin
+  isMuteAble: boolean; //chat: admin
   isAdmin: boolean; //chat: owner
+
+  myRole?: MemberRole;
 };
 
 export type DM = {

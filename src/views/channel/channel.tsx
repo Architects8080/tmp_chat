@@ -76,9 +76,8 @@ const Channel = () => {
 		setText('');
 	}
 
-  const leaveChannel = () => {
-    //post 
-    ioChannel.emit("leaveChannel", id);
+  const leaveChannel = async () => {
+    await axios.delete(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/${id}/member`);
     window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/main`;
   }
 
