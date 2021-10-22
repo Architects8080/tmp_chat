@@ -1,3 +1,4 @@
+import axios from "axios";
 import React from "react";
 import { io } from "../../../../../socket/socket";
 import DefaultDropdownItem from "../../../itemTemplate/default/item";
@@ -8,8 +9,8 @@ type ItemProps = {
 };
 
 const BanUserItem = (prop: ItemProps) => {
-  const handleBanUser = () => {
-    io.emit("channel/ban", prop.channelId, prop.targetId); //TODO
+  const handleBanUser = async () => {
+    await axios.put(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/${prop.channelId}/ban/${prop.targetId}`);
   };
 
   return (

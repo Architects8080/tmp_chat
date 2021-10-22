@@ -12,17 +12,16 @@ const ChannelMemberDropdownList = (prop: DropdownListType) => {
   {
     console.log("channel default", prop);
   }
+  console.log(`result : MEMBER`)
 
   return (
     <div className="dropdown-list-wrap" style={position}>
       <ViewProfileItem targetId={info.targetId} />
-      {info.targetId === info.userId ? (
-        ""
-      ) : (
+      {info.targetId !== info.userId ? 
         <React.Fragment>
           {!info.isFriend ? <AddFriendItem targetId={info.targetId} /> : ""}
-          {info.isInGame ? (
-            <ObserveGameItem channelId={info.channelId} />
+          {info.isInGame && info.gameId ? (
+            <ObserveGameItem gameId={info.gameId} />
           ) : (
             <InviteGameItem
               targetId={info.targetId}
@@ -30,7 +29,7 @@ const ChannelMemberDropdownList = (prop: DropdownListType) => {
             />
           )}
         </React.Fragment>
-      )}
+      : ""}
     </div>
   );
 }

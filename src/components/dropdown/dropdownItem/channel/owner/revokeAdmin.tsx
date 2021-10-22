@@ -10,7 +10,7 @@ type ItemProps = {
 
 const RevokeAdminItem = (prop: ItemProps) => {
   const handleRevokeAdmin = async () => {
-    await axios.delete(`${process.env.REACT_APP_SERVER_ADDRESS}/${prop.channelId}/admin/${prop.targetId}`);
+    await axios.delete(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/${prop.channelId}/admin/${prop.targetId}`);
   };
 
   return (

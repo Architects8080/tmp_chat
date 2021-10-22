@@ -1,5 +1,5 @@
+import axios from "axios";
 import React from "react";
-import { io } from "../../../../socket/socket";
 import DefaultDropdownItem from "../../itemTemplate/default/item";
 
 type ItemProps = {
@@ -8,7 +8,7 @@ type ItemProps = {
 
 const AddFriendItem = (prop: ItemProps) => {
   const handleAddFriend = () => {
-    io.emit("friend/add", prop.targetId); //TODO
+    axios.post(`${process.env.REACT_APP_SERVER_ADDRESS}/friend/${prop.targetId}`)
   };
 
   return (
