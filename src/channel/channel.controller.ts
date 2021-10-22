@@ -143,4 +143,12 @@ export class ChannelController {
   ) {
     return await this.channelService.banMember(channelId, memberId);
   }
+
+  @Roles('owner', 'admin', 'member')
+  @Get(':channelId/message')
+  async getChannelMessageList(
+    @Param('channelId', new ParseIntPipe()) channelId: number,
+  ) {
+    return await this.channelService.getChannelMessageList(channelId);
+  }
 }

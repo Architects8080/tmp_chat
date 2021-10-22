@@ -22,6 +22,7 @@ import { NotificationType } from 'src/notification/entity/notification.entity';
 import { UserService } from 'src/user/user.service';
 import { ChannelMessage } from './entity/channel-message.entity';
 import { channel } from 'diagnostics_channel';
+import { ChannelEventService } from './channel-event.service';
 
 @Injectable()
 export class ChannelService {
@@ -36,6 +37,7 @@ export class ChannelService {
     private channelMessageRepository: Repository<ChannelMessage>,
     private notificationEventService: NotificationEventService,
     private userService: UserService,
+    private readonly channelEventService: ChannelEventService,
   ) {}
 
   async channelToCountChannel(channel: Channel) {
@@ -80,25 +82,27 @@ export class ChannelService {
     if (channelDto.type != ChannelType.PROTECTED) channelData.password = null;
     const channelResult = await this.channelRepository.insert(channelData);
     const channelId: number = Number(channelResult.identifiers[0].id);
-
+    channelData.id = channelId;
     await this.channelMemberRepository.insert({
       channelId: channelId,
       userId: userId,
       role: MemberRole.OWNER,
     });
-    // TODO if (channelDto.type != ChannelType.PRIVATE)
-    // emit addChannelList
+    const countChannel = await this.channelToCountChannel(channelData);
+    if (channelDto.type != ChannelType.PRIVATE)
+      this.channelEventService.addChannelList(countChannel);
+    this.channelEventService.addMyChannel(userId, countChannel);
     return { channelId: channelId };
   }
 
   async deleteChannel(channelId: number) {
     await this.channelRepository.delete(channelId);
-    // TODO emit remove channel List
+    this.channelEventService.deleteChannel(channelId);
   }
 
   async updateChannel(channelId: number, dto: UpdateChannelDto) {
-    const channel = await this.channelRepository.findOne(channelId);
-
+    const channel = await this.channelRepository.findOneOrFail(channelId);
+    const isTypeChanged = dto.type && channel.type != dto.type;
     if (dto.type) {
       if (dto.type != ChannelType.PROTECTED) dto.password = null;
     } else {
@@ -108,8 +112,13 @@ export class ChannelService {
       channel[key] = dto[key];
     }
     await this.channelRepository.save(channel);
-    // TODO emit add channel List
-    // TODO emit update channel List
+    const countChannel = await this.channelToCountChannel(channel);
+    if (isTypeChanged) {
+      if (channel.type == ChannelType.PRIVATE)
+        this.channelEventService.removeChannelList(channelId);
+      else this.channelEventService.addChannelList(countChannel);
+    }
+    this.channelEventService.updateChannel(countChannel);
   }
 
   async isJoinChannel(memberId: number, channelId: number) {
@@ -141,6 +150,53 @@ export class ChannelService {
     return channel.memberList;
   }
 
+  async getCountChannelById(channelId: number) {
+    return await this.channelToCountChannel(
+      await this.channelRepository.findOneOrFail(channelId),
+    );
+  }
+
+  async emitJoinMember(userId: number, channelId: number) {
+    try {
+      const countChannel = await this.getCountChannelById(channelId);
+
+      if (countChannel.type != ChannelType.PRIVATE)
+        this.channelEventService.updateChannel(countChannel);
+      this.channelEventService.addMyChannel(userId, countChannel);
+      const newMember = await this.channelMemberRepository.findOne({
+        relations: ['user'],
+        where: {
+          userId: userId,
+          channelId: channelId,
+        },
+      });
+      this.channelEventService.addChannelMember(channelId, newMember);
+    } catch (error) {}
+  }
+
+  async emitLeaveMember(userId: number, channelId: number) {
+    try {
+      const countChannel = await this.getCountChannelById(channelId);
+
+      if (countChannel.type != ChannelType.PRIVATE)
+        this.channelEventService.updateChannel(countChannel);
+      this.channelEventService.removeMyChannel(userId, channelId);
+      this.channelEventService.removeChannelMember(channelId, userId);
+    } catch (error) {}
+  }
+
+  async emitUpdateChannelMember(channelId: number, userId: number) {
+    try {
+      const member = await this.channelMemberRepository.findOne({
+        where: {
+          userId: userId,
+          channelId: channelId,
+        },
+      });
+      this.channelEventService.updateChannelMember(channelId, member);
+    } catch (error) {}
+  }
+
   async acceptChannelInvitation(userId: number, channelId: number) {
     if (await this.isJoinChannel(userId, channelId))
       throw new ConflictException();
@@ -154,7 +210,7 @@ export class ChannelService {
     } catch (error) {
       throw new NotFoundException();
     }
-    // TODO new member emit
+    this.emitJoinMember(userId, channelId);
   }
 
   async joinChannel(userId: number, channelId: number, password?: string) {
@@ -182,7 +238,7 @@ export class ChannelService {
     } catch (error) {
       throw new NotFoundException();
     }
-    // TODO new member emit
+    this.emitJoinMember(userId, channelId);
   }
 
   async leaveChannel(userId: number, channelId: number) {
@@ -201,10 +257,10 @@ export class ChannelService {
 
         newOwner.role = MemberRole.OWNER;
         await this.channelMemberRepository.save(newOwner);
-        // change onwer emit ?
+        this.emitUpdateChannelMember(channelId, userId);
       }
     }
-    // TODO update ?
+    this.emitLeaveMember(userId, channelId);
   }
 
   async inviteUser(senderId: any, channelId: number, receiverId: number) {
@@ -277,11 +333,26 @@ export class ChannelService {
     if (result && result.type == ChannelPenaltyType.MUTE) {
       if (result.expired < new Date()) {
         await this.channelPenaltyRepository.delete(result);
+        this.emitUnmuteMember(channelId, memberId);
         return false;
       }
       return true;
     }
     return false;
+  }
+
+  async emitMuteMember(channelId: number, memberId: number) {
+    try {
+      const penalty = await this.channelPenaltyRepository.findOneOrFail({
+        channelId: channelId,
+        userId: memberId,
+      });
+      this.channelEventService.muteMember(channelId, memberId, penalty.expired);
+    } catch (error) {}
+  }
+
+  async emitUnmuteMember(channelId: number, memberId: number) {
+    this.channelEventService.unmuteMember(channelId, memberId);
   }
 
   async muteMember(channelId: number, memberId: number) {
@@ -294,7 +365,6 @@ export class ChannelService {
     if (exist && exist.type == ChannelPenaltyType.MUTE) {
       exist.expired = new Date();
       await this.channelPenaltyRepository.save(exist);
-      // TODO emit mute
     } else {
       await this.channelPenaltyRepository.insert(
         this.channelPenaltyRepository.create({
@@ -304,8 +374,8 @@ export class ChannelService {
           expired: new Date(),
         }),
       );
-      // TODO emit mute
     }
+    this.emitMuteMember(channelId, memberId);
   }
 
   async banMember(channelId: number, memberId: number) {
@@ -319,7 +389,6 @@ export class ChannelService {
       exist.expired = new Date();
       exist.type = ChannelPenaltyType.BAN;
       await this.channelPenaltyRepository.save(exist);
-      this.leaveChannel(memberId, channelId);
     } else {
       await this.channelPenaltyRepository.insert(
         this.channelPenaltyRepository.create({
@@ -328,8 +397,8 @@ export class ChannelService {
           type: ChannelPenaltyType.BAN,
         }),
       );
-      this.leaveChannel(memberId, channelId);
     }
+    this.leaveChannel(memberId, channelId);
   }
 
   async getChannelMessageList(channelId: number) {
