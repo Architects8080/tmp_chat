@@ -1,8 +1,5 @@
 import React from "react";
 import "./gameModal.scss";
-import { io } from "../../../socket/socket";
-import { useState } from "react";
-import { useEffect } from "react";
 import { score, winnerProfile } from "./gameResultModalType";
 
 type ModalProps = {
@@ -12,7 +9,7 @@ type ModalProps = {
   winnerProfile: winnerProfile;
 };
 
-function GameResultModal(prop: ModalProps) {
+const GameResultModal = (prop: ModalProps) => {
   const handleClose = () => {
     prop.close();
   };

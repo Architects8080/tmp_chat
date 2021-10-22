@@ -1,11 +1,11 @@
 import axios from "axios";
 import DefaultDropdownItem from "../../itemTemplate/default/item";
 
-type props = {
+type ItemProps = {
   targetId: number;
 };
 
-function BlockDMItem(prop: props) {
+const BlockDMItem = (prop: ItemProps) => {
   const handleBlockDM = async () => {
     await axios.post(
       `${process.env.REACT_APP_SERVER_ADDRESS}/block/${prop.targetId}`

@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import GameSettingModal from "../../modal/game/gameSettingModal";
-import { modalHandler } from "../../sidebar/sidebarType";
+import { ModalManager } from "../../sidebar/sidebarType";
 import DefaultDropdownItem from "../itemTemplate/default/item";
 
-type props = {
+type ItemProps = {
   targetId: number;
-  modalHandler: modalHandler;
+  modalHandler: ModalManager;
 };
 
-function InviteGameItem(prop: props) {
+const InviteGameItem = (prop: ItemProps) => {
   // const handleModalOpen = prop.modalHandler.handleModalOpen;
   // const handleModalClose = prop.modalHandler.handleModalClose;
 

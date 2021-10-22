@@ -5,11 +5,11 @@ import ProfileMenu from "../profile/dropdown";
 import "./header.scss";
 
 enum NotifyIconURL {
-  on = "/icons/notification/on.svg",
-  off = "/icons/notification/off.svg",
+  ON = "/icons/notification/on.svg",
+  OFF = "/icons/notification/off.svg",
 }
 
-type headerProps = {
+type HeaderProps = {
   isLoggedIn: boolean;
 };
 
@@ -23,21 +23,19 @@ type User = {
   ladderLevel: number;
 };
 
-function Header(prop: headerProps) {
+const Header = (prop: HeaderProps) => {
   const [isNotiOverlayActive, setIsNotiOverlayActive] = useState(false);
   const [isProfileMenuActive, setIsProfileMenuActive] = useState(false);
-  const [notifyIconURL, setNotifyIconURL] = useState(NotifyIconURL.off);
+  const [notifyIconURL, setNotifyIconURL] = useState(NotifyIconURL.OFF);
 
   const [user, setUser] = useState<User | null>(null);
   const [notiCount, setNotiCount] = useState<number>(0);
 
   const handleNotifyDropdown = () => {
-    console.log(`click!!`);
     setIsNotiOverlayActive(!isNotiOverlayActive);
   };
 
   const handleProfileDropdown = () => {
-    console.log(`test click!!`);
     setIsProfileMenuActive(!isProfileMenuActive);
   };
 
@@ -54,15 +52,15 @@ function Header(prop: headerProps) {
           setUser(userInfo.data);
           setNotiCount(notiList.data.length);
 
-          if (notiList.data.length > 0) setNotifyIconURL(NotifyIconURL.on);
+          if (notiList.data.length > 0) setNotifyIconURL(NotifyIconURL.ON);
         })
       );
   }, []);
 
   const updateNotiCount = (notiCount: number) => {
     setNotiCount(notiCount);
-    setNotifyIconURL(NotifyIconURL.off);
-    if (notiCount > 0) setNotifyIconURL(NotifyIconURL.on);
+    setNotifyIconURL(NotifyIconURL.OFF);
+    if (notiCount > 0) setNotifyIconURL(NotifyIconURL.ON);
   };
 
   return (
@@ -78,7 +76,7 @@ function Header(prop: headerProps) {
           className="title"
           onClick={() => {
             if (prop.isLoggedIn)
-              window.location.href = "http://localhost:3000/main";
+              window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/main`;
           }}
         >
           {" 42 Pong Pong "}

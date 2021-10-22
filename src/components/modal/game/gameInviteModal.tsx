@@ -2,7 +2,7 @@ import React from "react";
 import "./gameModal.scss";
 import { io } from "../../../socket/socket";
 
-type inviteInfo = {
+type InviteInfo = {
   nickname: string;
   avatar: string;
   roomID: number;
@@ -12,10 +12,10 @@ type inviteInfo = {
 type ModalProps = {
   open: any;
   close: any;
-  inviteInfo: inviteInfo;
+  inviteInfo: InviteInfo;
 };
 
-function GameInviteModal(prop: ModalProps) {
+const GameInviteModal = (prop: ModalProps) => {
   const handleAccept = () => {
     io.emit("accept", [prop.inviteInfo.roomID]);
 

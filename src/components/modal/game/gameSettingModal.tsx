@@ -13,7 +13,7 @@ type ModalProps = {
   targetId: number;
 };
 
-function GameSettingModal(prop: ModalProps) {
+const GameSettingModal = (prop: ModalProps) => {
   const dropdownRef = useRef(null);
   const [isActive, setIsActive] = useDetectOutsideClick(dropdownRef, false);
   const [currentImageIdx, setcurrentImageIdx] = useState(0);
@@ -26,8 +26,7 @@ function GameSettingModal(prop: ModalProps) {
 
   const getMapList = async (): Promise<any> => {
     const data = await axios.get(
-      process.env.REACT_APP_SERVER_ADDRESS + "/game/map/list",
-      { withCredentials: true }
+      process.env.REACT_APP_SERVER_ADDRESS + "/game/map/list"
     );
 
     setMapList(data.data);

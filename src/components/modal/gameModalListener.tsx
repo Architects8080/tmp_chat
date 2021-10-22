@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { Redirect } from "react-router";
 import { io } from "../../socket/socket";
-import { modalHandler } from "../sidebar/sidebarType";
+import { ModalManager } from "../sidebar/sidebarType";
 import snackbar from "../snackbar/snackbar";
 import GameInviteModal from "./game/gameInviteModal";
 import GameSettingModal from "./game/gameSettingModal";
 
-const GameModalListener = ({modalHandler} : {modalHandler: modalHandler}) => {
+const GameModalListener = ({modalHandler} : {modalHandler: ModalManager}) => {
   const acceptMessage = `곧 게임이 시작되니 준비하십시오.`;
   const rejectMessage = `상대방이 게임을 거절했습니다.`;
   const [inviteUserInfo, setInviteUserInfo] = useState({

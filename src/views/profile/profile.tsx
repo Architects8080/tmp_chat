@@ -1,5 +1,4 @@
 import axios from "axios";
-import { userInfo } from "os";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import AchievementItem from "../../components/achievement/achievement";
@@ -13,7 +12,7 @@ import GameLogItem from "./gamelog/item";
 import "./profile.scss";
 import { Achievement, GameTier, Match, MatchRatio, User } from "./profileType";
 
-function Profile() {
+const Profile = () => {
   const modalHandler = ModalHandler();
   const { id } = useParams<{ id: string }>();
 
@@ -31,11 +30,11 @@ function Profile() {
     if (e.key !== "Enter" || search === "") return;
 
     axios
-      .get(`http://localhost:5000/user/search/${search}`, {
+      .get(`${process.env.REACT_APP_SERVER_ADDRESS}/user/search/${search}`, {
         withCredentials: true,
       })
       .then((res) => {
-        window.location.href = `http://localhost:3000/profile/${res.data.id}`;
+        window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/profile/${res.data.id}`;
       })
       .catch((err) => {
         snackbar.error("유저가 존재하지 않습니다.");
@@ -62,10 +61,10 @@ function Profile() {
 
     axios
     .all([
-      axios.get("http://localhost:5000/user/", { withCredentials: true }),
-      axios.get("http://localhost:5000/user/" + id, { withCredentials: true }),
-      axios.get("http://localhost:5000/match/user/" + id, { withCredentials: true }),
-      axios.get("http://localhost:5000/achievement/" + id, {withCredentials: true}),
+      axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/user/`),
+      axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/user/${id}`),
+      axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/match/user/${id}`),
+      axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/achievement/${id}`),
     ])
     .then(
       axios.spread((userList, userInfo, matchList, achievementList) => { //achievementList
@@ -85,7 +84,7 @@ function Profile() {
       })
     )
     .catch((err) => {
-      window.location.href = "http://localhost:3000/main";
+      window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/main`;
     });
 
   }, []);

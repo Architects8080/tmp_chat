@@ -1,7 +1,7 @@
-import { dropdownMenuInfo, modalHandler } from "../../sidebar/sidebarType";
+import { DropdownMenuInfo, ModalManager } from "../../sidebar/sidebarType";
 
-export type dropdownListProps = {
+export type DropdownListType = {
   anchorPoint: any;
-  dropdownListInfo: dropdownMenuInfo;
-  modalHandler: modalHandler;
+  dropdownListInfo: DropdownMenuInfo;
+  modalHandler: ModalManager;
 };

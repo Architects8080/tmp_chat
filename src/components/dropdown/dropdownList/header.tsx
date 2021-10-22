@@ -11,21 +11,18 @@ type User = {
   nickname: string;
   intraLogin: string;
   avatar: string;
-  status: number;
   ladderPoint: number;
   ladderLevel: number;
 };
 
-function HeaderDropdownList() {
-
+const HeaderDropdownList = () => {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    axios
-      .get("http://localhost:5000/user/me", { withCredentials: true })
-      .then((res) => {
-        setUser(res.data);
-      });
+    axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/user/me`)
+    .then(response => {
+      setUser(response.data);
+    });
   }, []);
 
   return (

@@ -1,5 +1,6 @@
 import React from "react";
 import "./radio.scss";
+
 type RadioButtonProps = {
   name: string;
   label: string;
@@ -8,7 +9,7 @@ type RadioButtonProps = {
   handleChange: any;
 };
 
-function RadioButton(prop: RadioButtonProps) {
+const RadioButton = (prop: RadioButtonProps) => {
   const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id } = e.currentTarget;
     prop.handleChange(id); // Send back id to radio group for comparison

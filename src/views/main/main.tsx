@@ -2,25 +2,26 @@ import React, { useState, useEffect } from "react";
 import Button from "../../components/button/button";
 import EmptyPageInfo from "../../components/emptyPage/empty";
 import Header from "../../components/header/header";
-import ChatroomCreateModal from "../../components/modal/chatroom/create/chatroomCreateModal";
-import ChatroomItem, { chatroomItemProps } from "./chatroomItem/item";
+import ChannelItem, { ChannelItemProps } from "./channelItem/item";
 import "./main.scss";
 import ModalHandler from "../../components/modal/modalhandler";
 import axios from "axios";
 import GameModalListener from "../../components/modal/gameModalListener";
 import { io, ioChannel } from "../../socket/socket";
 import FriendSidebar from "../../components/sidebar/friendSidebar";
-import { modalHandler } from "../../components/sidebar/sidebarType";
+import { ModalManager } from "../../components/sidebar/sidebarType";
+import ChannelCreateModal from "../../components/modal/channel/create/channelCreateModal";
 
-enum ChatroomCategory {
-  AllChatroomList,
-  JoinedChatroomList,
+enum ChannelCategory {
+  CHANNEL_LIST,
+  MY_CHANNEL_LIST,
 }
 
 const Main = () => {
   const modalHandler = ModalHandler();
   const [isWaiting, setIsWaiting] = useState(false);
-  const modalListener: modalHandler = {
+
+  const modalListener: ModalManager = {
     handleModalClose: modalHandler.handleModalClose,
     handleModalOpen: modalHandler.handleModalOpen,
     isModalOpen: modalHandler.isModalOpen,
@@ -28,7 +29,7 @@ const Main = () => {
   }
 
   const [category, setCategory] = useState(
-    ChatroomCategory.AllChatroomList
+    ChannelCategory.CHANNEL_LIST
   );
 
   const handleAddWaiting = () => {
@@ -41,22 +42,20 @@ const Main = () => {
     io.emit('leaveQueue');
   }
 
-  const changeCategory = (category: ChatroomCategory) => {
-    //io.emit : by category
-    //io.on   : get Chatrooms object
+  const changeCategory = (category: ChannelCategory) => {
     return () => {
       setCategory(category);
     };
   };
 
-  const [channels, setChannels] = useState<chatroomItemProps[] | null>(null);
-  const [myChannels, setMyChannels] = useState<chatroomItemProps[] | null>(null);
+  const [channelList, setChannelList] = useState<ChannelItemProps[] | null>(null);
+  const [myChannelList, setMyChannelList] = useState<ChannelItemProps[] | null>(null);
 
   const getAllChannel = async () => {
     try {
       const response = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/channel`);
       if (response.data.length != 0)
-        setChannels(response.data);
+        setChannelList(response.data);
     } catch (error) {
       console.log(error);
     }
@@ -66,7 +65,7 @@ const Main = () => {
     try {
       const response = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/me`);
       if (response.data.length != 0)
-        setMyChannels(response.data);
+        setMyChannelList(response.data);
     } catch (error) {
       console.log(error);
     }
@@ -75,12 +74,6 @@ const Main = () => {
 	useEffect(() => {
 		getAllChannel();
     getMyChannel();
-    ioChannel.on('updateChannel', async () => {
-      if (category == ChatroomCategory.AllChatroomList)
-        getAllChannel();
-      else
-        getMyChannel();
-    })
 	}, [category]);
 
 
@@ -95,17 +88,16 @@ const Main = () => {
         <div className="main-wrap">
           <div className="button-list">
             <div className="button-left-side">
-              {/* to make a non-focusable element focusable */}
               <div className="focusable-button" tabIndex={1}>
                 <Button
                   title="전체 채팅방"
-                  onClick={changeCategory(ChatroomCategory.AllChatroomList)}
+                  onClick={changeCategory(ChannelCategory.CHANNEL_LIST)}
                 />
               </div>
               <div className="focusable-button" tabIndex={1}>
                 <Button
                   title="참여중인 채팅방"
-                  onClick={changeCategory(ChatroomCategory.JoinedChatroomList)}
+                  onClick={changeCategory(ChannelCategory.MY_CHANNEL_LIST)}
                 />
               </div>
             </div>
@@ -114,38 +106,33 @@ const Main = () => {
                 isWaiting ? <Button title="매칭 취소하기" onClick={handleRemoveWaiting} />
                 : <Button title="게임 찾기" onClick={handleAddWaiting} />
               }
-              
               <Button
                 title="채팅방 만들기"
-                onClick={() => modalHandler.handleModalOpen("chatroomCreate")}
+                onClick={() => modalHandler.handleModalOpen("channelCreate")}
               />
             </div>
           </div>
 
-          {(category === ChatroomCategory.AllChatroomList && !channels)
+          {(category === ChannelCategory.CHANNEL_LIST && !channelList)
             ? <EmptyPageInfo description={`공개 채팅방이 존재하지 않습니다.\n'채팅방 만들기' 버튼으로 채팅방을 생성해보세요!`}/>
-            : (category === ChatroomCategory.JoinedChatroomList && !myChannels)
+            : (category === ChannelCategory.MY_CHANNEL_LIST && !myChannelList)
               ? <EmptyPageInfo description={`현재 참여중인 채팅방이 없습니다.\n전체 채팅방 목록에서 참가해보세요!`}/> 
-              : <div className="chatroom-list">
-                  {category === ChatroomCategory.AllChatroomList && channels
-                    ? channels.map(item => (
-                        <ChatroomItem 
-                        channel = {item} 
-                        key = {item.roomId}/>
+              : <div className="channel-list">
+                  {category === ChannelCategory.CHANNEL_LIST && channelList
+                    ? channelList.map(channel => (
+                        <ChannelItem channel={channel} key={channel.id}/>
                       ))
-                       : myChannels ? myChannels.map(item => (
-                          <ChatroomItem 
-                          channel = {item} 
-                          key = {item.roomId}/>
+                       : myChannelList ? myChannelList.map(channel => (
+                          <ChannelItem channel={channel} key={channel.id}/>
                         )) : null
                   }
                 </div>
           }
         </div>
       </div>
-      <ChatroomCreateModal
-        open={modalHandler.isModalOpen.chatroomCreate}
-        close={() => modalHandler.handleModalClose("chatroomCreate")}
+      <ChannelCreateModal
+        open={modalHandler.isModalOpen.channelCreate}
+        close={() => modalHandler.handleModalClose("channelCreate")}
       />
       <GameModalListener modalHandler={modalListener}/>
     </>

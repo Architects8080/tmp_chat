@@ -15,8 +15,8 @@ type DropdownProps = {
 };
 
 enum NotificationType {
-  Friend = 0,
-  Channel,
+  FRIEND = 0,
+  CHANNEL,
 }
 
 type Notification = {
@@ -38,7 +38,7 @@ type NotificationItemProp = {
   rejectCallback: (id: number) => void;
 };
 
-function NotificationOverlay(prop: DropdownProps) {
+const NotificationOverlay = (prop: DropdownProps) => {
   const [notiList, setNotiList] = useState<NotificationItemProp[]>([]);
 
   useEffect(() => {
@@ -47,18 +47,18 @@ function NotificationOverlay(prop: DropdownProps) {
 
   const getTitleFromNotification = (noti: Notification) => {
     switch (noti.type) {
-      case NotificationType.Friend:
+      case NotificationType.FRIEND:
         return "친구 요청";
-      case NotificationType.Channel:
+      case NotificationType.CHANNEL:
         return "채팅방 초대";
     }
   };
 
   const getDescriptionFromNotification = (noti: Notification) => {
     switch (noti.type) {
-      case NotificationType.Friend:
+      case NotificationType.FRIEND:
         return `${noti.sender.nickname}님의 친구 요청입니다. 수락하시겠습니까?`;
-      case NotificationType.Channel:
+      case NotificationType.CHANNEL:
         return `${noti.sender.nickname}님의 채팅방 초대 요청입니다. 수락하시겠습니까?`;
     }
   };

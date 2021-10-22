@@ -1,0 +1,80 @@
+.page {
+  height: calc(100vh - 92px);
+  display: flex;
+  flex-direction: row;
+
+  .channel-wrap {
+    flex-grow: 1;
+    margin: 32px;
+    border: 1px solid #000000;
+    box-sizing: border-box;
+    border-radius: 4px;
+
+    display: flex;
+    flex-direction: column;
+
+    .channel-message-list-wrap {
+      margin: 32px;
+      margin-top: auto;
+    }
+
+    .channel-message-list {
+      overflow-y: hidden;
+      max-height: calc(100vh - 92px - 194px - 32px);
+    }
+
+    .channel-message-list:hover {
+      overflow-y: auto;
+      max-height: calc(100vh - 92px - 194px - 32px);
+    }
+
+    .channel-user-input {
+      display: flex;
+      background: #ffffff;
+      border: 1px solid #000000;
+      box-sizing: border-box;
+      border-radius: 8px;
+      // margin: 0 32px 32px 32px;
+      .input-field {
+        width: 100%;
+        border: none;
+        margin: 16px;
+
+        font-family: Spoqa Han Sans Neo;
+        font-style: normal;
+        font-weight: 300;
+        font-size: 24px;
+        line-height: 30px;
+
+        color: #000000;
+
+        &:focus {
+          outline: none;
+        }
+      }
+    }
+  }
+}
+
+.button-channel-exit {
+  position: fixed;
+  left: 24px;
+  bottom: 32px;
+
+  text-align: center;
+  width: 312px;
+  height: 48px;
+  background: rgba(255, 92, 92, 0.1);
+  border-radius: 4px;
+
+  font-family: Spoqa Han Sans Neo;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 48px;
+  color: #ff5c5c;
+
+  &:hover {
+    cursor: pointer;
+  }
+}

@@ -1,14 +1,14 @@
 import React from "react";
 import "./item.scss";
 
-type notificationItemProp = {
+type NotificationItemProp = {
   title: string;
   description: string;
   acceptCallback: any;
   rejectCallback: any;
 };
 
-function NotificationItem(prop: notificationItemProp) {
+const NotificationItem = (prop: NotificationItemProp) => {
   return (
     <div className="notification-item">
       <div className="notification-item-box">

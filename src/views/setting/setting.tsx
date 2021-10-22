@@ -7,7 +7,7 @@ import OTPModal from "../../components/modal/otp/otpModal";
 import axios from "axios";
 import snackbar from "../../components/snackbar/snackbar";
 
-function Setting() {
+const Setting = () => {
   const modalHandler = ModalHandler();
   const avatarImgInput = useRef<HTMLInputElement>(null);
   const [user, setUser] = useState<any>();

@@ -1,14 +1,14 @@
 import axios from 'axios';
 import './blockItem.scss';
 
-type prop = {
+type ItemProps = {
   id: number,
   avatar: string,
   nickname: string,
   deleteItem: (id: number) => void,
 }
 
-const BlockItem = (prop: prop) => {
+const BlockItem = (prop: ItemProps) => {
 
   const handleUnblockFriend = async () => {
     try {
