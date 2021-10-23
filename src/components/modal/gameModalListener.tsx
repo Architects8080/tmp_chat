@@ -12,33 +12,33 @@ const GameModalListener = ({modalHandler} : {modalHandler: ModalManager}) => {
   const [inviteUserInfo, setInviteUserInfo] = useState({
     nickname: "",
     avatar: "",
-    channelId: 0,
+    gameId: 0,
     isLadder: false,
   });
-  const [channelId, setchannelId] = useState(0);
+  const [gameId, setGameId] = useState(0);
 
   useEffect(() => {
-    io.on("invite", (inviteUserNickname, inviteUserAvatar, channelId, isLadder) => {
+    io.on("invite", (inviteUserNickname, inviteUserAvatar, gameId, isLadder) => {
       setInviteUserInfo({
         nickname: inviteUserNickname,
         avatar: inviteUserAvatar,
-        channelId: channelId,
+        gameId: gameId,
         isLadder: isLadder,
       });
       modalHandler.handleModalOpen('gameInvite');
     });
 
-    io.on("ready", (channelId) => {
+    io.on("ready", (gameId) => {
       snackbar.success(acceptMessage);
-      setchannelId(channelId);
+      setGameId(gameId);
     });
 
-    io.on("cancel", (channelId) => {
+    io.on("cancel", (gameId) => {
       snackbar.error(rejectMessage);
     });
   }, []);
 
-  if (channelId != 0) return <Redirect to={{ pathname: "/game/" + channelId }} />;
+  if (gameId != 0) return <Redirect to={{ pathname: "/game/" + gameId }} />;
 
   return(
     <GameInviteModal

@@ -28,8 +28,8 @@ const Game = () => {
   };
 
   useEffect(() => {
-    io.on("update", async (channelId, updateInfo: GameInfo) => {
-      if (channelId == id) {
+    io.on("update", async (gameId, updateInfo: GameInfo) => {
+      if (gameId == id) {
         temp = updateInfo;
         setGameInfo(updateInfo);
       }
@@ -41,8 +41,8 @@ const Game = () => {
         playerInfo["player2"] = player2Data.data;
       }
     });
-    io.on("vanished", (channelId: string) => {
-      if (channelId == id) {
+    io.on("vanished", (gameId: string) => {
+      if (gameId == id) {
         window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/main`;
       }
     });
@@ -81,7 +81,7 @@ const Game = () => {
               </div>
             </div>
             <div className="game-window">
-              <Pong channelId={id} gameInfo={gameInfo}></Pong>
+              <Pong gameId={id} gameInfo={gameInfo}></Pong>
             </div>
           </div>
         ) : (

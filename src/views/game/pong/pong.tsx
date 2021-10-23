@@ -13,7 +13,7 @@ import { GameInfo } from "../gameType";
 import "./pong.css";
 
 type PongProps = {
-  channelId: string;
+  gameId: string;
   gameInfo: GameInfo;
 };
 
@@ -22,7 +22,7 @@ type GameoverInfo = {
   score: score;
 };
 
-const Pong = ({ channelId, gameInfo }: PongProps) => {
+const Pong = ({ gameId, gameInfo }: PongProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const moveUpSpeed = -7;
   const moveDownSpeed = 7;
@@ -38,10 +38,10 @@ const Pong = ({ channelId, gameInfo }: PongProps) => {
     e.preventDefault();
     e.target.focus({preventScroll: true});
     if (e.key === "ArrowUp" || e.key === "w") {
-      io.emit("move", [channelId, moveUpSpeed]);
+      io.emit("move", [gameId, moveUpSpeed]);
     }
     if (e.key === "ArrowDown" || e.key === "s") {
-      io.emit("move", [channelId, moveDownSpeed]);
+      io.emit("move", [gameId, moveDownSpeed]);
     }
   }, []);
 
@@ -141,7 +141,7 @@ const Pong = ({ channelId, gameInfo }: PongProps) => {
   }, [test]);
 
   useEffect(() => {
-    io.on("gameover", (channelId: number, gameoverInfo: GameoverInfo) => {
+    io.on("gameover", (gameId: number, gameoverInfo: GameoverInfo) => {
       setGameoverInfo(gameoverInfo);
       setIsGameOver(true);
     });
