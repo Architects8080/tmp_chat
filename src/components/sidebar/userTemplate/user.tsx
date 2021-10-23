@@ -1,21 +1,9 @@
 import React from "react";
-import { Status } from "../sidebarType";
+import { User } from "../../../views/profile/profileType";
+import { DMUser } from "../sidebarType";
 import "./user.scss";
 
-type UserItemProps = {
-  avatar: string;
-  status: number;
-  nickname: string;
-};
-
-const UserItem = (prop: UserItemProps) => {
-  const userStatus =
-    prop.status === 0
-      ? Status.OFFLINE
-      : prop.status === 1
-      ? Status.ONLINE
-      : Status.INGAME;
-
+const UserItem = (prop: User | DMUser) => {
   return (
     <div className="user-item-wrap">
       <div className="user-photo-wrap">
@@ -26,7 +14,7 @@ const UserItem = (prop: UserItemProps) => {
             alt="cannot loaded avatar"
           />
         </div>
-        <img className="status" src={userStatus} alt="cannot loaded status" />
+        {/* <img className="status" src={prop.status} alt="cannot loaded status" /> */}
       </div>
       <div className="nickname">{prop.nickname}</div>
     </div>

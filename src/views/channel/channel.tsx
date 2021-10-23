@@ -69,16 +69,15 @@ const Channel = () => {
 		if (e.key !== 'Enter' || text === '')
 			return;
 		const newMessageSend = {
-      roomId: id,
+      channelId: id,
       text: text,
 		};
 		ioChannel.emit('msgToChannel', newMessageSend);
 		setText('');
 	}
 
-  const leaveChannel = () => {
-    //post 
-    ioChannel.emit("leaveChannel", id);
+  const leaveChannel = async () => {
+    await axios.delete(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/${id}/member`);
     window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/main`;
   }
 
@@ -87,7 +86,7 @@ const Channel = () => {
       <Header isLoggedIn={true} />
       <div className="page">
         <ChannelSidebar
-          roomId={id}
+          channelId={id}
           modalHandler={modalHandler}
         />
         <div className="channel-wrap">

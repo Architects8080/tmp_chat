@@ -1,15 +1,16 @@
+import axios from "axios";
 import React from "react";
 import { io } from "../../../../../socket/socket";
 import DefaultDropdownItem from "../../../itemTemplate/default/item";
 
 type ItemProps = {
   targetId: number;
-  roomId: number;
+  channelId: number;
 };
 
 const MuteUserItem = (prop: ItemProps) =>{
-  const handleMuteUser = () => {
-    io.emit("channel/mute", prop.roomId, prop.targetId); //TODO
+  const handleMuteUser = async () => {
+    await axios.put(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/${prop.channelId}/mute/${prop.targetId}`);
   };
 
   return (

@@ -1,65 +1,103 @@
+import axios from "axios";
 import React, { useCallback, useEffect, useState } from "react";
 import { io } from "../../socket/socket";
-import { DropdownMenuInfo, MemberRole, SidebarProperty, UserItemProps } from "./sidebarType";
+import { User } from "../../views/profile/profileType";
+import { ContextMenuInfo, DMUser, MemberRole, SidebarProperty } from "./sidebarType";
 import UserItem from "./userTemplate/user";
 
 type SidebarItemProps = {
-  itemType: SidebarProperty;
-  itemInfo: UserItemProps;
   contextMenuHandler: any;
-  roomId: number; //only channelId or 0
+
+  itemType: SidebarProperty;
+  // itemInfo: UserItemProps;
   userId: number;
+
+  targetUser: User | DMUser; //to with status?
   targetId: number;
-  // some more..
+
+  // gameId?: number; //gameId or null
+  channelId?: number; //channelId or null
+  userRole?: MemberRole; //Channel
+  targetRole?: MemberRole; //Channel
 };
 
+const menuInit = (menu: ContextMenuInfo) => {
+  menu.gameId = 0;
+  menu.channelId = 0;
+  menu.isAdmin = false;
+  menu.isBannable = false;
+  menu.isFriend = false;
+  menu.isInGame = false;
+  menu.isMuteAble = false;
+  menu.targetId = 0;
+  menu.userId = 0;
+  menu.myRole = MemberRole.MEMBER;
+}
+
 const SidebarItem = (prop: SidebarItemProps) => {
-  const handleDropdown = (e: React.MouseEvent) => {
+  var menuInfo: ContextMenuInfo = {
+    gameId: 0,
+    channelId: 0,
+    isAdmin: false,
+    isBannable: false,
+    isFriend: false,
+    isInGame: false,
+    isMuteAble: false,
+    targetId: 0,
+    userId: 0,
+  }
+
+  const [friendList, setFriendList] = useState<User[]>([]);
+  useEffect(() => {
+    axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/friend`)
+    .then(response => {setFriendList(response.data)})
+  }, []);
+
+  const isFriend = () => {
+    return (friendList.find((friend: User) => {
+      return friend.id == prop.targetId;
+    }) != undefined);
+  }
+
+  const handleDropdown = async (e: React.MouseEvent) => {
+    menuInit(menuInfo);
+
+
     if (e.type === "contextmenu") {
-      if (prop.itemType === SidebarProperty.FRIEND_LIST) {
-        //userId는 client로 서버에서 체크할 수 있으므로 생략하는게 맞지 않을까?
-        io.emit("dropdown/friend", prop.userId, prop.targetId);
+      menuInfo.userId = prop.userId;
+      menuInfo.targetId = prop.targetId;
+      menuInfo.isInGame = false; //TODO: set status
+      if (menuInfo.isInGame)
+        menuInfo.gameId = 0; //TODO: get gameId
+
+      if (prop.itemType === SidebarProperty.CHAT_MEMBER_LIST && prop.channelId) {
+        menuInfo.myRole = prop.userRole;
+        menuInfo.channelId = prop.channelId;
+        menuInfo.isFriend = isFriend();
+
+        if (prop.userRole === MemberRole.ADMIN && prop.targetRole === MemberRole.MEMBER) {
+          menuInfo.isBannable = true;
+          menuInfo.isMuteAble = true;
+        }
+
+        if (prop.userRole === MemberRole.OWNER) {
+          menuInfo.isBannable = true;
+          menuInfo.isMuteAble = true;
+          if (prop.targetRole === MemberRole.ADMIN) {
+            menuInfo.isAdmin = true;
+          }
+        }
       }
-      if (prop.itemType === SidebarProperty.CHAT_MEMBER_LIST) {
-        //roomId를 넘겨주는게 맞나..
-        //서버에서 그냥 userId가 속한 channel을 찾아서 권한을 체크하는게 빠를려나?
-        io.emit("dropdown/channel", prop.roomId, prop.userId, prop.targetId);
-      }
 
-      io.on("dropdownMenuInfo", (dropdownMenuInfo: DropdownMenuInfo) => {
-        dropdownMenuInfo.roomId = prop.roomId; //gameroom or channel or 0(null)
-        dropdownMenuInfo.userId = prop.userId; //이거도 서버에서 리턴..?
-        dropdownMenuInfo.targetId = prop.targetId; //이거도 서버에서?
-        prop.contextMenuHandler(e, dropdownMenuInfo);
-      });
-
-      //서버 연동 전에는 아래 tempInfo의 값들을 바꿔가며 테스트하면 됩니다.
-      var tempInfo = {
-        roomId: 42,
-        userId: 42,
-        targetId: prop.targetId,
-
-        // permission: undefined,
-        permission: MemberRole.OWNER,
-
-        // Default Menu
-        isInGame: false,
-        isBlocked: false, //friend
-
-        // channel Menu
-        isFriend: true,
-        isBannable: true, //admin
-        isMuted: false, //admin
-        isAdmin: false, //owner
-      };
-      prop.contextMenuHandler(e, tempInfo);
+      console.log(`menuInfo : `, menuInfo);
+      prop.contextMenuHandler(e, menuInfo);
     }
   };
 
   return (
     <>
       <div onContextMenu={handleDropdown}>
-        <UserItem {...prop.itemInfo} />
+        <UserItem {...prop.targetUser} />
       </div>
     </>
   );

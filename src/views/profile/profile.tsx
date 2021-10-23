@@ -94,7 +94,7 @@ const Profile = () => {
       <Header isLoggedIn={true} />
       <div className="page">
         <FriendSidebar
-          roomId={0}
+          channelId={0}
           modalHandler={modalHandler}
         />
         <div className="profile-wrap">
