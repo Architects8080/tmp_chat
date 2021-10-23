@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import { ioCommunity } from "../../socket/socket";
+import { User } from "../../views/profile/profileType";
 import NotificationItem from "../dropdown/itemTemplate/notification/item";
 import "./dropdown.scss";
 
@@ -10,102 +11,137 @@ import "./dropdown.scss";
 type DropdownProps = {
   isActive: boolean;
   nicknameLength: number;
-  updateIcon: () => void;
+  updateIcon: (count: number) => void;
 };
 
+enum NotificationType {
+  FRIEND = 0,
+  CHANNEL,
+}
+
 type Notification = {
-  key: number;
-	title: string;
-	description: string;
-  acceptCallback: () => void;
-	rejectCallback: () => void;
-}
+  id: number;
+  senderId: number;
+  receiverId: number;
+  //채널 초대: roomId
+  //친구 요청: senderId
+  sender: User;
+  targetId: number;
+  type: NotificationType;
+};
 
-enum NotiType {
-  Friend = 0,
-  Channel
-}
+type NotificationItemProp = {
+  id: number;
+  title: string;
+  description: string;
+  acceptCallback: (id: number) => void;
+  rejectCallback: (id: number) => void;
+};
 
-function NotificationOverlay(prop: DropdownProps) {
-  const [notiList, setNotiList] = useState<Notification[]>([]);
-  const key = useRef<number>(0);
+const NotificationOverlay = (prop: DropdownProps) => {
+  const [notiList, setNotiList] = useState<NotificationItemProp[]>([]);
+
+  useEffect(() => {
+    prop.updateIcon(notiList.length);
+  }, [notiList]);
+
+  const getTitleFromNotification = (noti: Notification) => {
+    switch (noti.type) {
+      case NotificationType.FRIEND:
+        return "친구 요청";
+      case NotificationType.CHANNEL:
+        return "채팅방 초대";
+    }
+  };
+
+  const getDescriptionFromNotification = (noti: Notification) => {
+    switch (noti.type) {
+      case NotificationType.FRIEND:
+        return `${noti.sender.nickname}님의 친구 요청입니다. 수락하시겠습니까?`;
+      case NotificationType.CHANNEL:
+        return `${noti.sender.nickname}님의 채팅방 초대 요청입니다. 수락하시겠습니까?`;
+    }
+  };
+
+  const acceptCallback = async (id: number) => {
+    await axios.post(
+      `${process.env.REACT_APP_SERVER_ADDRESS}/notification/accept/${id}`,
+    );
+    //TODO
+    //notiList에서 해당 id 찾아서 type이 channel이면 targetid로 redirection
+    setNotiList((notiList) => {
+      return notiList.filter((noti) => {
+        return noti.id != id;
+      });
+    });
+
+    //Redirect
+
+  };
+
+  const rejectCallback = async (id: number) => {
+    await axios.delete(
+      `${process.env.REACT_APP_SERVER_ADDRESS}/notification/${id}`,
+    );
+    setNotiList((notiList) => {
+      return notiList.filter((noti) => {
+        return noti.id != id;
+      });
+    });
+  };
+
+  const notificationToProps = (noti: Notification) => {
+    return {
+      id: noti.id,
+      title: getTitleFromNotification(noti),
+      description: getDescriptionFromNotification(noti),
+      acceptCallback: acceptCallback,
+      rejectCallback: rejectCallback,
+    };
+  };
 
   useEffect(() => {
     fetchNoti(); // notification 목록 불러오기
 
-    // 친구 요청 수신
-    ioCommunity.on("friendRequestToClient",
-    async (id: number, nickname: string) => {
-      const nowKey = key.current;
-      setNotiList(notiList => [...notiList, {
-        key: key.current,
-        title: "친구 요청",
-        description: `${nickname}님의 친구 요청입니다. 수락하시겠습니까?`,
-        acceptCallback: () => {
-          prop.updateIcon();
-          setNotiList(notiList => notiList.filter(item => item.key !== nowKey));
-          ioCommunity.emit("friendAcceptToServer", id);
-        },
-        rejectCallback: () => {
-          prop.updateIcon();
-          setNotiList(notiList => notiList.filter(item => item.key !== nowKey));
-          ioCommunity.emit("friendRejectToServer", id);
-        }
-      }])
-      key.current += 1;
+    // noti 수신
+    ioCommunity.on("notificationReceive", async (noti: Notification) => {
+      setNotiList((notiList) => [...notiList, notificationToProps(noti)]);
     });
   }, []);
 
   const fetchNoti = () => {
-    axios.get(
-      `${process.env.REACT_APP_SERVER_ADDRESS}/community/notification`,
-      { withCredentials: true }
-    )
-    .then ((response) => {
-      response.data.map((noti: any) => {
-        const title = noti.type === NotiType.Friend ? "친구 요청" : "채널 초대";
-        axios.get(
-          `${process.env.REACT_APP_SERVER_ADDRESS}/user/${noti.senderID}`,
-          { withCredentials: true }
-        )
-        .then((user) => {
-          const nowKey = key.current;
-          setNotiList(notiList => [...notiList, {
-            key: key.current,
-            title: title,
-            description: `${user.data.nickname}님의 ${title}입니다. 수락하시겠습니까?`,
-            acceptCallback: () => {
-              prop.updateIcon();
-              setNotiList(notiList => notiList.filter(item => item.key !== nowKey));
-              if (noti.type === NotiType.Friend)
-                ioCommunity.emit("friendAcceptToServer", noti.senderID);  //TODO 유저 아이디
-              //TODO else if (noti.type === NotiType.Channel) 채팅 초대 수락
-            },
-            rejectCallback: () => {
-              prop.updateIcon();
-              setNotiList(notiList => notiList.filter(item => item.key !== nowKey));
-              if (noti.type === NotiType.Friend)
-                ioCommunity.emit("friendRejectToServer", noti.senderID); //TODO 유저 아이디
-              //TODO else if (noti.type === NotiType.Channel) 채팅 초대 수락
-            }
-          }])
-        })
-        key.current += 1;
+    axios
+      .get(`${process.env.REACT_APP_SERVER_ADDRESS}/notification`, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        const newNotiList = response.data.map((noti: Notification) => {
+          return notificationToProps(noti);
+        });
+        setNotiList(newNotiList);
+      })
+      .catch((e) => {
+        console.log(`[fetchNotiList] ${e}`);
       });
-    })
-    .catch (e => { console.log(`[fetchNotiList] ${e}`) });
-  }
+  };
 
   return (
-    <div className="notification-wrap" style={{right: (40 + 48 + 50 + prop.nicknameLength * 10.9)}}>
+    <div
+      className="notification-wrap"
+      style={{ right: 40 + 48 + 50 + prop.nicknameLength * 10.9 }}
+    >
       <div className={`dropdown ${prop.isActive ? "active" : "inactive"}`}>
-        {notiList.map(noti => (
+        {notiList.map((noti) => (
           <NotificationItem
-            key={noti.key}
+            key={noti.id}
             title={noti.title}
             description={noti.description}
-            acceptCallback={noti.acceptCallback}
-            rejectCallback={noti.rejectCallback}
+            acceptCallback={() => {
+              acceptCallback(noti.id);
+            }}
+            rejectCallback={() => {
+              rejectCallback(noti.id);
+            }}
           />
         ))}
       </div>

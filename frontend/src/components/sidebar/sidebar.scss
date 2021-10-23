@@ -1,0 +1,81 @@
+ul {
+  padding: 0;
+  list-style: none;
+}
+
+ul li {
+  text-align: left;
+  padding: 4px 15px;
+}
+
+aside {
+  flex-shrink: 0;
+  width: 360px;
+  height: calc(100vh - 92px);
+  background: #f8f8f8;
+
+  .sidebar-header {
+    padding: 32px 24px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    .sidebar-title {
+      flex-grow: 1;
+
+      font-family: Spoqa Han Sans Neo;
+      font-style: normal;
+      font-weight: bold;
+      font-size: 24px;
+      line-height: 32px;
+    }
+
+    .sidebar-icon-list {
+      height: 32px;
+
+      .icon {
+        width: 32px;
+        height: 32px;
+        margin-left: 16px;
+
+        &:hover {
+          cursor: pointer;
+        }
+      }
+    }
+  }
+
+  .user-list {
+    max-height: calc(100vh - 92px - 96px);
+    overflow-y: scroll;
+    li {
+      padding: 0;
+      .alert-overlay {
+        position: absolute;
+        opacity: 0;
+        width: 360px;
+        height: 102px;
+        background: rgb(#fff6c7, 0.5);
+        animation: alert-animation 1s ease-in-out;
+      }
+    }
+  }
+
+  @keyframes alert-animation {
+    0% {
+      opacity: 0;
+    }
+    25% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+    75% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+}

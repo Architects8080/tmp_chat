@@ -5,11 +5,11 @@ import ProfileMenu from "../profile/dropdown";
 import "./header.scss";
 
 enum NotifyIconURL {
-  on = "/icons/notification/on.svg",
-  off = "/icons/notification/off.svg",
-};
+  ON = "/icons/notification/on.svg",
+  OFF = "/icons/notification/off.svg",
+}
 
-type headerProps = {
+type HeaderProps = {
   isLoggedIn: boolean;
 };
 
@@ -23,21 +23,19 @@ type User = {
   ladderLevel: number;
 };
 
-function Header(prop: headerProps) {
+const Header = (prop: HeaderProps) => {
   const [isNotiOverlayActive, setIsNotiOverlayActive] = useState(false);
   const [isProfileMenuActive, setIsProfileMenuActive] = useState(false);
-  const [notifyIconURL, setNotifyIconURL] = useState(NotifyIconURL.off);
+  const [notifyIconURL, setNotifyIconURL] = useState(NotifyIconURL.OFF);
 
   const [user, setUser] = useState<User | null>(null);
   const [notiCount, setNotiCount] = useState<number>(0);
 
   const handleNotifyDropdown = () => {
-    console.log(`click!!`);
     setIsNotiOverlayActive(!isNotiOverlayActive);
   };
 
-  const handleProfileDropdown = () => {  
-    console.log(`test click!!`);
+  const handleProfileDropdown = () => {
     setIsProfileMenuActive(!isProfileMenuActive);
   };
 
@@ -45,37 +43,40 @@ function Header(prop: headerProps) {
     //list check and url setting
     axios
       .all([
-        axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/user/me`, { withCredentials: true }),
-        axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/community/notification`, { withCredentials: true }),
+        axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/user/me`),
+        axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/notification`),
       ])
       .then(
         axios.spread((userInfo, notiList) => {
+          console.log(notiList);
           setUser(userInfo.data);
           setNotiCount(notiList.data.length);
 
-          if (notiList.data.length > 0)
-            setNotifyIconURL(NotifyIconURL.on);
+          if (notiList.data.length > 0) setNotifyIconURL(NotifyIconURL.ON);
         })
-      )
+      );
   }, []);
 
-  const updateNotiCount = () => {
-    setNotiCount(notiCount - 1);
-    setNotifyIconURL(NotifyIconURL.off);
-    if (notiCount > 0)
-      setNotifyIconURL(NotifyIconURL.on);
-  }
+  const updateNotiCount = (notiCount: number) => {
+    setNotiCount(notiCount);
+    setNotifyIconURL(NotifyIconURL.OFF);
+    if (notiCount > 0) setNotifyIconURL(NotifyIconURL.ON);
+  };
 
   return (
     <div>
-      <NotificationOverlay isActive={isNotiOverlayActive} nicknameLength={user ? user.nickname.length : 0} updateIcon={updateNotiCount}/>
-      <ProfileMenu isActive={isProfileMenuActive}/>
+      <NotificationOverlay
+        isActive={isNotiOverlayActive}
+        nicknameLength={user ? user.nickname.length : 0}
+        updateIcon={updateNotiCount}
+      />
+      <ProfileMenu isActive={isProfileMenuActive} />
       <header>
         <div
           className="title"
           onClick={() => {
             if (prop.isLoggedIn)
-              window.location.href = "http://localhost:3000/main";
+              window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/main`;
           }}
         >
           {" 42 Pong Pong "}

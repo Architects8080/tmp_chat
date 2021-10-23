@@ -1,18 +1,30 @@
+import axios from 'axios';
 import './blockItem.scss';
 
-type prop = {
+type ItemProps = {
+  id: number,
   avatar: string,
   nickname: string,
+  deleteItem: (id: number) => void,
 }
 
-const BlockItem = ({prop} : {prop: prop}) => {
+const BlockItem = (prop: ItemProps) => {
 
-  const handleUnblockFriend = () => {
-    //TODO
+  const handleUnblockFriend = async () => {
+    try {
+      await axios.delete(`${process.env.REACT_APP_SERVER_ADDRESS}/block/${prop.id}`);
+      prop.deleteItem(prop.id);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
-  const handleDeleteFriend = () => {
-    //TODO
+  const handleDeleteFriend = async () => {
+    try {
+      await axios.delete(`${process.env.REACT_APP_SERVER_ADDRESS}/friend/${prop.id}`);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   return (

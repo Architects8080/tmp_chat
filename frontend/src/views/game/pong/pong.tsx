@@ -17,23 +17,26 @@ type PongProps = {
   gameInfo: GameInfo;
 };
 
-type gameoverInfo = {
+type GameoverInfo = {
   winnerProfile: winnerProfile;
   score: score;
 };
 
-function Pong({ roomID, gameInfo }: PongProps) {
+const Pong = ({ roomID, gameInfo }: PongProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const moveUpSpeed = -7;
   const moveDownSpeed = 7;
 
-  const [gameoverInfo, setGameoverInfo] = useState({} as gameoverInfo);
+  const [gameoverInfo, setGameoverInfo] = useState({} as GameoverInfo);
 
   const [test, setTest] = useState(0);
   const time = useRef(0);
 
   const keyDownEvent = useCallback((e) => {
     //usememo 그대로 써서 cost
+
+    e.preventDefault();
+    e.target.focus({preventScroll: true});
     if (e.key === "ArrowUp" || e.key === "w") {
       io.emit("move", [roomID, moveUpSpeed]);
     }
@@ -51,7 +54,7 @@ function Pong({ roomID, gameInfo }: PongProps) {
 
   const [isGameOver, setIsGameOver] = useState(false);
   const closeGameInviteModal = () => {
-    window.location.href = "http://localhost:3000/main";
+    window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/main`;
     setIsGameOver(false);
   };
 
@@ -138,7 +141,7 @@ function Pong({ roomID, gameInfo }: PongProps) {
   }, [test]);
 
   useEffect(() => {
-    io.on("gameover", (roomId: number, gameoverInfo: gameoverInfo) => {
+    io.on("gameover", (roomId: number, gameoverInfo: GameoverInfo) => {
       setGameoverInfo(gameoverInfo);
       setIsGameOver(true);
     });
@@ -150,7 +153,6 @@ function Pong({ roomID, gameInfo }: PongProps) {
         <GameResultModal
           open={isGameOver}
           close={closeGameInviteModal}
-          header="게임 결과"
           score={gameoverInfo.score}
           winnerProfile={gameoverInfo.winnerProfile}
         ></GameResultModal>

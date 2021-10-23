@@ -7,7 +7,7 @@ import OTPModal from "../../components/modal/otp/otpModal";
 import axios from "axios";
 import snackbar from "../../components/snackbar/snackbar";
 
-function Setting() {
+const Setting = () => {
   const modalHandler = ModalHandler();
   const avatarImgInput = useRef<HTMLInputElement>(null);
   const [user, setUser] = useState<any>();
@@ -65,10 +65,9 @@ function Setting() {
       .post(
         process.env.REACT_APP_SERVER_ADDRESS + "/otp/register",
         {},
-        { withCredentials: true }
       )
       setOTPCode(res.data);
-      modalHandler.handleModalOpen("otp")
+      modalHandler.handleModalOpen("otp");
       updateUserOTP(true);
     } catch (error) {
       snackbar.error("OTP 설정에 실패했습니다.");
@@ -81,7 +80,6 @@ function Setting() {
       .post(
         process.env.REACT_APP_SERVER_ADDRESS + "/otp/deregister",
         {},
-        { withCredentials: true }
       )
       updateUserOTP(false);
     } catch (error) {
@@ -92,7 +90,7 @@ function Setting() {
   useEffect(() => {
     const getUserInfo = async () => {
       try {
-        const res = await axios.get(process.env.REACT_APP_SERVER_ADDRESS + '/user/me', {withCredentials: true})
+        const res = await axios.get(process.env.REACT_APP_SERVER_ADDRESS + '/user/me')
         setUser(res.data);
       } catch (error) {
         console.log(error);

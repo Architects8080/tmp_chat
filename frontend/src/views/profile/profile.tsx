@@ -1,6 +1,4 @@
-import { Match } from "@testing-library/dom";
 import axios from "axios";
-import { userInfo } from "os";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import AchievementItem from "../../components/achievement/achievement";
@@ -8,22 +6,22 @@ import EmptyPageInfo from "../../components/emptyPage/empty";
 import Header from "../../components/header/header";
 import GameModalListener from "../../components/modal/gameModalListener";
 import ModalHandler from "../../components/modal/modalhandler";
-import SideBar from "../../components/sideBar/sideBar";
-import { sidebarProperty } from "../../components/sideBar/sideBarType";
+import FriendSidebar from "../../components/sidebar/friendSidebar";
 import snackbar from "../../components/snackbar/snackbar";
 import GameLogItem from "./gamelog/item";
 import "./profile.scss";
-import { Achievement, MatchRatio, User } from "./profileType";
+import { Achievement, GameTier, Match, MatchRatio, User } from "./profileType";
 
-function Profile() {
+const Profile = () => {
   const modalHandler = ModalHandler();
   const { id } = useParams<{ id: string }>();
 
   const [user, setUser] = useState<User | null>(null);
-  const [topRate, setTopRate] = useState<string>("100");
+  // const [topRate, setTopRate] = useState<string>("100");
+  const [tier, setTier] = useState<GameTier>(GameTier.BRONZE);
   const [matchList, setMatchList] = useState<Match[] | null>(null);
   const [achievedList, setAchievedList] = useState<Achievement[] | null>(null);
-  const achievementTitle = ['10회 승리', '5연속 승리', '5연속 퍼펙트 게임', '50전 이상 플레이', 'OTP 등록'];
+  const achievementTitle = ['10회 승리', '20회 승리', '10회 이상 플레이', '20회 이상 플레이', 'OTP 등록'];
 
   const [winRatio, setWinRatio] = useState<MatchRatio | null>(null);
   const [search, setSearch] = useState("");
@@ -32,16 +30,29 @@ function Profile() {
     if (e.key !== "Enter" || search === "") return;
 
     axios
-      .get(`http://localhost:5000/user/search/${search}`, {
+      .get(`${process.env.REACT_APP_SERVER_ADDRESS}/user/search/${search}`, {
         withCredentials: true,
       })
       .then((res) => {
-        window.location.href = `http://localhost:3000/profile/${res.data.id}`;
+        window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/profile/${res.data.id}`;
       })
       .catch((err) => {
         snackbar.error("유저가 존재하지 않습니다.");
       });
   };
+
+  const getTier = (ladderPoint: number) => {
+    if (ladderPoint > 2100)
+      return GameTier.DIAMOND;
+    else if (ladderPoint > 1900)
+      return GameTier.PLATINUM;
+    else if (ladderPoint > 1600)
+      return GameTier.GOLD;
+    else if (ladderPoint > 1300)
+      return GameTier.SILVER;
+    else
+      return GameTier.BRONZE;
+  }
 
   // var gameLog;
   useEffect(() => {
@@ -50,15 +61,15 @@ function Profile() {
 
     axios
     .all([
-      axios.get("http://localhost:5000/user/", { withCredentials: true }),
-      axios.get("http://localhost:5000/user/" + id, { withCredentials: true }),
-      axios.get("http://localhost:5000/match/user/" + id, { withCredentials: true }),
-      axios.get("http://localhost:5000/achievement/" + id, {withCredentials: true}),
+      axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/user/`),
+      axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/user/${id}`),
+      axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/match/user/${id}`),
+      axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/achievement/${id}`),
     ])
     .then(
       axios.spread((userList, userInfo, matchList, achievementList) => { //achievementList
         setUser(userInfo.data);
-        setTopRate(((userInfo.data.ladderLevel) / userList.data.length).toFixed(2).toString());
+        // setTopRate(((userInfo.data.ladderLevel) / userList.data.length).toFixed(2).toString());
         setMatchList(matchList.data);
         setAchievedList(achievementList.data);
         matchList.data.map((match: any) => {
@@ -68,11 +79,12 @@ function Profile() {
           total++;
         });
 
+        setTier(getTier(userInfo.data.ladderPoint));
         setWinRatio({win: win, total: total, lose: total - win});
       })
     )
     .catch((err) => {
-      window.location.href = "http://localhost:3000/main";
+      window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/main`;
     });
 
   }, []);
@@ -81,8 +93,7 @@ function Profile() {
     <>
       <Header isLoggedIn={true} />
       <div className="page">
-        <SideBar
-          title={sidebarProperty.friendList}
+        <FriendSidebar
           roomId={0}
           modalHandler={modalHandler}
         />
@@ -99,7 +110,8 @@ function Profile() {
                   <div className="profile-nickname">{user.nickname}</div>
                   <div className="profile-gameInfo">
                     <div className="ladder-rank">
-                      Ladder Rank : #{user.ladderLevel} ({topRate}% of top)
+                      {/* Ladder Rank : #{user.ladderLevel} ({topRate}% of top) */}
+                      Ladder Tier : {tier}
                     </div>
                     <div className="ladder-point">
                       Ladder Point : {user.ladderPoint}
@@ -152,8 +164,10 @@ function Profile() {
           ) : (
             <div className="gameLogList">
               {user &&
-                matchList.map((match: any) => {
+                matchList.map((match: Match) => {
                   match.targetId = user.id;
+                  match.players[0].tier = getTier(match.players[0].ladderPoint);
+                  match.players[1].tier = getTier(match.players[1].ladderPoint);
                   return <GameLogItem {...match} />;
                 })}
             </div>

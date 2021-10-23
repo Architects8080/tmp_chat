@@ -7,10 +7,10 @@ import Profile from "./views/profile/profile";
 import Game from "./views/game/game";
 import Setting from "./views/setting/setting";
 import OTP from "./views/auth/otp/otp";
-import Chatroom from "./views/chatroom/chatroom";
 import Login from "./views/auth/login";
 import TestLogin from "./views/auth/test";
 import BlockList from "./views/blocklist/blocklist";
+import Channel from "./views/channel/channel";
 
 
 function App() {
@@ -26,7 +26,7 @@ function App() {
       <Route path="/setting" component={Setting} />
       <Route path="/otp" component={OTP} />
       <Route path="/register" component={Register} />
-      <Route path="/chatroom/:id" component={Chatroom} />
+      <Route path="/channel/:id" component={Channel} />
       <Route path="/blocklist" component={BlockList} />
     </div>
   );

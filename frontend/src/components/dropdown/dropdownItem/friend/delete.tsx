@@ -1,16 +1,15 @@
-import { ioCommunity } from "../../../../socket/socket";
+import axios from "axios";
 import DefaultDropdownItem from "../../itemTemplate/default/item";
 
-type props = {
+type ItemProps = {
   targetId: number;
 };
 
-function DeleteFriendItem(prop: props) {
+const DeleteFriendItem = (prop: ItemProps) => {
   const handleDeleteFriend = async () => {
-    ioCommunity.emit("relationDeleteToServer", {
-      otherID: prop.targetId,
-      isFriendly: true
-    });
+    await axios.delete(
+      `${process.env.REACT_APP_SERVER_ADDRESS}/friend/${prop.targetId}`
+    );
   };
 
   return (

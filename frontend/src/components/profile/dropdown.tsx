@@ -6,7 +6,7 @@ type DropdownProps = {
   isActive: boolean;
 };
 
-function ProfileMenu(prop: DropdownProps) {
+const ProfileMenu = (prop: DropdownProps) => {
   return (
     <div className="profile-menu-wrap">
       <div className={`dropdown ${prop.isActive ? "active" : "inactive"}`}>

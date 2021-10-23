@@ -1,13 +1,13 @@
 import React from "react";
 import "./item.scss";
 
-type dropdownItemTemplateProps = {
+type DefaultDropdownItemProps = {
   title: string;
-  color: string; //??
+  color: string;
   callback: any;
 };
 
-function DefaultDropdownItem(prop: dropdownItemTemplateProps) {
+const DefaultDropdownItem = (prop: DefaultDropdownItemProps) => {
   return (
     <div className="dropdownItem-wrap" onClick={prop.callback}>
       <div className={`dropdownItem-title ${prop.color}`}>{prop.title}</div>

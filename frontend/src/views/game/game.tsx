@@ -5,12 +5,10 @@ import { io } from "../../socket/socket";
 import { GameInfo } from "./gameType";
 import Header from "../../components/header/header";
 import Pong from "./pong/pong";
-import SideBar from "../../components/sideBar/sideBar";
 import "./game.scss";
-import { sidebarProperty } from "../../components/sideBar/sideBarType";
 import ModalHandler from "../../components/modal/modalhandler";
 
-function Game() {
+const Game = () => {
   const { id } = useParams<{ id: string }>();
 
   const modalHandler = ModalHandler();
@@ -25,8 +23,7 @@ function Game() {
 
   const getPlayerInfo = async (playerId: number): Promise<any> => {
     return axios.get(
-      process.env.REACT_APP_SERVER_ADDRESS + "/user/" + playerId,
-      { withCredentials: true }
+      process.env.REACT_APP_SERVER_ADDRESS + "/user/" + playerId
     );
   };
 
@@ -46,7 +43,7 @@ function Game() {
     });
     io.on("vanished", (roomId: string) => {
       if (roomId == id) {
-        window.location.href = "http://localhost:3000/main";
+        window.location.href = `${process.env.REACT_APP_CLIENT_ADDRESS}/main`;
       }
     });
     io.emit("observe", [id]);
@@ -56,11 +53,6 @@ function Game() {
     <>
       <Header isLoggedIn={true} />
       <div className="page">
-        <SideBar
-          title={sidebarProperty.observerList}
-          roomId={42}
-          modalHandler={modalHandler}
-        />
         {gameInfo ? (
           <div className="game-wrap">
             <div className="game-scoreboard">

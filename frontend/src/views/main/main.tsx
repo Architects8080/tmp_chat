@@ -2,132 +2,139 @@ import React, { useState, useEffect } from "react";
 import Button from "../../components/button/button";
 import EmptyPageInfo from "../../components/emptyPage/empty";
 import Header from "../../components/header/header";
-import ChatroomCreateModal from "../../components/modal/chatroom/create/chatroomCreateModal";
-import SideBar from "../../components/sideBar/sideBar";
-import ChatroomItem, { chatroomItemProps } from "./chatroomItem/item";
+import ChannelItem, { ChannelItemProps } from "./channelItem/item";
 import "./main.scss";
-import { sidebarProperty } from "../../components/sideBar/sideBarType";
 import ModalHandler from "../../components/modal/modalhandler";
-import ChatroomDefaultDropdownList from "../../components/dropdown/dropdownList/chatroomDefault";
-import ChatroomAdminDropdownList from "../../components/dropdown/dropdownList/chatroomAdmin";
-import ChatroomOwnerDropdownList from "../../components/dropdown/dropdownList/chatroomOwner";
-import FriendDropdownList from "../../components/dropdown/dropdownList/friend";
-import HeaderDropdownList from "../../components/dropdown/dropdownList/header";
-import OTPModal from "../../components/modal/otp/otpModal";
 import axios from "axios";
-import GameSettingModal from "../../components/modal/game/gameSettingModal";
 import GameModalListener from "../../components/modal/gameModalListener";
+import { io, ioChannel } from "../../socket/socket";
+import FriendSidebar from "../../components/sidebar/friendSidebar";
+import { ModalManager } from "../../components/sidebar/sidebarType";
+import ChannelCreateModal from "../../components/modal/channel/create/channelCreateModal";
 
-enum ChatroomCategory {
-  AllChatroomList,
-  JoinedChatroomList,
+enum ChannelCategory {
+  CHANNEL_LIST,
+  MY_CHANNEL_LIST,
 }
 
 const Main = () => {
   const modalHandler = ModalHandler();
+  const [isWaiting, setIsWaiting] = useState(false);
 
-  const [chatroomCategory, setChatroomCategory] = useState(
-    ChatroomCategory.AllChatroomList
+  const modalListener: ModalManager = {
+    handleModalClose: modalHandler.handleModalClose,
+    handleModalOpen: modalHandler.handleModalOpen,
+    isModalOpen: modalHandler.isModalOpen,
+    setWaiting: setIsWaiting,
+  }
+
+  const [category, setCategory] = useState(
+    ChannelCategory.CHANNEL_LIST
   );
 
-  const changeChatroomList = (category: ChatroomCategory) => {
-    //io.emit : by category
-    //io.on   : get Chatrooms object
+  const handleAddWaiting = () => {
+    setIsWaiting(true);
+    io.emit('joinQueue');
+  }
+
+  const handleRemoveWaiting = () => {
+    setIsWaiting(false);
+    io.emit('leaveQueue');
+  }
+
+  const changeCategory = (category: ChannelCategory) => {
     return () => {
-      setChatroomCategory(category);
+      setCategory(category);
     };
   };
 
-  const [channels, setChannels] = useState<chatroomItemProps[] | null>(null);
-  const [myChannels, setMyChannels] = useState<chatroomItemProps[] | null>(null);
+  const [channelList, setChannelList] = useState<ChannelItemProps[] | null>(null);
+  const [myChannelList, setMyChannelList] = useState<ChannelItemProps[] | null>(null);
+
+  const getAllChannel = async () => {
+    try {
+      const response = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/channel`);
+      if (response.data.length != 0)
+        setChannelList(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const getMyChannel = async () => {
+    try {
+      const response = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/me`);
+      if (response.data.length != 0)
+        setMyChannelList(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
 	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				let response = await axios.get(`http://localhost:5000/channel`, { withCredentials: true });
-        if (response.data.length != 0)
-          setChannels(response.data);
-        response = await axios.get(`http://localhost:5000/channel/me`, { withCredentials: true });
-        if (response.data.length != 0)
-          setMyChannels(response.data);
-			}
-			catch (e) { console.log(e); }
-		};
-		fetchData();
-	}, []);
-/*
-  if (!channels) {
-		return (
-			<div>Loading..</div>
-		)
-	}*/
-  // to test empty info
-  // tempAllChatroomList = [];
-  // tempJoinedChatroomList = [];
+		getAllChannel();
+    getMyChannel();
+	}, [category]);
+
 
   return (
     <>
       <Header isLoggedIn={true} />
       <div className="page">
-        <SideBar
-          title={sidebarProperty.friendList}
-          roomId={1}
+        <FriendSidebar
+          roomId={0}
           modalHandler={modalHandler}
         />
         <div className="main-wrap">
           <div className="button-list">
             <div className="button-left-side">
-              {/* to make a non-focusable element focusable */}
               <div className="focusable-button" tabIndex={1}>
                 <Button
                   title="전체 채팅방"
-                  onClick={changeChatroomList(ChatroomCategory.AllChatroomList)}
+                  onClick={changeCategory(ChannelCategory.CHANNEL_LIST)}
                 />
               </div>
               <div className="focusable-button" tabIndex={1}>
                 <Button
                   title="참여중인 채팅방"
-                  onClick={changeChatroomList(
-                    ChatroomCategory.JoinedChatroomList
-                  )}
+                  onClick={changeCategory(ChannelCategory.MY_CHANNEL_LIST)}
                 />
               </div>
             </div>
             <div className="button-right-side">
-              <Button title="게임 찾기" onClick={() => {}} />
+              {
+                isWaiting ? <Button title="매칭 취소하기" onClick={handleRemoveWaiting} />
+                : <Button title="게임 찾기" onClick={handleAddWaiting} />
+              }
               <Button
                 title="채팅방 만들기"
-                onClick={() => modalHandler.handleModalOpen("chatroomCreate")}
+                onClick={() => modalHandler.handleModalOpen("channelCreate")}
               />
             </div>
           </div>
 
-          {(chatroomCategory === ChatroomCategory.AllChatroomList && !channels)
+          {(category === ChannelCategory.CHANNEL_LIST && !channelList)
             ? <EmptyPageInfo description={`공개 채팅방이 존재하지 않습니다.\n'채팅방 만들기' 버튼으로 채팅방을 생성해보세요!`}/>
-            : (chatroomCategory === ChatroomCategory.JoinedChatroomList && !myChannels)
+            : (category === ChannelCategory.MY_CHANNEL_LIST && !myChannelList)
               ? <EmptyPageInfo description={`현재 참여중인 채팅방이 없습니다.\n전체 채팅방 목록에서 참가해보세요!`}/> 
-              : <div className="chatroom-list">
-                  {chatroomCategory === ChatroomCategory.AllChatroomList && channels
-                    ? channels.map(item => (
-                        <ChatroomItem 
-                        channel = {item} 
-                        key = {item.roomId}/>
+              : <div className="channel-list">
+                  {category === ChannelCategory.CHANNEL_LIST && channelList
+                    ? channelList.map(channel => (
+                        <ChannelItem channel={channel} key={channel.id}/>
                       ))
-                       : myChannels ? myChannels.map(item => (
-                          <ChatroomItem 
-                          channel = {item} 
-                          key = {item.roomId}/>
+                       : myChannelList ? myChannelList.map(channel => (
+                          <ChannelItem channel={channel} key={channel.id}/>
                         )) : null
                   }
                 </div>
           }
         </div>
       </div>
-      <ChatroomCreateModal
-        open={modalHandler.isModalOpen.chatroomCreate}
-        close={() => modalHandler.handleModalClose("chatroomCreate")}
+      <ChannelCreateModal
+        open={modalHandler.isModalOpen.channelCreate}
+        close={() => modalHandler.handleModalClose("channelCreate")}
       />
-      <GameModalListener modalHandler={modalHandler}/>
+      <GameModalListener modalHandler={modalListener}/>
     </>
   );
 }

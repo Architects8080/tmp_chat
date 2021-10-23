@@ -2,15 +2,12 @@ import React from "react";
 import "./achievement.scss";
 import Tooltip from "@mui/material/Tooltip";
 
-type achievementItemProps = {
+type AchievementItemProps = {
   title: string;
   isAchieve: boolean;
 };
 
-//db achievementId -> achievementTitle X
-//isfront?
-
-function AchievementItem(prop: achievementItemProps) {
+const AchievementItem = (prop: AchievementItemProps) => {
   return (
     <Tooltip title={prop.title} placement="top">
       <img

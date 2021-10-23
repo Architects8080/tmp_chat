@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { GameType, Match, MatchPlayer } from "../profileType";
 import "./item.scss";
 
-function GameLogItem(match: Match) {
+const GameLogItem = (match: Match) => {
 
   const [leftPlayer, setLeftPlayer] = useState<MatchPlayer>(match.players[0]);
   const [rightPlayer, setRightPlayer] = useState<MatchPlayer>(match.players[1]);
@@ -56,7 +56,8 @@ function GameLogItem(match: Match) {
             <div className="userinfo">
               <div className="nickname">{leftPlayer.user.nickname}</div>
               <div className="ladderinfo">
-                <div className="rank">Ladder Rank: #{leftPlayer.user.ladderLevel}</div>
+                {/* <div className="rank">Ladder Rank: #{leftPlayer.user.ladderLevel}</div> */}
+                <div className="rank">Ladder Rank: {leftPlayer.tier}</div>
                 <div className="point">Ladder Point : {leftPlayer.ladderPoint} ({(leftPlayer.ladderIncrease <= 0 ? "" : "+") + leftPlayer.ladderIncrease})</div>
               </div>
             </div>
@@ -78,7 +79,8 @@ function GameLogItem(match: Match) {
             <div className="userinfo">
               <div className="nickname">{rightPlayer.user.nickname}</div>
               <div className="ladderinfo">
-                <div className="rank">Ladder Rank: #{rightPlayer.user.ladderLevel}</div>
+                {/* <div className="rank">Ladder Rank: #{rightPlayer.user.ladderLevel}</div> */}
+                <div className="rank">Ladder Rank: {rightPlayer.tier}</div>
                 <div className="point">Ladder Point : {rightPlayer.ladderPoint} ({(rightPlayer.ladderIncrease <= 0 ? "" : "+") + rightPlayer.ladderIncrease})</div>
               </div>
             </div>

@@ -1,29 +1,31 @@
 import { useEffect, useState } from "react";
 import { Redirect } from "react-router";
 import { io } from "../../socket/socket";
-import { modalHandler } from "../sideBar/sideBarType";
+import { ModalManager } from "../sidebar/sidebarType";
 import snackbar from "../snackbar/snackbar";
 import GameInviteModal from "./game/gameInviteModal";
 import GameSettingModal from "./game/gameSettingModal";
 
-const GameModalListener = ({modalHandler} : {modalHandler: modalHandler}) => {
+const GameModalListener = ({modalHandler} : {modalHandler: ModalManager}) => {
   const acceptMessage = `곧 게임이 시작되니 준비하십시오.`;
   const rejectMessage = `상대방이 게임을 거절했습니다.`;
   const [inviteUserInfo, setInviteUserInfo] = useState({
     nickname: "",
     avatar: "",
     roomID: 0,
+    isLadder: false,
   });
   const [roomID, setRoomID] = useState(0);
 
   useEffect(() => {
-    io.on("invite", (inviteUserNickname, inviteUserAvatar, roomID) => {
+    io.on("invite", (inviteUserNickname, inviteUserAvatar, roomID, isLadder) => {
       setInviteUserInfo({
         nickname: inviteUserNickname,
         avatar: inviteUserAvatar,
         roomID: roomID,
+        isLadder: isLadder,
       });
-      modalHandler.handleModalOpen('gameSetting');
+      modalHandler.handleModalOpen('gameInvite');
     });
 
     io.on("ready", (roomID) => {
@@ -41,8 +43,12 @@ const GameModalListener = ({modalHandler} : {modalHandler: modalHandler}) => {
   return(
     <GameInviteModal
       inviteInfo={inviteUserInfo}
-      open={modalHandler.isModalOpen.gameSetting}
-      close={() => modalHandler.handleModalClose("gameSetting")}
+      open={modalHandler.isModalOpen.gameInvite}
+      close={() => {modalHandler.handleModalClose("gameInvite");
+
+      if (modalHandler.setWaiting)
+        modalHandler.setWaiting(false);
+      }}
     />
   );
 };

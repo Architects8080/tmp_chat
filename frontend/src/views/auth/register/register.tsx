@@ -7,7 +7,7 @@ import Header from "../../../components/header/header";
 import snackbar from "../../../components/snackbar/snackbar";
 import "./register.scss";
 
-function Register() {
+const Register = () => {
   const [form, setForm] = useState({
     nickname: "",
   });
@@ -32,25 +32,24 @@ function Register() {
     try {
       await axios
         .post(
-          `http://localhost:5000/auth/register`,
+          `${process.env.REACT_APP_SERVER_ADDRESS}/auth/register`,
           {
             nickname: nickname,
           },
-          {
-            withCredentials: true,
-          }
         )
         .then((response) => {
           setRegisted(true);
         })
         .catch(error => {
+          console.log(`error : `, error.response.data);
           if (error.response.data.statusCode === 403) {
             setForbiddenError(true);
             snackbar.error("잘못된 접근입니다.");
           }
-          else if (error.response.data.statusCode === 400) {
+          else if (error.response.data.statusCode === 400)
             snackbar.error("닉네임이 중복되었습니다. 다시 시도해주세요.");
-          }
+          else if (error.response.data.statusCode === 413)
+            snackbar.error("닉네임은 최대 10자까지 가능합니다.");
         });
     } catch (error) {};
 

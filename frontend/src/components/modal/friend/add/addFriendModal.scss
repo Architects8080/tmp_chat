@@ -112,21 +112,18 @@
 }
 
 .submit {
-  &:hover {
-    cursor: pointer;
+  .submit-title {
+    font-family: Spoqa Han Sans Neo;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 16px;
+    line-height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: #000000;
   }
-}
-
-.submit-title {
-  font-family: Spoqa Han Sans Neo;
-  font-style: normal;
-  font-weight: bold;
-  font-size: 16px;
-  line-height: 20px;
-  display: flex;
-  align-items: center;
-  text-align: center;
-  color: #000000;
 }
 
 .result {
