@@ -1,9 +1,6 @@
 import {
-<<<<<<< HEAD
-=======
   BeforeInsert,
   BeforeUpdate,
->>>>>>> a864136ce98e1c940db1ee791c31ad90ab99a749
   Column,
   Entity,
   JoinColumn,
@@ -13,11 +10,8 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '../../user/entity/user.entity';
-<<<<<<< HEAD
-=======
 import * as bcrypt from 'bcrypt';
 import { InternalServerErrorException } from '@nestjs/common';
->>>>>>> a864136ce98e1c940db1ee791c31ad90ab99a749
 
 @Entity('channel')
 export class Channel {
@@ -35,8 +29,6 @@ export class Channel {
 
   @OneToMany(() => ChannelMember, (channelMember) => channelMember.channelID)
   channelIDs: ChannelMember[];
-<<<<<<< HEAD
-=======
 
   @BeforeInsert()
   @BeforeUpdate()
@@ -48,7 +40,6 @@ export class Channel {
       throw new InternalServerErrorException();
     }
   }
->>>>>>> a864136ce98e1c940db1ee791c31ad90ab99a749
 }
 
 @Entity('channel_member')

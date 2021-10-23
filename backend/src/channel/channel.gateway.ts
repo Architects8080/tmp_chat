@@ -72,13 +72,6 @@ export class ChannelGateway
     @MessageBody() data: any,
     @ConnectedSocket() client: SocketUser,
   ) {
-<<<<<<< HEAD
-    client.join(data.toString());
-    const myChannel = await this.channelService.getMyChannel(client);
-    if (!myChannel.some((channel) => channel.roomId == data))
-      this.channelService.joinChannel(data, client.user.id);
-    console.log(client.rooms);
-=======
     if (this.channelService.channelMap.get(+data).isProtected > 0) {
       const myChannel = await this.channelService.getMyChannel(client.user.id);
       if (myChannel.find((myChannel) => myChannel.roomId == data)) {
@@ -99,7 +92,6 @@ export class ChannelGateway
       this.channelService.joinChannel(data, client.user.id);
       console.log(client.rooms);
     }
->>>>>>> a864136ce98e1c940db1ee791c31ad90ab99a749
   }
 
   @SubscribeMessage('msgToChannel')
@@ -109,12 +101,6 @@ export class ChannelGateway
   ) {
     const payload = {
       text: data.text,
-<<<<<<< HEAD
-      name: client.user.intraLogin,
-    };
-    this.server.to(data.roomId).emit('msgToClient', payload);
-  }
-=======
       name: client.user.nickname,
     };
     this.server.to(data.roomId).emit('msgToClient', payload);
@@ -128,5 +114,4 @@ export class ChannelGateway
     this.channelService.leaveChannel(data, client.user.id);
     this.server.to(data).emit('channelMemberRemove', client.user.id);
   }
->>>>>>> a864136ce98e1c940db1ee791c31ad90ab99a749
 }

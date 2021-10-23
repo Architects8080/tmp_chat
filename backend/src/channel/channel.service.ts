@@ -1,30 +1,15 @@
-<<<<<<< HEAD
-import { Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { InjectRepository } from '@nestjs/typeorm';
-import { cookieExtractor, JwtStrategy } from 'src/auth/strategy/jwt.strategy';
-=======
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
->>>>>>> a864136ce98e1c940db1ee791c31ad90ab99a749
 import { Repository } from 'typeorm';
 import { ChannelListDto } from './dto/channel-list.dto';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { Channel, ChannelMember } from './entity/channel.entity';
-<<<<<<< HEAD
-=======
 import * as bcrypt from 'bcrypt';
 import { UpdateChannelDto } from './dto/update-channel.dto';
->>>>>>> a864136ce98e1c940db1ee791c31ad90ab99a749
 
 @Injectable()
 export class ChannelService {
   constructor(
-<<<<<<< HEAD
-    private jwtService: JwtService,
-    private jwtStrategy: JwtStrategy,
-=======
->>>>>>> a864136ce98e1c940db1ee791c31ad90ab99a749
     @InjectRepository(Channel)
     private readonly channelRepository: Repository<Channel>,
     @InjectRepository(ChannelMember)
@@ -37,33 +22,6 @@ export class ChannelService {
     await this.getAllChannelDB();
   }
 
-<<<<<<< HEAD
-  async createChannel(channelData: CreateChannelDto) {
-    const newChannel: Channel = this.channelRepository.create({
-      title: channelData.title,
-      type: channelData.type,
-      password: channelData.password,
-    });
-    await this.channelRepository.insert(newChannel);
-    const newChannelMember: ChannelMember =
-      this.channelMemberRepository.create();
-    newChannelMember.userID = channelData.ownerId;
-    const tmpChannelId = await this.channelRepository.find({
-      select: ['id'],
-      order: {
-        id: 'DESC',
-      },
-      take: 1,
-    });
-    newChannelMember.channelID = tmpChannelId[0].id;
-    newChannelMember.permissionType = 2;
-    newChannelMember.penalty = 0;
-    await this.channelMemberRepository.insert(newChannelMember);
-    return tmpChannelId[0].id;
-  }
-
-=======
->>>>>>> a864136ce98e1c940db1ee791c31ad90ab99a749
   async getAllChannelDB() {
     const channels: Channel[] = await this.channelRepository.find();
     if (!channels) return;
@@ -71,12 +29,8 @@ export class ChannelService {
       const instance = new ChannelListDto();
       instance.roomId = channel.id;
       instance.title = channel.title;
-<<<<<<< HEAD
-      instance.isProtected = channel.type === 2 ? true : false;
-=======
       instance.isProtected =
         channel.type === 2 ? 2 : channel.type === 1 ? 1 : 0;
->>>>>>> a864136ce98e1c940db1ee791c31ad90ab99a749
       const memCnt = await this.channelMemberRepository.findAndCount({
         where: {
           channelID: channel.id,
@@ -99,23 +53,12 @@ export class ChannelService {
     return [...this.channelMap.values()];
   }
 
-<<<<<<< HEAD
-  async getMyChannel(req) {
-    const token = cookieExtractor(req); //error
-    const userPayload = this.jwtService.verify(token);
-    const user = await this.jwtStrategy.validate(userPayload);
-=======
   async getMyChannel(userId: number) {
->>>>>>> a864136ce98e1c940db1ee791c31ad90ab99a749
     const myChannel = [];
     const channels = await this.channelMemberRepository.find({
       select: ['channel'],
       where: {
-<<<<<<< HEAD
-        userID: user.id,
-=======
         userID: userId,
->>>>>>> a864136ce98e1c940db1ee791c31ad90ab99a749
       },
       join: {
         alias: 'channel_member',
@@ -128,12 +71,8 @@ export class ChannelService {
       const instance = new ChannelListDto();
       instance.roomId = channel.channelID;
       instance.title = channel.channel.title;
-<<<<<<< HEAD
-      instance.isProtected = channel.channel.type === 2 ? true : false;
-=======
       instance.isProtected =
         channel.channel.type === 2 ? 2 : channel.channel.type === 1 ? 1 : 0;
->>>>>>> a864136ce98e1c940db1ee791c31ad90ab99a749
       const memCnt = await this.channelMemberRepository.findAndCount({
         where: {
           channelID: channel.channelID,
@@ -151,16 +90,6 @@ export class ChannelService {
     return myChannel;
   }
 
-<<<<<<< HEAD
-  async joinChannel(roomId, userId) {
-    const newChannelMember: ChannelMember =
-      this.channelMemberRepository.create();
-    newChannelMember.userID = userId;
-    newChannelMember.channelID = roomId;
-    newChannelMember.permissionType = 0;
-    newChannelMember.penalty = 0;
-    await this.channelMemberRepository.insert(newChannelMember);
-=======
   async createChannel(channelData: CreateChannelDto) {
     const newChannel: Channel = this.channelRepository.create({
       title: channelData.title,
@@ -265,6 +194,5 @@ export class ChannelService {
       });
     });
     return result;
->>>>>>> a864136ce98e1c940db1ee791c31ad90ab99a749
   }
 }

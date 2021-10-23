@@ -1,12 +1,7 @@
-<<<<<<< HEAD
-import { Column, Entity, PrimaryColumn, OneToMany } from 'typeorm';
-import { ChannelMember } from 'src/channel/entity/channel.entity';
-=======
 import { Exclude, Transform, TransformFnParams } from 'class-transformer';
 import { configuration } from 'config/configuration';
 import { Block, Friend } from 'src/community/entity/community.entity';
 import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
->>>>>>> a864136ce98e1c940db1ee791c31ad90ab99a749
 
 @Entity('user')
 export class User {

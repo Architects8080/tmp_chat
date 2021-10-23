@@ -23,18 +23,11 @@ function App() {
       <Route path="/test" component={TestLogin} />
       <Route path="/profile/:id" component={Profile} />
       <Route path="/game/:id" component={Game} />
-<<<<<<< HEAD
-      <Route path="/setting" component={Setting}/>
-      <Route path="/otp" component={OTP}/>
-      <Route path="/register" component={Register}/>
-      <Route exact path="/chatroom/:id" component={Chatroom}/>
-=======
       <Route path="/setting" component={Setting} />
       <Route path="/otp" component={OTP} />
       <Route path="/register" component={Register} />
       <Route path="/chatroom/:id" component={Chatroom} />
       <Route path="/blocklist" component={BlockList} />
->>>>>>> 7ea3303af2888e238a68985385c8fe3e26348f77
     </div>
   );
 }
