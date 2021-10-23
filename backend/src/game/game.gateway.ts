@@ -19,8 +19,10 @@ import { SocketUserService } from '../socket/socket-user.service';
 import { GameRoomService } from './game-room.service';
 import { GamePlayer } from './data/game-player.data';
 import { MatchmakerService } from './matchmaker/matchmaker.service';
-import { GameRoom } from './data/gameroom.data';
 import { User } from 'src/user/entity/user.entity';
+import { UserStatus } from 'src/community/data/user-status';
+import { UserService } from 'src/user/user.service';
+import { StatusService } from 'src/community/status/status.service';
 
 @UseGuards(JwtAuthGuard)
 @WebSocketGateway(4000, { namespace: 'game' })
@@ -33,6 +35,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @Inject('GAME_SOCKET_USER_SERVICE')
     private socketUserService: SocketUserService,
     private matchmakerService: MatchmakerService,
+    private userService: UserService,
+    private statusService: StatusService,
   ) {}
 
   @WebSocketServer()
@@ -94,7 +98,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const targetUserId = data[0];
     const mapSetting = data[1];
     const targetUser = this.socketUserService.getSocketById(targetUserId);
-
     // queue에서 대기중인 경우 초대를 못 보내게 합니다.
     if (this.matchmakerService.isWaiting(client.user)) return;
     if (targetUser) {
@@ -114,6 +117,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         client.user.nickname,
         client.user.avatar,
         roomId,
+        false,
       );
     }
   }
@@ -163,7 +167,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             .in('gameroom:' + roomId.toString())
             .emit('update', roomId, gameInfo);
         },
-        (gameInfo: GameInfo) => {
+        async (gameInfo: GameInfo) => {
           let winner: GamePlayer;
           let loser: GamePlayer;
           if (gameInfo.player1.score >= gameInfo.player2.score) {
@@ -173,13 +177,21 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             winner = gameInfo.player2;
             loser = gameInfo.player1;
           }
-          const winnerUser = this.socketUserService.getSocketById(winner.id);
+          const winnerUser = await this.userService.getUserById(winner.id);
+          this.statusService.setUserStatusById(
+            gameInfo.player1.id,
+            UserStatus.ONLINE,
+          );
+          this.statusService.setUserStatusById(
+            gameInfo.player2.id,
+            UserStatus.ONLINE,
+          );
           this.server
             .in('gameroom:' + roomId.toString())
             .emit('gameover', roomId, {
               winnerProfile: {
-                nickname: winnerUser.user.nickname,
-                avatar: winnerUser.user.avatar,
+                nickname: winnerUser.nickname,
+                avatar: winnerUser.avatar,
               },
               score: {
                 winnerScore: winner.score,
@@ -192,6 +204,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.matchmakerService.removeWaiting(player2.user);
       this.clearReadyRoom(player1.user);
       this.clearReadyRoom(player2.user);
+      this.statusService.setUserStatusById(player1.user.id, UserStatus.PLAYING);
+      this.statusService.setUserStatusById(player2.user.id, UserStatus.PLAYING);
     }
   }
 

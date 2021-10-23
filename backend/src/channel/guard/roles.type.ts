@@ -1,11 +1,7 @@
-enum MemberRoleEnum {
-  USER = 'user',
-  ADMIN = 'admin',
-  OWNER = 'owner',
-}
+import { MemberRole } from '../entity/channel-member.entity';
 
 export const RoleDefaultList = [
-  MemberRoleEnum.USER,
-  MemberRoleEnum.ADMIN,
-  MemberRoleEnum.OWNER,
+  MemberRole.MEMBER,
+  MemberRole.ADMIN,
+  MemberRole.OWNER,
 ];

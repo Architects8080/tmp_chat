@@ -1,32 +1,28 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from 'src/auth/auth.module';
-import { DmService } from 'src/dm/dm.service';
+import { DmModule } from 'src/dm/dm.module';
 import { DirectMessageInfo } from 'src/dm/entity/dm.entity';
+import { FriendModule } from 'src/friend/friend.module';
 import { User } from 'src/user/entity/user.entity';
-import { UserService } from 'src/user/user.service';
-import { CommunityController } from './community.controller';
+import { UserModule } from 'src/user/user.module';
+import { CommunityEventModule } from './event/community-event.module';
 import { CommunityGateway } from './community.gateway';
-import { CommunityService } from './community.service';
-import { Block, Friend } from './entity/community.entity';
-import { Notification } from './entity/notification.entity';
-import { SocketUserService } from './socket-user.service';
+import { StatusModule } from './status/status.module';
+import { CommunitySocketUserModule } from './socket-user/community.socket-user.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([
-    Friend,
-    Block,
-    User,
-    DirectMessageInfo,
-    Notification
-  ]), AuthModule],
-  controllers: [CommunityController],
-  providers: [
-    CommunityService,
-    CommunityGateway,
-    SocketUserService,
-    UserService,
-    DmService
-  ]
+  imports: [
+    TypeOrmModule.forFeature([User, DirectMessageInfo]),
+    AuthModule,
+    DmModule,
+    UserModule,
+    StatusModule,
+    CommunityEventModule,
+    CommunitySocketUserModule,
+    FriendModule,
+  ],
+  providers: [CommunityGateway],
+  exports: [CommunityGateway],
 })
 export class CommunityModule {}

@@ -1,198 +1,434 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { ChannelListDto } from './dto/channel-list.dto';
+import { In, InsertResult, Repository } from 'typeorm';
+import { mergeChannelAndCount } from './data/count-channel.data';
 import { CreateChannelDto } from './dto/create-channel.dto';
-import { Channel, ChannelMember } from './entity/channel.entity';
-import * as bcrypt from 'bcrypt';
 import { UpdateChannelDto } from './dto/update-channel.dto';
+import { ChannelMember, MemberRole } from './entity/channel-member.entity';
+import {
+  ChannelPenalty,
+  ChannelPenaltyType,
+} from './entity/channel-penalty.entity';
+import { Channel, ChannelType } from './entity/channel.entity';
+import * as bcrypt from 'bcrypt';
+import { NotificationEventService } from 'src/notification/event/notification-event.service';
+import { NotificationType } from 'src/notification/entity/notification.entity';
+import { UserService } from 'src/user/user.service';
+import { ChannelMessage } from './entity/channel-message.entity';
+import { channel } from 'diagnostics_channel';
+import { ChannelEventService } from './channel-event.service';
 
 @Injectable()
 export class ChannelService {
   constructor(
     @InjectRepository(Channel)
-    private readonly channelRepository: Repository<Channel>,
+    private channelRepository: Repository<Channel>,
     @InjectRepository(ChannelMember)
     private channelMemberRepository: Repository<ChannelMember>,
+    @InjectRepository(ChannelPenalty)
+    private channelPenaltyRepository: Repository<ChannelPenalty>,
+    @InjectRepository(ChannelMessage)
+    private channelMessageRepository: Repository<ChannelMessage>,
+    private notificationEventService: NotificationEventService,
+    private userService: UserService,
+    private readonly channelEventService: ChannelEventService,
   ) {}
 
-  channelMap: Map<number, ChannelListDto> = new Map();
-
-  async onModuleInit() {
-    await this.getAllChannelDB();
+  async channelToCountChannel(channel: Channel) {
+    const count = await this.channelMemberRepository.count({
+      where: {
+        channelId: channel.id,
+      },
+    });
+    return mergeChannelAndCount(channel, count);
   }
 
-  async getAllChannelDB() {
-    const channels: Channel[] = await this.channelRepository.find();
-    if (!channels) return;
-    for (const channel of channels) {
-      const instance = new ChannelListDto();
-      instance.roomId = channel.id;
-      instance.title = channel.title;
-      instance.isProtected =
-        channel.type === 2 ? 2 : channel.type === 1 ? 1 : 0;
-      const memCnt = await this.channelMemberRepository.findAndCount({
-        where: {
-          channelID: channel.id,
-        },
-        join: {
-          alias: 'channel_member',
-          leftJoinAndSelect: {
-            channel: 'channel_member.channel',
-          },
-        },
-      });
-      instance.memberCount = memCnt[1];
-      this.channelMap.set(instance.roomId, instance);
-    }
+  async getChannelList() {
+    const channelList = await this.channelRepository.find({
+      where: {
+        type: In([ChannelType.PUBLIC, ChannelType.PROTECTED]),
+      },
+    });
+    return await Promise.all(
+      channelList.map((ch) => {
+        return this.channelToCountChannel(ch);
+      }),
+    );
   }
 
-  async getAllChannel() {
-    this.channelMap.clear();
-    await this.getAllChannelDB();
-    return [...this.channelMap.values()];
-  }
-
-  async getMyChannel(userId: number) {
-    const myChannel = [];
-    const channels = await this.channelMemberRepository.find({
+  async getChannelListByUser(userId: number) {
+    const channelMemberList = await this.channelMemberRepository.find({
       select: ['channel'],
+      relations: ['channel'],
       where: {
-        userID: userId,
-      },
-      join: {
-        alias: 'channel_member',
-        leftJoinAndSelect: {
-          channel: 'channel_member.channel',
-        },
+        userId: userId,
       },
     });
-    for (const channel of channels) {
-      const instance = new ChannelListDto();
-      instance.roomId = channel.channelID;
-      instance.title = channel.channel.title;
-      instance.isProtected =
-        channel.channel.type === 2 ? 2 : channel.channel.type === 1 ? 1 : 0;
-      const memCnt = await this.channelMemberRepository.findAndCount({
-        where: {
-          channelID: channel.channelID,
-        },
-        join: {
-          alias: 'channel_member',
-          leftJoinAndSelect: {
-            channel: 'channel_member.channel',
-          },
-        },
-      });
-      instance.memberCount = memCnt[1];
-      myChannel.push(instance);
-    }
-    return myChannel;
+    return await Promise.all(
+      channelMemberList.map((cm) => {
+        return this.channelToCountChannel(cm.channel);
+      }),
+    );
   }
 
-  async createChannel(channelData: CreateChannelDto) {
-    const newChannel: Channel = this.channelRepository.create({
-      title: channelData.title,
-      type: channelData.type,
-      password: channelData.password,
+  async createChannel(userId: number, channelDto: CreateChannelDto) {
+    const channelData = this.channelRepository.create(channelDto);
+    if (channelDto.type != ChannelType.PROTECTED) channelData.password = null;
+    const channelResult = await this.channelRepository.insert(channelData);
+    const channelId: number = Number(channelResult.identifiers[0].id);
+    channelData.id = channelId;
+    await this.channelMemberRepository.insert({
+      channelId: channelId,
+      userId: userId,
+      role: MemberRole.OWNER,
     });
-    await this.channelRepository.insert(newChannel);
-    const newChannelMember: ChannelMember =
-      this.channelMemberRepository.create();
-    newChannelMember.userID = channelData.ownerId;
-    const tmpChannelId = await this.channelRepository.find({
-      select: ['id'],
-      order: {
-        id: 'DESC',
-      },
-      take: 1,
-    });
-    newChannelMember.channelID = tmpChannelId[0].id;
-    newChannelMember.permissionType = 2;
-    newChannelMember.penalty = 0;
-    await this.channelMemberRepository.insert(newChannelMember);
-    return tmpChannelId[0].id;
+    const countChannel = await this.channelToCountChannel(channelData);
+    if (channelDto.type != ChannelType.PRIVATE)
+      this.channelEventService.addChannelList(countChannel);
+    this.channelEventService.addMyChannel(userId, countChannel);
+    return { channelId: channelId };
   }
 
-  async joinChannel(roomId: number, userId: number) {
-    const myChannel = await this.getMyChannel(userId);
-    if (myChannel.find((myChannel) => myChannel.roomId == roomId)) {
+  async deleteChannel(channelId: number) {
+    await this.channelRepository.delete(channelId);
+    this.channelEventService.deleteChannel(channelId);
+  }
+
+  async updateChannel(channelId: number, dto: UpdateChannelDto) {
+    const channel = await this.channelRepository.findOneOrFail(channelId);
+    const isTypeChanged = dto.type && channel.type != dto.type;
+    if (dto.type) {
+      if (dto.type != ChannelType.PROTECTED) dto.password = null;
     } else {
-      const newChannelMember: ChannelMember =
-        this.channelMemberRepository.create();
-      newChannelMember.userID = userId;
-      newChannelMember.channelID = roomId;
-      newChannelMember.permissionType = 0;
-      newChannelMember.penalty = 0;
-      await this.channelMemberRepository.insert(newChannelMember);
+      if (channel.type != ChannelType.PROTECTED) dto.password = null;
     }
+    for (const key in dto) {
+      channel[key] = dto[key];
+    }
+    await this.channelRepository.save(channel);
+    const countChannel = await this.channelToCountChannel(channel);
+    if (isTypeChanged) {
+      if (channel.type == ChannelType.PRIVATE)
+        this.channelEventService.removeChannelList(channelId);
+      else this.channelEventService.addChannelList(countChannel);
+    }
+    this.channelEventService.updateChannel(countChannel);
   }
 
-  async checkPassword(roomId: number, password: string) {
+  async isJoinChannel(memberId: number, channelId: number) {
     try {
-      const hashedpw = await this.channelRepository.findOne({
+      await this.channelMemberRepository.findOneOrFail({
         where: {
-          id: roomId,
+          userId: memberId,
+          channelId: channelId,
         },
       });
-      const isPasswordMatching = await bcrypt.compare(
-        password,
-        hashedpw.password,
-      );
-      return isPasswordMatching ? true : false;
+      return true;
     } catch (error) {
-      throw new HttpException(
-        'Wrong credentials provided',
-        HttpStatus.BAD_REQUEST,
+      return false;
+    }
+  }
+
+  async getChannelMemberList(channelId: number) {
+    const channel = await this.channelRepository
+      .createQueryBuilder('channel')
+      .where(`channel.id=${channelId}`)
+      .leftJoinAndSelect('channel.memberList', 'memberList')
+      .leftJoinAndSelect('memberList.user', 'user')
+      .orderBy({
+        'memberList.role': 'DESC',
+        'user.nickname': 'ASC',
+      })
+      .getOne();
+    // with status?
+    return channel.memberList;
+  }
+
+  async getCountChannelById(channelId: number) {
+    return await this.channelToCountChannel(
+      await this.channelRepository.findOneOrFail(channelId),
+    );
+  }
+
+  async emitJoinMember(userId: number, channelId: number) {
+    try {
+      const countChannel = await this.getCountChannelById(channelId);
+
+      if (countChannel.type != ChannelType.PRIVATE)
+        this.channelEventService.updateChannel(countChannel);
+      this.channelEventService.addMyChannel(userId, countChannel);
+      const newMember = await this.channelMemberRepository.findOne({
+        relations: ['user'],
+        where: {
+          userId: userId,
+          channelId: channelId,
+        },
+      });
+      this.channelEventService.addChannelMember(channelId, newMember);
+    } catch (error) {}
+  }
+
+  async emitLeaveMember(userId: number, channelId: number) {
+    try {
+      const countChannel = await this.getCountChannelById(channelId);
+
+      if (countChannel.type != ChannelType.PRIVATE)
+        this.channelEventService.updateChannel(countChannel);
+      this.channelEventService.removeMyChannel(userId, channelId);
+      this.channelEventService.removeChannelMember(channelId, userId);
+    } catch (error) {}
+  }
+
+  async emitUpdateChannelMember(channelId: number, userId: number) {
+    try {
+      const member = await this.channelMemberRepository.findOne({
+        where: {
+          userId: userId,
+          channelId: channelId,
+        },
+      });
+      this.channelEventService.updateChannelMember(channelId, member);
+    } catch (error) {}
+  }
+
+  async acceptChannelInvitation(userId: number, channelId: number) {
+    if (await this.isJoinChannel(userId, channelId))
+      throw new ConflictException();
+    if (await this.isBanMember(channelId, userId))
+      throw new ForbiddenException();
+    try {
+      await this.channelMemberRepository.insert({
+        userId: userId,
+        channelId: channelId,
+      });
+    } catch (error) {
+      throw new NotFoundException();
+    }
+    this.emitJoinMember(userId, channelId);
+  }
+
+  async joinChannel(userId: number, channelId: number, password?: string) {
+    if (await this.isJoinChannel(userId, channelId))
+      throw new ConflictException();
+    if (await this.isBanMember(channelId, userId))
+      throw new ForbiddenException();
+    const channel = await this.channelRepository.findOne(channelId);
+    if (!channel || channel.type == ChannelType.PRIVATE)
+      throw new NotFoundException();
+    if (channel.type == ChannelType.PROTECTED) {
+      if (
+        !password ||
+        password.length != 4 ||
+        !password.match('^[0-9]+$') ||
+        !(await bcrypt.compare(password, channel.password))
+      )
+        throw new ForbiddenException();
+    }
+    try {
+      await this.channelMemberRepository.insert({
+        userId: userId,
+        channelId: channelId,
+      });
+    } catch (error) {
+      throw new NotFoundException();
+    }
+    this.emitJoinMember(userId, channelId);
+  }
+
+  async leaveChannel(userId: number, channelId: number) {
+    const removeMember = await this.channelMemberRepository.findOneOrFail({
+      userId: userId,
+      channelId: channelId,
+    });
+    await this.channelMemberRepository.delete(removeMember);
+    const channelMemberList = await this.getChannelMemberList(channelId);
+    if (channelMemberList.length <= 0) {
+      await this.deleteChannel(channelId);
+      return;
+    } else {
+      if (removeMember.role == MemberRole.OWNER) {
+        const newOwner: ChannelMember = channelMemberList[0];
+
+        newOwner.role = MemberRole.OWNER;
+        await this.channelMemberRepository.save(newOwner);
+        this.emitUpdateChannelMember(channelId, userId);
+      }
+    }
+    this.emitLeaveMember(userId, channelId);
+  }
+
+  async inviteUser(senderId: any, channelId: number, receiverId: number) {
+    if (senderId == receiverId)
+      throw new BadRequestException('Cannot invite yourself.');
+    if (!(await this.userService.getUserById(receiverId)))
+      throw new NotFoundException('Not found user');
+    console;
+    if (await this.isJoinChannel(receiverId, channelId))
+      throw new ConflictException('Already channel member');
+    const result = await this.notificationEventService.setNotification(
+      senderId,
+      {
+        receiverId: receiverId,
+        targetId: channelId,
+        type: NotificationType.CHANNEL,
+      },
+    );
+    if (!result) throw new ConflictException('Already invited');
+  }
+
+  async grantAdmin(channelId: number, memberId: number) {
+    await this.channelMemberRepository.update(
+      {
+        channelId: channelId,
+        userId: memberId,
+      },
+      {
+        role: MemberRole.ADMIN,
+      },
+    );
+  }
+
+  async revokeAdmin(channelId: number, memberId: number) {
+    await this.channelMemberRepository.update(
+      {
+        channelId: channelId,
+        userId: memberId,
+      },
+      {
+        role: MemberRole.MEMBER,
+      },
+    );
+  }
+
+  async getPenaltyMember(channelId: number, memberId: number) {
+    const result = await this.channelPenaltyRepository.findOne({
+      where: {
+        channelId: channelId,
+        userId: memberId,
+      },
+    });
+    return result;
+  }
+
+  async isBanMember(channelId: number, memberId: number) {
+    const result = await this.getPenaltyMember(channelId, memberId);
+    if (result && result.type == ChannelPenaltyType.BAN) {
+      if (result.expired < new Date()) {
+        await this.channelPenaltyRepository.delete(result);
+        return false;
+      }
+      return true;
+    }
+    return false;
+  }
+
+  async isMuteMember(channelId: number, memberId: number) {
+    const result = await this.getPenaltyMember(channelId, memberId);
+    if (result && result.type == ChannelPenaltyType.MUTE) {
+      if (result.expired < new Date()) {
+        await this.channelPenaltyRepository.delete(result);
+        this.emitUnmuteMember(channelId, memberId);
+        return false;
+      }
+      return true;
+    }
+    return false;
+  }
+
+  async emitMuteMember(channelId: number, memberId: number) {
+    try {
+      const penalty = await this.channelPenaltyRepository.findOneOrFail({
+        channelId: channelId,
+        userId: memberId,
+      });
+      this.channelEventService.muteMember(channelId, memberId, penalty.expired);
+    } catch (error) {}
+  }
+
+  async emitUnmuteMember(channelId: number, memberId: number) {
+    this.channelEventService.unmuteMember(channelId, memberId);
+  }
+
+  async muteMember(channelId: number, memberId: number) {
+    const exist = await this.channelPenaltyRepository.findOne({
+      where: {
+        channelId: channelId,
+        userId: memberId,
+      },
+    });
+    if (exist && exist.type == ChannelPenaltyType.MUTE) {
+      exist.expired = new Date();
+      await this.channelPenaltyRepository.save(exist);
+    } else {
+      await this.channelPenaltyRepository.insert(
+        this.channelPenaltyRepository.create({
+          channelId: channelId,
+          userId: memberId,
+          type: ChannelPenaltyType.MUTE,
+          expired: new Date(),
+        }),
       );
     }
+    this.emitMuteMember(channelId, memberId);
   }
 
-  async leaveChannel(roomId: number, userId: number) {
-    await this.channelMemberRepository.delete({
-      userID: userId,
-      channelID: roomId,
-    });
-    const memCnt = await this.channelMemberRepository.count({
+  async banMember(channelId: number, memberId: number) {
+    const exist = await this.channelPenaltyRepository.findOne({
       where: {
-        channelID: roomId,
+        channelId: channelId,
+        userId: memberId,
       },
     });
-    if (memCnt === 0) await this.channelRepository.delete({ id: roomId });
-  }
-
-  async updateChannel(roomId: number, updateData: UpdateChannelDto) {
-    const updateChannel = await this.channelRepository.findOne(roomId);
-    console.log(updateChannel);
-    for (const key in updateData) {
-      updateChannel[key] = updateData[key];
+    if (exist) {
+      exist.expired = new Date();
+      exist.type = ChannelPenaltyType.BAN;
+      await this.channelPenaltyRepository.save(exist);
+    } else {
+      await this.channelPenaltyRepository.insert(
+        this.channelPenaltyRepository.create({
+          channelId: channelId,
+          userId: memberId,
+          type: ChannelPenaltyType.BAN,
+        }),
+      );
     }
-    await this.channelRepository.save(updateChannel);
+    this.leaveChannel(memberId, channelId);
   }
 
-  async getChannelMember(roomId: number) {
-    const member = await this.channelMemberRepository.find({
-      select: ['user'],
+  async getChannelMessageList(channelId: number) {
+    const result = await this.channelMessageRepository.find({
+      relations: ['sender', 'sender.user'],
       where: {
-        channelID: roomId,
-      },
-      join: {
-        alias: 'channel_member',
-        leftJoinAndSelect: {
-          user: 'channel_member.user',
-        },
+        channelId: channelId,
       },
     });
-    const obj = member.map(({ userID, ...keepAttrs }) => keepAttrs);
-    const result = [];
-    obj.map((item) => {
-      result.push({
-        id: item['user'].id,
-        avatar: item['user'].avatar,
-        status: item['user'].status,
-        nickname: item['user'].nickname,
-      });
+    return result.map((cm: any) => {
+      if (cm.sender) cm.sender = cm.sender.user;
+      return cm;
     });
+  }
+
+  async createMessage(channelId: number, memberId: number, message: string) {
+    if (!(await this.isJoinChannel(memberId, channelId))) return;
+    if (await this.isMuteMember(channelId, memberId)) return;
+    const insertResult = await this.channelMessageRepository.insert({
+      userId: memberId,
+      channelId: channelId,
+      message: message,
+    });
+    const result: any = await this.channelMessageRepository.findOne({
+      relations: ['sender', 'sender.user'],
+      where: {
+        id: insertResult.identifiers[0].id,
+      },
+    });
+    result.sender = result.sender.user;
     return result;
   }
 }
