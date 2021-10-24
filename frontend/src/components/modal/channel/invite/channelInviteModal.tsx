@@ -5,14 +5,13 @@ import "./channelInviteModal.scss";
 enum Result {
   NONE = 0,
   SUCCESS,
-  NOT_FOUND_USER,
-  ALREADY_FRIEND,
+  ERROR,
 }
 
 type ChannelInviteModalProps = {
   open: boolean;
   close: any;
-  roomId: number;
+  channelId: number;
 };
 
 const ChannelInviteModal = (prop: ChannelInviteModalProps) => {
@@ -41,26 +40,34 @@ const ChannelInviteModal = (prop: ChannelInviteModalProps) => {
   };
 
   const handleSubmitEvent = async () => {
-    //axios.get(user/nickname), -> then axios.get(channelmember, check) -> then.
-    //io.emit -> nickname & roomId send
-    //io.on -> get result code
-    const user = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/user/me`);
-    console.log(`user.data.id : `, user.data);
-    axios.post(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/invite/${prop.roomId}`,
-      {
-        userId: user.data.id,
-        nickname: nickname,
-      }
-    )
-    .then((response) => {
-      console.log(`response.data : `, response.data);
-      resultCode.current = response.data;
-      if (response.data == Result.ALREADY_FRIEND)
-        setResultText(nickname + " 님은 이미 채팅방에 참여중입니다.");
-      else if (response.data == Result.SUCCESS)
-        setResultText("초대 메시지를 보냈습니다!");
-      else if (response.data == Result.NOT_FOUND_USER)
+    var targetId = 0;
+    try {
+      const user = await axios.get(`${process.env.REACT_APP_SERVER_ADDRESS}/user/search/${nickname}`)
+      targetId = user.data.id;
+    } catch (error) {}
+    
+    console.log(`targetid : `, targetId);
+
+    axios.post(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/${prop.channelId}/invite/${targetId}`)
+    .then(() => {
+      resultCode.current = Result.SUCCESS;
+      setResultText("초대 메시지를 보냈습니다!");
+    })
+    .catch((err) => {
+      console.log(`err.response.data : `, err.response.data)
+      resultCode.current = Result.ERROR;
+      if (err.response.data.statusCode === 404)
         setResultText("존재하지 않는 플레이어입니다. 다시 시도해주세요.");
+      if (err.response.data.statusCode === 400)
+        setResultText("자기 자신은 초대할 수 없습니다.");
+      if (err.response.data.statusCode === 409) {
+        if (err.response.data.message == "Already channel member") {
+          setResultText(nickname + " 님은 이미 채팅방에 참여중입니다.");
+        }
+        else {
+          setResultText("이미 초대장을 보냈습니다!");
+        }
+      }
     })
   };
 

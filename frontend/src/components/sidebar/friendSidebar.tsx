@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ioCommunity } from "../../socket/socket";
+import { User } from "../../views/profile/profileType";
 import DirectMessage from "../directMessage/directMessage";
 import FriendDropdownList from "../dropdown/dropdownList/friend";
 import AddFriendModal from "../modal/friend/add/addFriendModal";
@@ -9,11 +10,12 @@ import AddUserIcon from "./icon/addUser";
 import "./sidebar.scss";
 import SidebarItem from "./sidebarItem";
 import {
-  DM, DropdownMenuInfo, SidebarProperty, SidebarProps, UserItemProps,
+  ContextMenuInfo,
+  DM,  DMUser,  SidebarProperty, SidebarProps, 
 } from "./sidebarType";
 
 const FriendSidebar = (prop: SidebarProps) => {
-  const [userList, setUserList] = useState<UserItemProps[]>([]);
+  const [userList, setUserList] = useState<DMUser[]>([]);
   const [myProfile, setMyProfile] = useState<{ id: number; nickname: string }>({
     id: 0,
     nickname: "",
@@ -31,7 +33,7 @@ const FriendSidebar = (prop: SidebarProps) => {
 
     ioCommunity.on(
       "addFriendUser",
-      async (friend: Omit<UserItemProps, "alert">) => {
+      async (friend: Omit<User, "alert">) => {
         console.log(userList);
         console.log(friend);
         const existIndex = userList.findIndex((f) => f.id == friend.id);
@@ -60,7 +62,7 @@ const FriendSidebar = (prop: SidebarProps) => {
   // to contextMenu
   const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
   const [show, setShow] = useState(false);
-  const [result, setResult] = useState<DropdownMenuInfo | null>();
+  const [result, setResult] = useState<ContextMenuInfo | null>();
 
   const handleContextMenu = useCallback(
     (event) => {
@@ -85,14 +87,14 @@ const FriendSidebar = (prop: SidebarProps) => {
   //get dropdownMenuInfo according to user's relation & sidebarType
   const contextMenuHandler = (
     e: React.MouseEvent,
-    dropdownMenuInfo: DropdownMenuInfo
+    dropdownMenuInfo: ContextMenuInfo
   ) => {
     handleContextMenu(e);
     //get info
     setResult(dropdownMenuInfo);
   };
 
-  const friendToUserProps = (friend: any): UserItemProps => {
+  const friendToUserProps = (friend: any): DMUser => {
     return {
       id: friend.id,
       avatar: friend.avatar,
@@ -119,14 +121,14 @@ const FriendSidebar = (prop: SidebarProps) => {
 
   // direct message
   const [DMopen, setDMOpen] = useState<boolean>(false);
-  const [DMReceiver, setDMReceiver] = useState<UserItemProps>({
+  const [DMReceiver, setDMReceiver] = useState<DMUser>({
     id: 0,
     avatar: "",
     status: 1,
     nickname: "",
     alert: false,
   });
-  const DMReceiverRef = useRef<UserItemProps | null>(null);
+  const DMReceiverRef = useRef<DMUser | null>(null);
   const timerRef = useRef<NodeJS.Timeout>();
 
   const getNewDM = () => {
@@ -196,13 +198,11 @@ const FriendSidebar = (prop: SidebarProps) => {
           <li onClick={openDM} value={user.id}>
             {user.alert && <span className="alert-overlay"></span>}
             <SidebarItem
-              itemType={SidebarProperty.FRIEND_LIST}
-              key={user.id}
-              itemInfo={user}
               contextMenuHandler={contextMenuHandler}
-              roomId={0}
+              itemType={SidebarProperty.FRIEND_LIST}
               userId={myProfile.id}
               targetId={user.id}
+              targetUser={user}
             />
           </li>
         )): null}

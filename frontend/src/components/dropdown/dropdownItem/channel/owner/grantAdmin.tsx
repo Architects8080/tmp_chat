@@ -1,24 +1,25 @@
+import axios from "axios";
 import React from "react";
 import { io } from "../../../../../socket/socket";
 import DefaultDropdownItem from "../../../itemTemplate/default/item";
 
 type ItemProps = {
   targetId: number;
-  roomId: number;
+  channelId: number;
 };
 
-const AddAdminItem = (prop: ItemProps) => {
-  const handleAddAdmin = () => {
-    io.emit("channel/admin/add", prop.roomId, prop.targetId); //TODO
+const GrantAdminItem = (prop: ItemProps) => {
+  const handleGrantAdmin = async () => {
+    await axios.put(`${process.env.REACT_APP_SERVER_ADDRESS}/channel/${prop.channelId}/admin/${prop.targetId}`);
   };
 
   return (
     <DefaultDropdownItem
       title="어드민 권한 부여하기"
       color="black"
-      callback={handleAddAdmin}
+      callback={handleGrantAdmin}
     />
   );
 }
 
-export default AddAdminItem;
+export default GrantAdminItem;

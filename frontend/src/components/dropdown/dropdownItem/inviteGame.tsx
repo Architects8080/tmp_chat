@@ -31,7 +31,7 @@ const InviteGameItem = (prop: ItemProps) => {
       <GameSettingModal
         open={test}
         close={handleModalClose}
-        targetId={prop.targetId} //TODO
+        targetId={prop.targetId}
       />
       <DefaultDropdownItem
         title="게임 초대하기"

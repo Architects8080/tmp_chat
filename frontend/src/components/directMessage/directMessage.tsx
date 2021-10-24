@@ -1,13 +1,13 @@
 import React, { useEffect, useState, useRef, MutableRefObject } from 'react';
 import './directMessage.scss';
 import axios from 'axios';
-import { DM, UserItemProps,  } from '../sidebar/sidebarType';
+import { DM, DMUser } from '../sidebar/sidebarType';
 import { ioCommunity } from '../../socket/socket';
 
 type DMProps = {
 	myProfile: {id: number, nickname: string},
-	DMReceiver: UserItemProps,
-	DMReceiverRef: MutableRefObject<UserItemProps | null>,
+	DMReceiver: DMUser,
+	DMReceiverRef: MutableRefObject<DMUser | null>,
 	closeDM: () => void,
 	alertNewDM: (senderID: number) => void
 };
